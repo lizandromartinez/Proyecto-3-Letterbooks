@@ -7,13 +7,14 @@ Este documento guía nuestra forma de trabajar para que el código sea legible y
 * **develop**: Rama de integración. Aquí se junta el trabajo de todos antes de hacer merge a main.
 * **feature/[nombre]**: Para cada funcionalidad nueva (ej: `feature/landing-page`).
 * **docs/[nombre]**: Para agregar documentación nueva (ej: `docs/convenciones`).
+* **db/[nombre]**: Para agregar cambios a la base de datos (ej: `db/agregar-registros`).
 * **fix/[error]**: Para corregir errores específicos (ej: `feature/error-registro`).
 
 ### Mensajes de Commit
 Usaremos un formato descriptivo sencillo:
 - `feat:` Para cosas nuevas.
 - `fix:` Para corregir errores.
-- `docs:` Para cambios en el README o este archivo.
+- `docs:` Para cambios en el README, este archivo o documentación de código.
 - `style:` Para diseño (CSS) o formato de código.
 - `refactor:` Mejora de código que no añade funciones ni arregla bugs.
 
