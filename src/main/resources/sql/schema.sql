@@ -45,6 +45,7 @@ CREATE TABLE Libro (
     paginas INT,
     ano INT,
     isbn VARCHAR(20),
+    reportes INT DEFAULT 0,
     promedio_calificacion DECIMAL(3,2) DEFAULT 0.00,
     FOREIGN KEY (id_genero) REFERENCES Genero(id_genero),
     FOREIGN KEY (id_autor) REFERENCES Autor(id_autor),
