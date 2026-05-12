@@ -1,7 +1,11 @@
 package mx.unam.ciencias.myp.letterbooks;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class Aplicacion {
     public static void main(String[] args) {
-        System.out.println("Letterbooks");
+	SpringApplication.run(Aplicacion.class, args);
     }
 }
