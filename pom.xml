@@ -11,7 +11,7 @@
 
   <name>Proyecto 3</name>
   <description>
-    Proyecto 3 de Modelado y Programación
+    Proyecto 3 de Modelado y Programación - LetterBooks
   </description>
   <organization>
     <name>Equipo 4</name>
@@ -23,8 +23,15 @@
   </properties>
 
   <build>
-    <plugins>
+    <sourceDirectory>backend/src/main/java</sourceDirectory>
+    
+    <resources>
+      <resource>
+        <directory>backend/src/main/resources</directory>
+      </resource>
+    </resources>
 
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -61,16 +68,16 @@
       </plugin>
 
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-jar-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <version>3.2.0</version>
-	<configuration>
-	  <archive>
-	    <manifest>
-	      <mainClass>mx.unam.ciencias.myp.letterbooks.Aplicacion</mainClass>
-	    </manifest>
-	  </archive>
-	</configuration>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>mx.unam.ciencias.myp.letterbooks.Aplicacion</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -84,7 +91,6 @@
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>3.1.1</version>
       </plugin>
-
     </plugins>
 
     <finalName>proyecto3</finalName>
@@ -92,7 +98,6 @@
 
   <reporting>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -119,7 +124,6 @@
         <artifactId>maven-jxr-plugin</artifactId>
         <version>3.0.0</version>
       </plugin>
-
     </plugins>
   </reporting>
 
@@ -130,5 +134,4 @@
       <version>4.13.2</version>
     </dependency>
   </dependencies>
-
 </project>
