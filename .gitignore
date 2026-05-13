@@ -1,1 +1,22 @@
+#BACKEND (Java/Maven) 
 target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+.factorypath
+.project
+.settings/
+.classpath
+
+#FRONTEND (React/Vite)
+frontend/node_modules/
+frontend/dist/
+
+# Logs de errores de Node
+npm-debug.log*
+
+# Variables de entorno
+.env
+.env.local
