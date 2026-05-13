@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@300;400;700&display=swap');
+
+/* ── Variables ── */
+:root {
+  --bg:          #f0ece4;
+  --card-bg:     #ffffff;
+  --navy:        #1e2d3d;
+  --gold:        #b8860b;
+  --text:        #2c2c2c;
+  --muted:       #888880;
+  --border:      #ddd9d0;
+  --input-bg:    #fafaf8;
+  --radius:      10px;
+  --shadow:      0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* ── Página ── */
+.registro-page {
+  min-height: 100vh;
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lato', sans-serif;
+  padding: 2rem 1rem;
+}
+
+/* ── Enlace de regreso ── */
+.registro-back {
+  align-self: flex-start;
+  margin-left: calc(50% - 200px);
+  margin-bottom: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.registro-back:hover { opacity: 1; }
+
+/* ── Marca ── */
+.registro-brand {
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+.registro-brand h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+  color: var(--navy);
+  margin: 0;
+}
+.registro-brand h1 span {
+  color: var(--gold);
+}
+.registro-brand p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.3rem 0 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── Tarjeta ── */
+.registro-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2rem 2.4rem 2.4rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ── Seleccionador de pestañas ── */
+.registro-tabs {
+  display: flex;
+  gap: 0.6rem;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0;
+  margin-bottom: 1.8rem;
+}
+.registro-tab {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  background: transparent;
+  color: var(--muted);
+}
+.registro-tab.active {
+  background: var(--navy);
+  color: #fff;
+}
+.registro-tab:not(.active):hover {
+  background: #d8d3ca;
+  color: var(--text);
+}
+.registro-tab:not(.active) {
+  background: #e8e3da;
+  color: var(--muted);
+}
+
+/* ── Formulario ── */
+.registro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.registro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.registro-field label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.registro-field input {
+  background: var(--input-bg);
+  border: 1.5px solid #c8c4bb;
+  border-radius: 999px;
+  padding: 0.75rem 1.2rem;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.registro-field input::placeholder {
+  color: #bbb8b0;
+}
+.registro-field input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(30,45,61,0.08);
+}
+
+/* ── Botón de envío ── */
+.registro-btn {
+  margin-top: 0.4rem;
+  padding: 0.85rem;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.registro-btn:hover:not(:disabled) {
+  background: #16222e;
+}
+.registro-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.registro-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Texto de demostración ── */
+.registro-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.8rem;
+}
+
+/* ── Cosas inferiores ── */
+.registro-features {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+.registro-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.registro-feature span:first-child {
+  font-size: 1rem;
+}
+
+/* ── Estilos para los errores en los campos ── */
+.error {
+  color: #c0392b;
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.error-general {
+  color: #c0392b;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}

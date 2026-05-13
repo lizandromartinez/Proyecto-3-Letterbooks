@@ -1,0 +1,52 @@
+/* frontend/src/estilos/Globales.css */
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Lato:wght@300;400;700&display=swap');
+
+@theme {
+  --color-crema-fondo: #FDF8F3;
+  --color-dark-fondo: #121212;
+  --color-dark-borde: #1E1E1E;
+  --color-navy-letter: #1B2A47;
+  --color-navy-button: #1E294B;
+  --color-gold-books-2: #C9A675;
+
+  --font-cormorant: "Cormorant Garamond", serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+/* ── Variables Globales ── */
+:root {
+  /* Paleta base del wireframe */
+  --bg:          #f0ece4;
+  --card-bg:     #ffffff;
+  --navy:        #1e2d3d;
+  --gold:        #b8860b;
+  --text:        #2c2c2c;
+  --muted:       #888880;
+  --border:      #ddd9d0;
+  --input-bg:    #fafaf8;
+  
+  /* Medidas y sombras globales */
+  --radius:      10px;
+  --shadow:      0 4px 24px rgba(0,0,0,0.08);
+
+  /* Variables originales */
+  --color-crema: #f5f5f1;
+  --color-azul:  #1a2b3c;
+}
+
+/* ── Estilos Base ── */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  font-family: 'Lato', sans-serif;
+  color: var(--text);
+}
+
+.contenedor-principal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
