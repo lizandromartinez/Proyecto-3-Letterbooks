@@ -1,6 +1,6 @@
 package mx.unam.ciencias.myp.letterbooks.modelo;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Clase que representa a un usuario en el sistema.
@@ -8,7 +8,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "Usuario")
-
 public class Usuario {
 
     /* ID único del usuario. */
@@ -18,20 +17,38 @@ public class Usuario {
     private Integer idUsuario;
 
     /* Correo electrónico único del usuario. */
-    @Column(unique = true, nullable = false)
+    @Column(
+        name = "correo",
+        unique = true,
+        nullable = false,
+        length = 150
+    )
     private String correo;
 
-    /* Contraseña hasheada del usuario. */
-    @Column(nullable = false)
-    private String contrasena;
-
     /* Nombre de usuario utilizado para iniciar sesión. */
-    @Column(name = "nombre_usuario", unique = true, nullable = false)
+    @Column(
+        name = "nombre_usuario",
+        unique = true,
+        nullable = false,
+        length = 50
+    )
     private String nombreUsuario;
+
+    /* Contraseña hasheada del usuario. */
+    @Column(
+        name = "contrasena",
+        nullable = false,
+        length = 255
+    )
+    private String contrasena;
 
     /* Rol asingado al usuario dentro del sistema. */
     @Enumerated(EnumType.STRING)
-    private Rol rol;
+    @Column(name = "rol",
+	nullable = false,
+	columnDefinition = "ENUM('admin','usuario') DEFAULT 'usuario'"
+    )
+    private Rol rol = Rol.usuario;
 
     /**
      * Enumeración para los tipos de roles.
@@ -56,7 +73,7 @@ public class Usuario {
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
     }
-    
+
     /**
      * Obtiene el correo electrónico del usuario.
      * @return correo cadena con el email.
@@ -71,6 +88,22 @@ public class Usuario {
      */
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    /**
+     * Obtiene el nombre de usuario.
+     * @return nombreUsuario el nombre del usuario.
+     */
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+    
+    /**
+     * Define el nombre de usuario.
+     * @param nombreUsuario el nombre de usuario.
+     */
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     /**
@@ -89,22 +122,6 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
-    /**
-     * Obtiene el nombre de usuario.
-     * @return nombreUsuario el nombre del usuario.
-     */
-    public String getNombreUsuario() {
-        return nombreUsuario;
-    }
-    
-    /**
-     * Define el nombre de usuario.
-     * @param nombreUsuario el nombre de usuario.
-     */
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
-    }
-    
     /**
      * Obtiene el rol del usuario (admin o usuario).
      * @return rol valor de la enumeración Rol.

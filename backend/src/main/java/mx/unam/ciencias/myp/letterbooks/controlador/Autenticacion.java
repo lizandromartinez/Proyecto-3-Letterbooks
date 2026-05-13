@@ -2,32 +2,36 @@ package mx.unam.ciencias.myp.letterbooks.controlador;
 
 import mx.unam.ciencias.myp.letterbooks.dto.InicioDeSesion;
 import mx.unam.ciencias.myp.letterbooks.servicio.AutenticacionServicio;
+import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
+import mx.unam.ciencias.myp.letterbooks.servicio.UsuarioServicio;
+import mx.unam.ciencias.myp.letterbooks.dto.Registro;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Clase que representa un controlador REST para exponer los endpoints de autenticación.
- * Permite el acceso desde orígenes cruzados para la integración con el frontend.
+ * Controlador REST para exponer los endpoints de autenticación y registro.
  */
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*") // Permite peticiones desde cualquier origen (ajustar en producción)
+@CrossOrigin(origins = "*") 
 public class Autenticacion {
 
-    @Autowired
-    private AutenticacionServicio autenticacionServicio;
+    private final AutenticacionServicio autenticacionServicio;
+    private final UsuarioServicio usuarioServicio;
+
+    public Autenticacion(AutenticacionServicio autenticacionServicio, UsuarioServicio usuarioServicio) {
+        this.autenticacionServicio = autenticacionServicio;
+        this.usuarioServicio = usuarioServicio;
+    }
 
     /**
      * Endpoint público para iniciar sesión.
-     * @param datosInicioDeSesion Objeto JSON validado que contiene correo y contraseña.
-     * @return Respuesta HTTP con el token JWT si es exitoso, o código 401 si falla.
      */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> iniciarSesion(@Valid @RequestBody InicioDeSesion datosInicioDeSesion) {
@@ -41,4 +45,19 @@ public class Autenticacion {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(respuesta);
         }
     }
+
+    /**
+     * Endpoint para registrar un nuevo usuario.
+     */
+    @PostMapping("/registro")
+    public ResponseEntity<?> registro(@Valid @RequestBody Registro registro) {	
+	try {	    
+            Usuario usuario = usuarioServicio.registrar(registro);
+            return ResponseEntity.ok(usuario);
+	} catch (IllegalArgumentException e) {
+            return ResponseEntity
+		.badRequest()
+		.body(e.getMessage());
+	}	
+    }    
 }
