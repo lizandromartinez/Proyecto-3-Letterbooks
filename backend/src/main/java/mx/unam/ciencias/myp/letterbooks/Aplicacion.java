@@ -5,13 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Clase principal.
- * Configura el contexto de Spring Boot, escaneo de componentes y persistencia.
  */
 @SpringBootApplication
 public class Aplicacion {
 
     /**
-     * Método principal que arranca la ejecución del framework.
+     * Punto de entrada principal de la aplicación.
      * @param args Argumentos de la línea de comandos.
      */
     public static void main(String[] args) {
