@@ -42,6 +42,7 @@ const InicioDeSesion = () => {
         try {
             const respuesta = await peticionLogin(credenciales);
             iniciarSesion(respuesta.token);
+            navigate('/dashboard');
         } catch (err) {
             setError(err.message);
         }
@@ -49,7 +50,7 @@ const InicioDeSesion = () => {
 
     return (
         <div className="login-page">
-            <button className="login-back" onClick={() => window.location.reload()}>
+            <button className="login-back" onClick={() => navigate('/')}>
                 &larr; Volver al inicio
             </button>
 

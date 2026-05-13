@@ -132,7 +132,7 @@ function Registro() {
 
             setMensajeExito('¡Registro exitoso! Redirigiendo al inicio de sesión...');
             setTimeout(() => {
-                navigate('/');
+                navigate('/login');
             }, 2000);
 
 	} catch (error) {
@@ -173,7 +173,7 @@ function Registro() {
                     <button
                         type="button"
                         className={`registro-tab ${pestana === 'inicioSesion' ? 'active' : ''}`}
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/login')}
                     >
                          Iniciar sesión
                     </button>

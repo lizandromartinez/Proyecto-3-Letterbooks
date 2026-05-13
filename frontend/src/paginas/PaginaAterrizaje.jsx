@@ -29,7 +29,6 @@ const PaginaAterrizaje = () => {
   if (token) {
     return <Navigate to="/dashboard" replace />;
   }
-
   return (
     /* CONTENEDOR PRINCIPAL 
        'bg-crema-fondo' mantiene la estética de papel/diario.
