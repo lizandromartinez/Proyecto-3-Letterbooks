@@ -9,112 +9,122 @@ import '../estilos/InicioDeSesion.css';
  * Componente que renderiza el formulario de inicio de sesión.
  */
 const InicioDeSesion = () => {
-    const { iniciarSesion } = useContext(ContextoSesion);
-    const navigate = useNavigate();
-    const [credenciales, setCredenciales] = useState({ nombreUsuario: '', contrasena: '' });
-    const [error, setError] = useState('');
+  const { iniciarSesion } = useContext(ContextoSesion);
+  const navigate = useNavigate();
 
-    /**
-     * Actualiza el estado cuando el usuario escribe en los inputs.
-     * @param {Object} e Evento del input.
-     */
-    const manejarCambio = (e) => {
-        setCredenciales({ ...credenciales, [e.target.name]: e.target.value });
-    };
+  const [credenciales, setCredenciales] = useState({
+    nombreUsuario: '',
+    contrasena: ''
+  });
+  const [error, setError] = useState('');
 
-    /**
-     * Gestiona el envío del formulario realizando validaciones previas.
-     * @param {Object} e Evento de envío del formulario.
-     */
-    const manejarEnvio = async (e) => {
-        e.preventDefault();
-        setError('');
+  /**
+   * Actualiza el estado cuando el usuario escribe en los inputs.
+   * @param {Object} e Evento del input.
+   */
+  const manejarCambio = (e) => {
+    setCredenciales({
+      ...credenciales,
+      [e.target.name]: e.target.value
+    });
+  };
 
-        if (!validarNombreUsuario(credenciales.nombreUsuario)) {
-            setError("El nombre de usuario no puede estar vacío.");
-            return;
-        }
-        if (!validarContrasena(credenciales.contrasena)) {
-            setError("La contraseña debe tener al menos 6 caracteres.");
-            return;
-        }
+  /**
+   * Gestiona el envío del formulario realizando validaciones previas.
+   * @param {Object} e Evento de envío del formulario.
+   */
+  const manejarEnvio = async (e) => {
+    e.preventDefault();
+    setError('');
 
-        try {
-            const respuesta = await peticionLogin(credenciales);
-            iniciarSesion(respuesta.token);
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
+    if (!validarNombreUsuario(credenciales.nombreUsuario)) {
+      setError("El nombre de usuario no puede estar vacío.");
+      return;
+    }
+    if (!validarContrasena(credenciales.contrasena)) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
 
-    return (
-        <div className="login-page">
-            <button className="login-back" onClick={() => navigate('/')}>
-                &larr; Volver al inicio
-            </button>
+    try {
+      const respuesta = await peticionLogin(credenciales);
+      iniciarSesion(respuesta.token);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-            <div className="login-brand">
-                <h1>LETTER <span>BOOKS</span></h1>
-                <p>Tu comunidad literaria</p>
-            </div>
+  return (
+    <div className="login-page">
+      <button className="login-back" onClick={() => navigate('/')}>
+        &larr; Volver al inicio
+      </button>
 
-            <div className="login-card">
-                <div className="login-tabs">
-                    <button className="login-tab active">Iniciar sesión</button>
-                    {/* El botón de registro navega a la ruta /registro */}
-                    <button className="login-tab" onClick={() => navigate("/registro")}>Registrarse</button>
-                </div>
+      <div className="login-brand">
+        <h1>LETTER <span>BOOKS</span></h1>
+        <p>Tu comunidad literaria</p>
+      </div>
 
-                {error && <p className="login-error">{error}</p>}
-
-                <form className="login-form" onSubmit={manejarEnvio}>
-                    <div className="login-field">
-                        <label>Usuario</label>
-                        <input
-                            type="text"
-                            name="nombreUsuario"
-                            placeholder="lector001"
-                            value={credenciales.nombreUsuario}
-                            onChange={manejarCambio}
-                        />
-                    </div>
-
-                    <div className="login-field">
-                        <label>Contraseña</label>
-                        <input
-                            type="password"
-                            name="contrasena"
-                            placeholder="••••••••"
-                            value={credenciales.contrasena}
-                            onChange={manejarCambio}
-                        />
-                    </div>
-
-                    <button type="submit" className="login-btn">
-                        Iniciar sesión
-                    </button>
-                </form>
-                
-                <p className="login-hint">Demo: usa cualquier nombre de usuario</p>
-            </div>
-
-            <div className="login-features">
-                <div className="login-feature">
-                    <span>&#128214;</span>
-                    <span>Descubre<br/>libros</span>
-                </div>
-                <div className="login-feature">
-                    <span>&#128218;</span>
-                    <span>Comparte<br/>reseñas</span>
-                </div>
-                <div className="login-feature">
-                    <span>&#128101;</span>
-                    <span>Conecta con<br/>lectores</span>
-                </div>
-            </div>
+      <div className="login-card">
+        <div className="login-tabs">
+          <button className="login-tab active">
+            Iniciar sesión
+          </button>
+          <button className="login-tab" onClick={() => navigate("/registro")}>
+            Registrarse
+          </button>
         </div>
-    );
+
+        {error && <p className="login-error">{error}</p>}
+
+        <form className="login-form" onSubmit={manejarEnvio}>
+          <div className="login-field">
+            <label>Usuario</label>
+            <input
+              type="text"
+              name="nombreUsuario"
+              placeholder="lector001"
+              value={credenciales.nombreUsuario}
+              onChange={manejarCambio}
+            />
+          </div>
+
+          <div className="login-field">
+            <label>Contraseña</label>
+            <input
+              type="password"
+              name="contrasena"
+              placeholder="••••••••"
+              value={credenciales.contrasena}
+              onChange={manejarCambio}
+            />
+          </div>
+
+          <button type="submit" className="login-btn">
+            Iniciar sesión
+          </button>
+        </form>
+
+        <p className="login-hint">Demo: usa cualquier nombre de usuario</p>
+      </div>
+
+      <div className="login-features">
+        <div className="login-feature">
+          <span>&#128214;</span>
+          <span>Descubre<br />libros</span>
+        </div>
+        <div className="login-feature">
+          <span>&#128218;</span>
+          <span>Comparte<br />reseñas</span>
+        </div>
+        <div className="login-feature">
+          <span>&#128101;</span>
+          <span>Conecta con<br />lectores</span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default InicioDeSesion;

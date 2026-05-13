@@ -22,13 +22,14 @@ import ResenasRecientes from '../componentes/comentarios/ResenasRecientes';
  * 4. Reseñas Recientes (Prueba social y comunidad)
  * 5. Footer (Cierre y enlaces legales/sociales)
  */
-const PaginaAterrizaje = () => {
-  const { token } = useContext(ContextoSesion);
+const PaginaAterrizajeAutenticado = () => {
+    const { token } = useContext(ContextoSesion);
 
-  // Si el usuario ya está autenticado, lo enviamos directo a su dashboard
-  if (token) {
-     return <Navigate to="/dashboard" replace />;
-  }
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+  // Si el usuario ya está autenticado, lo enviamos directo a su dashboard  
   return (
     /* CONTENEDOR PRINCIPAL 
        'bg-crema-fondo' mantiene la estética de papel/diario.
@@ -37,24 +38,24 @@ const PaginaAterrizaje = () => {
     <div className="bg-crema-fondo min-h-screen dark:bg-dark-fondo transition-colors duration-500">
       
       {/* NAVEGACIÓN: Definida explícitamente como no autenticada para invitados */}
-      <Navbar estaAutenticado={false} />
+      <Navbar estaAutenticado={true} />
       
       <main>
           {/* SECCIÓN HERO: Llamada a la acción principal (CTA) */}
           <Hero />   
 
           {/* SECCIÓN CATÁLOGO: Muestra tendencias globales (modo invitado) */}
-          <LibrosPopulares estaAutenticado={false} />  
+          <LibrosPopulares estaAutenticado={true} />  
 
           {/* SECCIÓN SOCIAL: Feed de actividad de la comunidad */}
           <ResenasRecientes />     
       </main>
 
       {/* PIE DE PÁGINA: Muestra opciones de registro/invitado */}
-      <Footer estaAutenticado={false} />
+      <Footer estaAutenticado={true} />
       
     </div>
   );
 };
 
-export default PaginaAterrizaje;
+export default PaginaAterrizajeAutenticado;

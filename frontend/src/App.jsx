@@ -3,6 +3,7 @@ import Registro from "./paginas/Registro";
 import ManejadorVistas from "./ManejadorVistas";
 import PaginaAterrizaje from "./paginas/PaginaAterrizaje";
 import InicioDeSesion from "./paginas/InicioDeSesion";
+import PaginaAterrizajeAutenticado from "./paginas/PaginaAterrizajeAutenticado";
 
 /**
  * Componente principal de la aplicación.
@@ -19,9 +20,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<PaginaAterrizaje />} />
+        <Route path="/paginaAterrizaje" element={<PaginaAterrizaje />} />
         <Route path="/login" element={<InicioDeSesion />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/dashboard" element={<ManejadorVistas />} />
+        <Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
       </Routes>
     </BrowserRouter>
   );

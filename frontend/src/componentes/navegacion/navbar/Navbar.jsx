@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Logo from '../../comunes/Logo';
 import NavLink from './NavLink';
 import AccionRecomendada from '../../comunes/AccionRecomendada';
+import { useNavigate } from 'react-router-dom'; 
+import { ContextoSesion } from '../../../contexto/Sesion';
 
 /**
  * Navbar - Componente de navegación principal y responsivo.
@@ -13,11 +15,22 @@ const Navbar = ({ estaAutenticado = false }) => {
     // Estado local para controlar la apertura/cierre del menú en dispositivos móviles.
     const [isOpen, setIsOpen] = useState(false);
 
+    const navigate = useNavigate();
+
     /** Alterna el estado del menú móvil */
     const alternaMenu = () => setIsOpen(!isOpen);
     
     /** Garantiza el cierre del menú al hacer clic en un enlace */
     const cerrarMenu = () => setIsOpen(false);
+
+    const { cerrarSesion } = useContext(ContextoSesion);    
+
+    /** Maneja la salida del usuario */
+    const manejarLogout = () => {
+        cerrarSesion();
+        cerrarMenu();
+        navigate('/');
+    };
 
     return (
         <nav className="sticky top-0 z-50 bg-crema-fondo dark:bg-dark-fondo border-b border-gray-200 dark:border-dark-borde shadow-sm">
@@ -64,6 +77,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <AccionRecomendada href="/dashboard" variante="primario">
                                 Mi Perfil
                             </AccionRecomendada>
+                            <button onClick={manejarLogout} className="text-red-500 font-bold py-2">Cerrar Sesión</button>
                         </>
                     )}
                 </div>
@@ -93,6 +107,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <AccionRecomendada href="/dashboard" variante="outline" esMovil onClick={cerrarMenu}>
                                 Mi Perfil
                             </AccionRecomendada>
+                            <button onClick={manejarLogout} className="text-red-500 font-bold py-2">Cerrar Sesión</button>
                         </>
                     )}
                 </div>
