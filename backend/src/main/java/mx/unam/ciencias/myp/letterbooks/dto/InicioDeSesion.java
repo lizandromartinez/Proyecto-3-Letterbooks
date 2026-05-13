@@ -1,6 +1,5 @@
 package mx.unam.ciencias.myp.letterbooks.dto;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -9,29 +8,28 @@ import javax.validation.constraints.NotBlank;
  */
 public class InicioDeSesion {
 
-    /* Correo electrónico del usuario utilizado para iniciar sesión. */
-    @NotBlank(message = "El correo no puede estar vacío.")
-    @Email(message = "Debe proporcionar un formato de correo válido.")
-    private String correo;
+    /* Nombre de usuario utilizado para iniciar sesión. */
+    @NotBlank(message = "El nombre de usuario no puede estar vacío.")
+    private String nombreUsuario;
 
     /* Contraseña del usuario utilizada para autenticación. */
     @NotBlank(message = "La contraseña no puede estar vacía.")
     private String contrasena;
 
     /**
-     * Obtiene el correo electrónico ingresado.
-     * @return correo cadena con el email.
+     * Obtiene el nombre de usuario ingresado.
+     * @return nombreUsuario cadena con el nombre de usuario.
      */
-    public String getCorreo() {
-        return correo;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
     /**
-     * Define el correo electrónico ingresado.
-     * @param correo el correo ingresado por el usuario.
+     * Define el nombre de usuario ingresado.
+     * @param nombreUsuario el nombre de usuario ingresado por el usuario.
      */
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     /**

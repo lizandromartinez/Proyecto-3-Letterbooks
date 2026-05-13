@@ -16,11 +16,10 @@ import java.util.Optional;
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Integer> {
 
     /**
-     * Busca un usuario en la base de datos a partir de su correo electrónico.
-     * Uso de @Query para mantener nombre de método en español.
-     * @param correo El correo electrónico a buscar.
+     * Busca un usuario en la base de datos a partir de su nombre de usuario.
+     * @param nombreUsuario El nombre de usuario a buscar.
      * @return Un Optional que contiene al usuario si es encontrado.
      */
-    @Query("SELECT u FROM Usuario u WHERE u.correo = :correo")
-    Optional<Usuario> encontrarPorCorreo(@Param("correo") String correo);
+    @Query("SELECT u FROM Usuario u WHERE u.nombreUsuario = :nombreUsuario")
+    Optional<Usuario> encontrarPorNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 }

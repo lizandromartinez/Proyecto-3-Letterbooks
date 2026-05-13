@@ -1,12 +1,10 @@
 /**
- * Valida si una cadena tiene el formato correcto de correo electrónico.
- * @param {string} correo El texto ingresado en el campo de correo.
+ * Valida si la cadena ingresada como nombre de usuario no está vacía o solo contiene espacios.
+ * @param {string} nombreUsuario El texto ingresado en el campo de nombre de usuario.
  * @return {boolean} true si el formato es válido, false en caso contrario.
  */
-export const validarCorreo = (correo) => {
-    // Expresión regular básica para validar estructura de email
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(correo);
+export const validarNombreUsuario = (nombreUsuario) => {
+    return nombreUsuario !== null && nombreUsuario.trim().length > 0;
 };
 
 /**

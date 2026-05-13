@@ -29,7 +29,7 @@ public class TestAutenticacionServicio {
     @Autowired
     private PasswordEncoder codificador;
 
-    /* Limpia la base de datos y crea un usuario fresco antes de cada test. */
+    /* Limpia la base de datos y crea un usuario antes de cada test. */
     @BeforeEach
     public void prepararDatos() {
         repositorio.deleteAll();
@@ -48,7 +48,7 @@ public class TestAutenticacionServicio {
     @Test
     public void deberiaAutenticarExitosamente() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setCorreo("ana@prueba.com");
+        datos.setNombreUsuario("ana_test");
         datos.setContrasena("secreto123");
 
         String token = servicio.autenticarUsuario(datos);
@@ -62,7 +62,7 @@ public class TestAutenticacionServicio {
     @Test
     public void noDeberiaAutenticarConContrasenaErronea() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setCorreo("ana@prueba.com");
+        datos.setNombreUsuario("ana_test");
         datos.setContrasena("clave_equivocada");
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -71,12 +71,12 @@ public class TestAutenticacionServicio {
     }
 
     /**
-     * Prueba que el sistema rechace correos que no están en la base de datos.
+     * Prueba que el sistema rechace nombres de usuario que no están en la base de datos.
      */
     @Test
     public void noDeberiaAutenticarUsuarioInexistente() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setCorreo("fantasma@correo.com");
+        datos.setNombreUsuario("usuario_inexistente");
         datos.setContrasena("password123");
 
         assertThrows(IllegalArgumentException.class, () -> {

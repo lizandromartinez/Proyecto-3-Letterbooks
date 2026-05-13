@@ -1,15 +1,15 @@
 import React, { useState, useContext } from 'react';
 import { ContextoSesion } from '../contexto/Sesion';
 import { peticionLogin } from '../api/Usuarios';
-import { validarCorreo, validarContrasena } from '../utilidades/Validadores';
+import { validarNombreUsuario, validarContrasena } from '../utilidades/Validadores';
 
 /**
  * Componente que renderiza el formulario de inicio de sesión.
  * Maneja el estado local de los campos y gestiona los errores de validación.
  */
-const Login = () => {
+const InicioDeSesion = () => {
     const { iniciarSesion } = useContext(ContextoSesion);
-    const [credenciales, setCredenciales] = useState({ correo: '', contrasena: '' });
+    const [credenciales, setCredenciales] = useState({ nombreUsuario: '', contrasena: '' });
     const [error, setError] = useState('');
 
     /* Actualiza el estado cuando el usuario escribe en los inputs. */
@@ -23,8 +23,8 @@ const Login = () => {
         setError('');
 
         // Validaciones locales antes de ir al servidor
-        if (!validarCorreo(credenciales.correo)) {
-            setError("El formato del correo no es válido.");
+        if (!validarNombreUsuario(credenciales.nombreUsuario)) {
+            setError("El nombre de usuario no puede estar vacío.");
             return;
         }
         if (!validarContrasena(credenciales.contrasena)) {
@@ -47,9 +47,9 @@ const Login = () => {
                 <h2>Iniciar Sesión</h2>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <input
-                    type="email"
-                    name="correo"
-                    placeholder="Correo electrónico"
+                    type="text"
+                    name="nombreUsuario"
+                    placeholder="Nombre de usuario"
                     onChange={manejarCambio}
                     required
                 />
@@ -66,4 +66,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default InicioDeSesion;

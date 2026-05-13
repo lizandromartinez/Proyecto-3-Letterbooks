@@ -40,7 +40,7 @@ public class TokenJWT {
 
         return Jwts.builder()
             .setClaims(claims)
-            .setSubject(usuario.getCorreo())
+            .setSubject(usuario.getNombreUsuario()) 
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + tiempoExpiracion))
             .signWith(clave, SignatureAlgorithm.HS256)
@@ -48,12 +48,12 @@ public class TokenJWT {
     }
 
     /**
-     * Extrae el correo electrónico contenido en el token.
-     * @param token La cadena del token JWT.
-     * @return El correo del usuario.
+     * Extrae el nombre de usuario contenido en el token.
+     * @param token El token JWT a procesar.
+     * @return El nombre de usuario recuperado.
      */
-    public String obtenerCorreo(String token) {
-        return obtenerReclamacion(token, Claims::getSubject);
+    public String obtenerNombreUsuario(String token) {
+        return obtenerReclamacion(token, Claims::getSubject); 
     }
 
     /**
@@ -63,8 +63,8 @@ public class TokenJWT {
      * @return true si es válido, false en caso contrario.
      */
     public boolean esTokenValido(String token, Usuario usuario) {
-        final String correo = obtenerCorreo(token);
-        return (correo.equals(usuario.getCorreo()) && !estaExpirado(token));
+        final String nombreUsuario = obtenerNombreUsuario(token); 
+        return (nombreUsuario.equals(usuario.getNombreUsuario()) && !estaExpirado(token)); 
     }
 
     /* Determina si el token ya superó su fecha de expiración. */

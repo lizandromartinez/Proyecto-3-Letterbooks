@@ -29,24 +29,22 @@ public class TestTokenJWT {
     @BeforeEach
     public void configurar() {
         usuarioPrueba = new Usuario();
-        usuarioPrueba.setCorreo("ana.lee@ciencias.unam.mx");
-        usuarioPrueba.setNombreUsuario("ana_lee");
+        usuarioPrueba.setCorreo("kevin.ls@ciencias.unam.mx");
+        usuarioPrueba.setNombreUsuario("kevin_gmd");
         usuarioPrueba.setRol(Usuario.Rol.usuario);
     }
 
     /**
      * Prueba la generación exitosa de un token y la recuperación de su contenido.
-     * Valida que el identificador (subject) coincida con el correo electrónico del usuario.
+     * Valida que el identificador (subject) coincida con el nombre de usuario.
      */
     @Test
     public void deberiaGenerarYLeerTokenValido() {
-        String token = componenteToken.generarToken(usuarioPrueba);
-        
+        String token = componenteToken.generarToken(usuarioPrueba);        
         assertThat(token).isNotNull();
         assertThat(token).isNotEmpty();
-
-        String correoRecuperado = componenteToken.obtenerCorreo(token);
-        assertThat(correoRecuperado).isEqualTo(usuarioPrueba.getCorreo());
+        String nombreUsuarioRecuperado = componenteToken.obtenerNombreUsuario(token);
+        assertThat(nombreUsuarioRecuperado).isEqualTo(usuarioPrueba.getNombreUsuario());
     }
 
     /**
@@ -94,7 +92,7 @@ public class TestTokenJWT {
         String tokenAna = componenteToken.generarToken(usuarioPrueba);
 
         Usuario otroUsuario = new Usuario();
-        otroUsuario.setCorreo("intruso@correo.com");
+        otroUsuario.setNombreUsuario("intruso_user");
 
         boolean esValido = componenteToken.esTokenValido(tokenAna, otroUsuario);
         assertFalse(esValido);

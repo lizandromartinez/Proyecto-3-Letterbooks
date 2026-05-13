@@ -28,21 +28,21 @@ public class AutenticacionServicio {
 
     /**
      * Valida las credenciales ingresadas y genera un token JWT si son correctas.
-     * @param datosInicioDeSesion DTO con el correo y la contraseña en texto plano.
+     * @param datosInicioDeSesion DTO con el nombre de usuario y la contraseña.
      * @return Un token JWT como cadena de texto para autorizar la sesión.
      * @throws IllegalArgumentException Si las credenciales no coinciden.
      */
     public String autenticarUsuario(InicioDeSesion datosInicioDeSesion) throws IllegalArgumentException {
-        Optional<Usuario> usuarioOpt = usuarioRepositorio.encontrarPorCorreo(datosInicioDeSesion.getCorreo().trim());
+        Optional<Usuario> usuarioOpt = usuarioRepositorio.encontrarPorNombreUsuario(datosInicioDeSesion.getNombreUsuario().trim());
 
         if (usuarioOpt.isEmpty()) {
-            throw new IllegalArgumentException("El correo o la contraseña son incorrectos.");
+            throw new IllegalArgumentException("El nombre de usuario o la contraseña son incorrectos.");
         }
 
         Usuario usuario = usuarioOpt.get();
 
         if (!codificadorContrasena.matches(datosInicioDeSesion.getContrasena(), usuario.getContrasena())) {
-            throw new IllegalArgumentException("El correo o la contraseña son incorrectos.");
+            throw new IllegalArgumentException("El nombre de usuario o la contraseña son incorrectos.");
         }
 
         return tokenJWT.generarToken(usuario);
