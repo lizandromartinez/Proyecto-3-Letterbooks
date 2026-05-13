@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ContextoSesion } from './contexto/Sesion';
-import InicioDeSesion from './componentes/InicioDeSesion';
+import InicioDeSesion from './paginas/InicioDeSesion';
 
 /**
  * Componente principal que actúa como controlador de vistas.
