@@ -1,6 +1,6 @@
 package mx.unam.ciencias.myp.letterbooks.dto;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Clase que representa un DTO para recibir credenciales de inicio de sesión.

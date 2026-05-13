@@ -25,10 +25,12 @@ public class Seguridad {
     @Bean
     public SecurityFilterChain cadenaFiltrosSeguridad(HttpSecurity http) throws Exception {
         http
-            .cors().and().csrf().disable() // Desactivamos CSRF por ser una API REST sin estado
-            .authorizeRequests()
-            .antMatchers("/auth/**").permitAll() // Rutas de login/registro públicas
-            .anyRequest().authenticated(); // Todo lo demás requiere autenticación
+            .cors(org.springframework.security.config.Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable()) // Desactivamos CSRF por ser una API REST sin estado
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**").permitAll() // Rutas de login/registro públicas
+                .anyRequest().authenticated() // Todo lo demás requiere autenticación
+            );
         return http.build();
     }
 
