@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import { ProveedorSesion } from './contexto/Sesion'
+import './estilos/Globales.css'
 
 /**
  * Renderiza la aplicación React en el DOM.
@@ -10,6 +12,8 @@ import App from './App.jsx'
  */
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ProveedorSesion>
+      <App />
+    </ProveedorSesion>
   </StrictMode>,
 )

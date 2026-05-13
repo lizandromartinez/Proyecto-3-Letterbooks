@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -17,12 +16,13 @@ services:
       test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 120s
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: letterbooks_backend
     ports:
       - "8080:8080"

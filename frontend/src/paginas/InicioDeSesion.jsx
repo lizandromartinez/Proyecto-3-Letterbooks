@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ContextoSesion } from '../contexto/Sesion';
 import { peticionLogin } from '../api/Usuarios';
 import { validarNombreUsuario, validarContrasena } from '../utilidades/Validadores';
@@ -9,6 +10,7 @@ import '../estilos/InicioDeSesion.css';
  */
 const InicioDeSesion = () => {
     const { iniciarSesion } = useContext(ContextoSesion);
+    const navigate = useNavigate();
     const [credenciales, setCredenciales] = useState({ nombreUsuario: '', contrasena: '' });
     const [error, setError] = useState('');
 
@@ -59,8 +61,8 @@ const InicioDeSesion = () => {
             <div className="login-card">
                 <div className="login-tabs">
                     <button className="login-tab active">Iniciar sesión</button>
-                    {/* El botón de registro por ahora es solo visual, se conectará a su ruta luego */}
-                    <button className="login-tab" onClick={() => alert("Ir a Registro")}>Registrarse</button>
+                    {/* El botón de registro navega a la ruta /registro */}
+                    <button className="login-tab" onClick={() => navigate("/registro")}>Registrarse</button>
                 </div>
 
                 {error && <p className="login-error">{error}</p>}

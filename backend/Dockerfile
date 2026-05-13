@@ -5,7 +5,7 @@ COPY pom.xml .
 # Descargar las dependencias
 RUN mvn dependency:go-offline -B
 # Copiar el código fuente
-COPY src ./src
+COPY backend/src ./backend/src
 # Compilar el proyecto saltándose las pruebas para acelerar el build
 RUN mvn clean package -DskipTests
 

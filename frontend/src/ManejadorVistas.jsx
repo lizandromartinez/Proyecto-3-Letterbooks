@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ContextoSesion } from './contexto/Sesion';
-import InicioDeSesion from './paginas/InicioDeSesion';
+import { Navigate } from 'react-router-dom';
 
 /**
  * Componente principal que actúa como controlador de vistas.
@@ -12,7 +12,7 @@ function ManejadorVistas() {
   return (
     <div className="contenedor-principal">
       {!token ? (
-        <InicioDeSesion />
+        <Navigate to="/login" replace />
       ) : (
         <div className="dashboard">
           <h1>Bienvenido a LetterBooks</h1>

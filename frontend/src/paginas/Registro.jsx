@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registrarUsuario } from '../api/Usuarios';
 import '../estilos/Registro.css';
 
@@ -21,6 +22,16 @@ function Registro() {
      * Estado que almacena los errores de validación del formulario.     
      */
     const [errores, setErrores] = useState({});
+
+    /**
+     * Hook para navegar a otras rutas
+     */
+    const navigate = useNavigate();
+
+    /**
+     * Estado que almacena el mensaje de éxito tras el registro
+     */
+    const [mensajeExito, setMensajeExito] = useState('');
     
     /**
      * Estado que controla la pestaña activa de la interfaz.
@@ -119,6 +130,11 @@ function Registro() {
 		nombreCompleto: ''
             });
 
+            setMensajeExito('¡Registro exitoso! Redirigiendo al inicio de sesión...');
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+
 	} catch (error) {
             const nuevosErroresBackend = {};
 
@@ -141,7 +157,7 @@ function Registro() {
         <div className="registro-page">
 
             {/* enlace de regreso */}
-            <a href="/" className="registro-back">← Volver al inicio</a>
+            <a href="/" className="registro-back" onClick={(e) => { e.preventDefault(); navigate('/'); }}>← Volver al inicio</a>
 
             {/* marca */}
             <div className="registro-brand">
@@ -157,7 +173,7 @@ function Registro() {
                     <button
                         type="button"
                         className={`registro-tab ${pestana === 'inicioSesion' ? 'active' : ''}`}
-                        onClick={() => setPestana('inicioSesion')}
+                        onClick={() => navigate('/')}
                     >
                          Iniciar sesión
                     </button>
@@ -228,6 +244,11 @@ function Registro() {
 		    {errores.general && (
 			<p className="error-general">{errores.general}</p>
 		    )}
+                    {mensajeExito && (
+                        <p className="exito-general" style={{ color: 'green', fontWeight: 'bold', marginTop: '10px' }}>
+                            {mensajeExito}
+                        </p>
+                    )}
 		    
                 </form>
 
