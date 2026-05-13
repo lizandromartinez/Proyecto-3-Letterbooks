@@ -18,6 +18,11 @@ import '../estilos/Registro.css';
 function Registro() {
 
     /**
+     * Estado que almacena los errores de validación del formulario.     
+     */
+    const [errores, setErrores] = useState({});
+    
+    /**
      * Estado que controla la pestaña activa de la interfaz.
      * Valores posibles: 'inicioSesion' o 'registro'
      */
@@ -45,12 +50,19 @@ function Registro() {
      * @param {React.ChangeEvent<HTMLInputElement>} evento evento del input
      */
     const manejarCambio = (evento) => {
-        setDatosFormulario({
-            ...datosFormulario,
-            [evento.target.name]: evento.target.value
-        });
-    };
+	const { name, value } = evento.target;
 
+	setDatosFormulario(prev => ({
+            ...prev,
+            [name]: value
+	}));
+
+	setErrores(prev => ({
+            ...prev,
+            [name]: undefined
+	}));
+    };
+    
     /**
      * Maneja el envío del formulario de registro.
      * <p>
@@ -58,51 +70,71 @@ function Registro() {
      * Muestra mensajes de éxito o error según la respuesta.
      * </p>
      *
-     * @param {React.FormEvent<HTMLFormElement>} evento evento de envío
+     * @param {<HTMLFormElement>} evento evento de envío
      */
     const manejarEnvio = async (evento) => {
         evento.preventDefault();
 
-        const correoValido = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(datosFormulario.correo);
-        if (!correoValido) {
-            alert('Ingresa un correo válido');
+	const nuevosErrores = {};
+
+	const correoValido =
+            /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(datosFormulario.correo);
+
+	if (!correoValido) {
+            nuevosErrores.correo = 'Ingresa un correo válido';
+	}
+
+	if (!datosFormulario.nombreUsuario.trim()) {
+            nuevosErrores.nombreUsuario = 'El usuario es obligatorio';
+	}
+
+	if (!datosFormulario.contrasena.trim()) {
+            nuevosErrores.contrasena = 'La contraseña es obligatoria';
+	}
+
+	if (Object.keys(nuevosErrores).length > 0) {
+            setErrores(nuevosErrores);
             return;
-        }
+	}
 
-        setCargando(true);
+	setErrores({});
+	setCargando(true);
 
-        try {
+	try {
             const datosLimpios = {
-                nombreUsuario: datosFormulario.nombreUsuario.trim(),
-                correo: datosFormulario.correo.trim().toLowerCase(),
-                contrasena: datosFormulario.contrasena.trim(),
-                nombreCompleto: datosFormulario.nombreCompleto.trim()
+		nombreUsuario: datosFormulario.nombreUsuario.trim(),
+		correo: datosFormulario.correo.trim().toLowerCase(),
+		contrasena: datosFormulario.contrasena.trim(),
+		nombreCompleto: datosFormulario.nombreCompleto.trim()
             };
 
             const usuario = await registrarUsuario(datosLimpios);
 
             console.log(usuario);
-            alert('Usuario registrado');
 
             setDatosFormulario({
-                nombreUsuario: '',
-                correo: '',
-                contrasena: '',
-                nombreCompleto: ''
+		nombreUsuario: '',
+		correo: '',
+		contrasena: '',
+		nombreCompleto: ''
             });
 
-        } catch (error) {
-            console.error(error);
+	} catch (error) {
+            const nuevosErroresBackend = {};
 
             if (typeof error === 'object') {
-                alert(Object.values(error).join('\n'));
+		Object.entries(error).forEach(([campo, mensaje]) => {
+                    nuevosErroresBackend[campo] = mensaje;
+		});
             } else {
-                alert(error);
+		nuevosErroresBackend.general = error;
             }
 
-        } finally {
+            setErrores(nuevosErroresBackend);
+
+	} finally {
             setCargando(false);
-        }
+	}
     };
 
     return (
@@ -127,7 +159,7 @@ function Registro() {
                         className={`registro-tab ${pestana === 'inicioSesion' ? 'active' : ''}`}
                         onClick={() => setPestana('inicioSesion')}
                     >
-                        Iniciar sesión
+                         Iniciar sesión
                     </button>
 
                     <button
@@ -135,7 +167,7 @@ function Registro() {
                         className={`registro-tab ${pestana === 'registro' ? 'active' : ''}`}
                         onClick={() => setPestana('registro')}
                     >
-                        Registrarse
+                         Registrarse
                     </button>
                 </div>
 
@@ -153,8 +185,11 @@ function Registro() {
                             onChange={manejarCambio}
                             required
                         />
+			{errores.nombreUsuario && (
+			    <small className="error">{errores.nombreUsuario}</small>
+			)}
                     </div>
-
+			       
                     <div className="registro-field">
                         <label htmlFor="contrasena">Contraseña</label>
                         <input
@@ -166,6 +201,9 @@ function Registro() {
                             onChange={manejarCambio}
                             required
                         />
+			{errores.contrasena && (
+			    <small className="error">{errores.contrasena}</small>
+			)}
                     </div>
 
                     <div className="registro-field">
@@ -179,29 +217,19 @@ function Registro() {
                             onChange={manejarCambio}
                             required
                         />
-                    </div>
-
-                    <div className="registro-field">
-                        <label htmlFor="nombreCompleto">Nombre completo</label>
-                        <input
-                            id="nombreCompleto"
-                            type="text"
-                            name="nombreCompleto"
-                            placeholder="Ana Lee"
-                            value={datosFormulario.nombreCompleto}
-                            onChange={manejarCambio}
-                        />
+			{errores.correo && (
+			    <small className="error">{errores.correo}</small>
+			)}
                     </div>
 
                     <button type="submit" className="registro-btn" disabled={cargando}>
                         {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
-                    </button>
-
+                    </button>		   
+		    {errores.general && (
+			<p className="error-general">{errores.general}</p>
+		    )}
+		    
                 </form>
-
-                <p className="registro-hint">
-                    Demo: usa cualquier nombre de usuario
-                </p>
 
             </div>
 

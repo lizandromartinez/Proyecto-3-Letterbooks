@@ -198,3 +198,17 @@
 .registro-feature span:first-child {
   font-size: 1rem;
 }
+
+/* ── Estilos para los errores en los campos ── */
+.error {
+  color: #c0392b;
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.error-general {
+  color: #c0392b;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
