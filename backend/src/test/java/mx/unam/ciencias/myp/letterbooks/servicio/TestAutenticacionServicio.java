@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Verifica la integración entre el servicio, el repositorio y el cifrado.
  */
 @SpringBootTest
+@Transactional
 public class TestAutenticacionServicio {
 
     @Autowired
@@ -29,17 +31,15 @@ public class TestAutenticacionServicio {
     @Autowired
     private PasswordEncoder codificador;
 
-    /* Limpia la base de datos y crea un usuario antes de cada test. */
+    /* Crea un usuario de prueba antes de cada test dentro de una transacción. */
     @BeforeEach
     public void prepararDatos() {
-        repositorio.deleteAll();
-        Usuario ana = new Usuario();
-        ana.setNombreUsuario("ana_test");
-        ana.setCorreo("ana@prueba.com");
-        // Guardamos la contraseña cifrada
-        ana.setContrasena(codificador.encode("secreto123"));
-        ana.setRol(Usuario.Rol.usuario);
-        repositorio.save(ana);
+        Usuario usuarioTest = new Usuario();
+        usuarioTest.setNombreUsuario("test_user_auth");
+        usuarioTest.setCorreo("test.auth@letterbooks.com");
+        usuarioTest.setContrasena(codificador.encode("password_test_123"));
+        usuarioTest.setRol(Usuario.Rol.usuario);
+        repositorio.save(usuarioTest);
     }
 
     /**
@@ -48,8 +48,8 @@ public class TestAutenticacionServicio {
     @Test
     public void deberiaAutenticarExitosamente() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setNombreUsuario("ana_test");
-        datos.setContrasena("secreto123");
+        datos.setNombreUsuario("test_user_auth");
+        datos.setContrasena("password_test_123");
 
         String token = servicio.autenticarUsuario(datos);
         assertThat(token).isNotNull();
@@ -62,8 +62,8 @@ public class TestAutenticacionServicio {
     @Test
     public void noDeberiaAutenticarConContrasenaErronea() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setNombreUsuario("ana_test");
-        datos.setContrasena("clave_equivocada");
+        datos.setNombreUsuario("test_user_auth");
+        datos.setContrasena("clave_incorrecta");
 
         assertThrows(IllegalArgumentException.class, () -> {
             servicio.autenticarUsuario(datos);
@@ -76,7 +76,7 @@ public class TestAutenticacionServicio {
     @Test
     public void noDeberiaAutenticarUsuarioInexistente() {
         InicioDeSesion datos = new InicioDeSesion();
-        datos.setNombreUsuario("usuario_inexistente");
+        datos.setNombreUsuario("usuario_totalmente_inexistente");
         datos.setContrasena("password123");
 
         assertThrows(IllegalArgumentException.class, () -> {
