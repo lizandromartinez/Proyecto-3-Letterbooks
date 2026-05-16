@@ -40,9 +40,7 @@ const PaginaAterrizajeAutenticado = () => {
       {/* NAVEGACIÓN: Definida explícitamente como no autenticada para invitados */}
       <Navbar estaAutenticado={true} />
       
-      <main>
-          {/* SECCIÓN HERO: Llamada a la acción principal (CTA) */}
-          <Hero />   
+      <main>          
 
           {/* SECCIÓN CATÁLOGO: Muestra tendencias globales (modo invitado) */}
           <LibrosPopulares estaAutenticado={true} />  
