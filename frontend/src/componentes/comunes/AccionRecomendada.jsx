@@ -27,9 +27,9 @@ const AccionRecomendada = ({
      * Incluye cambio de brillo sutil en hover.
      */
     primario: `
-      bg-gold-books-2 dark:bg-navy-button
+      bg-gold-button dark:bg-navy-button
       text-white 
-      hover:bg-[#b3936a] dark:hover:bg-[#1e294b]
+      hover:bg-gold-button-hover dark:hover:bg-navy-button-hover
       shadow-md
     `,
     /**
@@ -37,9 +37,9 @@ const AccionRecomendada = ({
      * Al hacer hover, se rellena con el color correspondiente.
      */
     outline: `
-      border-2 border-gold-books-2 dark:border-navy-button
-      text-gold-books-2 dark:text-gray-200 
-      hover:bg-gold-books-2 dark:hover:bg-navy-button 
+      border-2 border-gold-button dark:border-navy-button
+      text-gold-button dark:text-gray-200 
+      hover:bg-gold-button-hover dark:hover:bg-navy-button-hover 
       hover:text-white
     `
   };

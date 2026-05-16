@@ -25,7 +25,7 @@ const NavLink = ({ href, children, esMovil = false, onClick }) => {
    * Colores Navy en modo claro y Gris claro en modo oscuro.
    * Cambia a beige (gold-books-2) al pasar el mouse.
    */
-  const estilosEscritorio = "text-navy-letter dark:text-gray-400 hover:text-gold-books-2 dark:hover:text-white text-[15px] font-medium";
+  const estilosEscritorio = "text-navy-letter dark:text-gray-400 hover:text-gold-button dark:hover:text-white text-[15px] font-medium";
   
   /**
    * estilosMovil:

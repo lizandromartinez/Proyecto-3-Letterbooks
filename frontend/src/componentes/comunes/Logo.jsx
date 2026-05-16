@@ -23,7 +23,7 @@ const Logo = ({ className = "" }) => (
     />
     
     {/* Texto 'BOOKS' */}
-    <span className="text-gold-books-2 font-medium text-3xl tracking-[0.25em]">
+    <span className="text-gold-button font-medium text-3xl tracking-[0.25em]">
       BOOKS
     </span>
   </div>

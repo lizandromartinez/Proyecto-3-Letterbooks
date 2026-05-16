@@ -42,7 +42,7 @@ const LibroCard = ({ imagen, titulo, autor, rating, resenas }) => (
             <div className="mt-auto pt-4 border-t border-gray-50 dark:border-white/5 flex justify-between items-center">
                 {/* Rating con estrella dorada */}
                 <div className="flex items-center gap-1.5">
-                    <span className="text-gold-books-2 text-lg">★</span>
+                    <span className="text-gold-button text-lg">★</span>
                     <span className="font-bold text-navy-letter dark:text-gray-200">{rating}</span>
                 </div>
                 {/* Contador de reseñas en formato tracking-widest (estilo editorial) */}
@@ -73,7 +73,7 @@ const LibrosPopulares = ({ estaAutenticado = false }) => {
                 
                 {/* ENCABEZADO DE SECCIÓN: Título dinámico y SVG de tendencia */}
                 <div className="flex items-center gap-3 mb-12 group w-fit">
-                    <div className="p-2 rounded-lg bg-gold-books-2/10 text-gold-books-2">
+                    <div className="p-2 rounded-lg bg-gold-button/10 text-gold-button">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>

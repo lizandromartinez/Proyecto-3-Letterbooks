@@ -20,7 +20,7 @@ const ResenaCard = ({ resena }) => {
                     <img 
                         src={resena.userImg} 
                         alt={resena.usuario} 
-                        className="w-12 h-12 rounded-full border-2 border-gold-books-2/20 object-cover" 
+                        className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover" 
                     />
                     <div className="text-left">
                         <h4 className="font-bold text-navy-letter dark:text-white leading-tight">
@@ -35,7 +35,7 @@ const ResenaCard = ({ resena }) => {
             {/* INFO LIBRO: Enlace visual al detalle del libro reseñado */}
             <a 
                 href={`/libro/${resena.id}`} 
-                className="flex gap-4 mb-6 p-4 bg-[#dedfe0] dark:bg-white/5 rounded-2xl border border-gold-books-2/5 hover:bg-[#c7c7c7] transition-all duration-300"
+                className="flex gap-4 mb-6 p-4 bg-[#dedfe0] dark:bg-white/5 rounded-2xl border border-gold-button/5 hover:bg-[#c7c7c7] transition-all duration-300"
             >
                 <img 
                     src={resena.libroImg} 
@@ -48,7 +48,7 @@ const ResenaCard = ({ resena }) => {
                     </h5>
                     <p className="text-gray-500 text-xs mb-2">{resena.autor}</p>
                     {/* Renderizado dinámico de estrellas (Rating) */}
-                    <div className="flex text-gold-books-2 text-xs">
+                    <div className="flex text-gold-button text-xs">
                         {"★".repeat(resena.estrellas)}{"☆".repeat(5 - resena.estrellas)}
                     </div>
                 </div>
@@ -71,9 +71,9 @@ const ResenaCard = ({ resena }) => {
             </div>
 
             {/* FOOTER: Botones de interacción (Like y Comentarios) */}
-            <div className="flex gap-5 mt-6 pt-4 border-t border-gray-50 dark:border-white/5">
-                {/* Botón Like */}
-                <button className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group">
+            <div className="flex items-center w-full gap-4 border-t border-gray-50 dark:border-white/5">
+                {/* Botón Me Gusta (Like) */}
+                <button className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group cursor-pointer">
                     <img
                         src={like} 
                         alt="Icono de Like" 
@@ -83,7 +83,7 @@ const ResenaCard = ({ resena }) => {
                 </button>
                 
                 {/* Botón Comentar */}
-                <button className="flex items-center gap-1.5 text-gray-400 hover:text-navy-letter dark:hover:text-white transition-colors group">
+                <button className="flex items-center gap-1.5 text-gray-400 hover:text-navy-letter dark:hover:text-white transition-colors group cursor-pointer">
                     <img
                         src={comentarioIcon} 
                         alt="Icono de Comentario" 
@@ -91,6 +91,17 @@ const ResenaCard = ({ resena }) => {
                     />
                     <span className="text-xs font-bold">{resena.comments}</span>
                 </button>
+
+                {/* Contenedor de Calificación - Empujado al extremo derecho con ml-auto */}
+                <div className="ml-auto flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-inter font-medium hidden sm:inline">
+                        Calificación de la reseña:
+                    </span>
+                    {/* Renderizado dinámico de estrellas (Rating) */}
+                    <div className="flex text-gold-button text-xs tracking-wider">
+                        {"★".repeat(resena.calificacionResena)}{"☆".repeat(5 - resena.calificacionResena)}
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -113,6 +124,7 @@ const ResenasRecientes = () => {
             autor: "Gabriel García Márquez",
             libroImg: libroCienAnos,
             estrellas: 5,
+            calificacionResena: 4,
             comentario: "Una obra maestra absoluta. García Márquez teje una narrativa tan rica y compleja que te sumerge completamente en Macondo. Cada relectura revela nuevas capas de significado.",
             citas: [
                 { texto: "Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota...", pagina: "1" },
