@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registrarUsuario } from '../api/Usuarios';
-import '../estilos/Registro.css';
+import Logo from '../componentes/comunes/Logo';
+import libro from '../estilos/img/iconos/libro.png'; 
+import estrella from '../estilos/img/iconos/estrella.png'; 
+import personas from '../estilos/img/iconos/personas.png';
 
 /**
  * Componente de registro e inicio de sesión de usuarios.
@@ -154,25 +157,27 @@ function Registro() {
     };
 
     return (
-        <div className="registro-page">
+        <div className="bg-crema-fondo dark:bg-dark-fondo transition-colors duration-300 min-h-screen flex flex-col items-center justify-center py-8 px-4">
 
             {/* enlace de regreso */}
-            <a href="/" className="registro-back" onClick={(e) => { e.preventDefault(); navigate('/'); }}>← Volver al inicio</a>
+            <button className="self-start sm:ml-[calc(50%-220px)] mb-5 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 opacity-70 hover:opacity-100 transition-opacity cursor-pointer bg-transparent border-none p-0" onClick={() => navigate('/')}>
+                &larr; Volver al inicio
+            </button>
 
             {/* marca */}
-            <div className="registro-brand">
-                <h1>LETTER 📖 <span>BOOKS</span></h1>
-                <p>Tu comunidad literaria</p>
+            <div className="text-center mb-6">
+                <Logo />
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-6">Tu comunidad literaria</p>
             </div>
 
             {/* tarjeta */}
-            <div className="registro-card">
+            <div className="bg-white dark:bg-dark-borde rounded-[12px] shadow-lg p-9 w-full max-w-[440px]">
 
                 {/* pestañas */}
-                <div className="registro-tabs">
+                <div className="flex gap-2 mb-7">
                     <button
                         type="button"
-                        className={`registro-tab ${pestana === 'inicioSesion' ? 'active' : ''}`}
+                        className="flex-1 p-2 rounded-lg font-sans text-sm bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all cursor-pointer"
                         onClick={() => navigate('/login')}
                     >
                          Iniciar sesión
@@ -180,7 +185,7 @@ function Registro() {
 
                     <button
                         type="button"
-                        className={`registro-tab ${pestana === 'registro' ? 'active' : ''}`}
+                        className="flex-1 p-2 rounded-lg font-sans text-sm bg-[#b58841] dark:bg-navy-letter text-white cursor-pointer transition-all"
                         onClick={() => setPestana('registro')}
                     >
                          Registrarse
@@ -188,12 +193,13 @@ function Registro() {
                 </div>
 
                 {/* formulario */}
-                <form className="registro-form" onSubmit={manejarEnvio}>
+                <form className="flex flex-col gap-5" onSubmit={manejarEnvio}>
 
-                    <div className="registro-field">
-                        <label htmlFor="nombreUsuario">Usuario</label>
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="nombreUsuario" className="text-sm text-gray-700 dark:text-gray-300" >Usuario</label>
                         <input
                             id="nombreUsuario"
+                            className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"                            
                             type="text"
                             name="nombreUsuario"
                             placeholder="ana_lee"
@@ -202,14 +208,33 @@ function Registro() {
                             required
                         />
 			{errores.nombreUsuario && (
-			    <small className="error">{errores.nombreUsuario}</small>
+			    <small className="text-red-500 text-xs mt-0.5">{errores.nombreUsuario}</small>
 			)}
                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <label htmlFor="correo" className="text-sm text-gray-700 dark:text-gray-300">Correo</label>
+                        <input
+                            id="correo"
+                            className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
+                            type="email"
+                            name="correo"
+                            placeholder="ana@ejemplo.com"   
+                            value={datosFormulario.correo}
+                            onChange={manejarCambio}
+                            required
+                        />
+			{errores.correo && (
+			    <small className="text-red-500 text-xs mt-0.5">{errores.correo}</small>
+			)}
+                    </div>
+
 			       
-                    <div className="registro-field">
-                        <label htmlFor="contrasena">Contraseña</label>
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="contrasena" className="text-sm text-gray-700 dark:text-gray-300">Contraseña</label>
                         <input
                             id="contrasena"
+                            className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
                             type="password"
                             name="contrasena"
                             placeholder="••••••••"
@@ -218,34 +243,18 @@ function Registro() {
                             required
                         />
 			{errores.contrasena && (
-			    <small className="error">{errores.contrasena}</small>
+			    <small className="text-red-500 text-xs mt-0.5">{errores.contrasena}</small>
 			)}
                     </div>
 
-                    <div className="registro-field">
-                        <label htmlFor="correo">Correo</label>
-                        <input
-                            id="correo"
-                            type="email"
-                            name="correo"
-                            placeholder="ana@ejemplo.com"
-                            value={datosFormulario.correo}
-                            onChange={manejarCambio}
-                            required
-                        />
-			{errores.correo && (
-			    <small className="error">{errores.correo}</small>
-			)}
-                    </div>
-
-                    <button type="submit" className="registro-btn" disabled={cargando}>
+                    <button type="submit" className="mt-2 py-3 px-4 rounded-lg font-semibold text-white cursor-pointer transition-all duration-200 bg-gold-button hover:bg-gold-button dark:bg-navy-button dark:hover:bg-navy-button-hover hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled={cargando}>
                         {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
                     </button>		   
 		    {errores.general && (
-			<p className="error-general">{errores.general}</p>
+			<p className="text-red-500 text-sm text-center mb-4">{errores.general}</p>
 		    )}
                     {mensajeExito && (
-                        <p className="exito-general" style={{ color: 'green', fontWeight: 'bold', marginTop: '10px' }}>
+                        <p className="text-green-500 font-semibold text-sm text-center mb-4" style={{ color: 'green', fontWeight: 'bold', marginTop: '10px' }}>
                             {mensajeExito}
                         </p>
                     )}
@@ -255,23 +264,31 @@ function Registro() {
             </div>
 
             {/* características */}
-            <div className="registro-features">
-
-                <div className="registro-feature">
-                    <span>📖</span>
-                    <span>Descubre<br />libros</span>
-                </div>
-
-                <div className="registro-feature">
-                    <span>📖</span>
-                    <span>Comparte<br />reseñas</span>
-                </div>
-
-                <div className="registro-feature">
-                    <span>📖</span>
-                    <span>Conecta con<br />lectores</span>
-                </div>
-
+            <div className="flex justify-center gap-8 sm:gap-12 mt-10 text-navy-letter dark:text-gray-400 text-xs text-center opacity-80">
+                    <div className="flex flex-col items-center gap-2">
+                      <img 
+                        src={libro} 
+                        alt="Libro" 
+                        className="h-5 w-auto dark:brightness-200" 
+                      />
+                      <span className="font-cormorant leading-tight">Descubre<br />libros</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <img 
+                        src={estrella} 
+                        alt="Estreha" 
+                        className="h-5 w-auto dark:brightness-200" 
+                      />
+                      <span className="font-cormorant leading-tight">Comparte<br />reseñas</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <img 
+                        src={personas} 
+                        alt="Personas" 
+                        className="h-5 w-auto dark:brightness-200" 
+                      />
+                      <span className="font-cormorant leading-tight">Conecta con<br />lectores</span>
+                    </div>
             </div>
         </div>
     );

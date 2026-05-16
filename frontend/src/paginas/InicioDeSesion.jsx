@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ContextoSesion } from '../contexto/Sesion';
 import { peticionLogin } from '../api/Usuarios';
 import { validarNombreUsuario, validarContrasena } from '../utilidades/Validadores';
-import '../estilos/InicioDeSesion.css';
+import Logo from '../componentes/comunes/Logo';
+import libro from '../estilos/img/iconos/libro.png'; 
+import estrella from '../estilos/img/iconos/estrella.png'; 
+import personas from '../estilos/img/iconos/personas.png';
 
 /**
  * Componente que renderiza el formulario de inicio de sesión.
@@ -56,32 +59,33 @@ const InicioDeSesion = () => {
   };
 
   return (
-    <div className="login-page">
-      <button className="login-back" onClick={() => navigate('/')}>
+    <div className="bg-crema-fondo dark:bg-dark-fondo transition-colors duration-300 min-h-screen flex flex-col items-center justify-center py-8 px-4">
+      <button className="self-start sm:ml-[calc(50%-220px)] mb-5 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 opacity-70 hover:opacity-100 transition-opacity cursor-pointer bg-transparent border-none p-0" onClick={() => navigate('/')}>
         &larr; Volver al inicio
       </button>
 
-      <div className="login-brand">
-        <h1>LETTER <span>BOOKS</span></h1>
-        <p>Tu comunidad literaria</p>
+      <div className="text-center mb-6">
+        <Logo />
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-6">Tu comunidad literaria</p>
       </div>
 
-      <div className="login-card">
-        <div className="login-tabs">
-          <button className="login-tab active">
+      <div className="bg-white dark:bg-dark-borde rounded-[12px] shadow-lg p-9 w-full max-w-[440px]">
+        <div className="flex gap-2 mb-7"> 
+          <button className="flex-1 p-2 rounded-lg font-sans text-sm bg-[#b58841] dark:bg-navy-letter text-white cursor-pointer transition-all">
             Iniciar sesión
           </button>
-          <button className="login-tab" onClick={() => navigate("/registro")}>
+          <button className="flex-1 p-2 rounded-lg font-sans text-sm bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all cursor-pointer" onClick={() => navigate("/registro")}>
             Registrarse
           </button>
         </div>
 
-        {error && <p className="login-error">{error}</p>}
+        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
 
-        <form className="login-form" onSubmit={manejarEnvio}>
-          <div className="login-field">
-            <label>Usuario</label>
+        <form className="flex flex-col gap-5" onSubmit={manejarEnvio}>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-700 dark:text-gray-300">Usuario</label>
             <input
+              className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
               type="text"
               name="nombreUsuario"
               placeholder="lector001"
@@ -90,9 +94,10 @@ const InicioDeSesion = () => {
             />
           </div>
 
-          <div className="login-field">
-            <label>Contraseña</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-700 dark:text-gray-300">Contraseña</label>
             <input
+              className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
               type="password"
               name="contrasena"
               placeholder="••••••••"
@@ -101,26 +106,36 @@ const InicioDeSesion = () => {
             />
           </div>
 
-          <button type="submit" className="login-btn">
+          <button type="submit" className="mt-2 py-3 px-4 rounded-lg font-semibold text-white cursor-pointer transition-all duration-200 bg-gold-button hover:bg-gold-button dark:bg-navy-button dark:hover:bg-navy-button-hover hover:scale-110">
             Iniciar sesión
           </button>
         </form>
-
-        <p className="login-hint">Demo: usa cualquier nombre de usuario</p>
       </div>
 
-      <div className="login-features">
-        <div className="login-feature">
-          <span>&#128214;</span>
-          <span>Descubre<br />libros</span>
+      <div className="flex justify-center gap-8 sm:gap-12 mt-10 text-navy-letter dark:text-gray-400 text-xs text-center opacity-80">
+        <div className="flex flex-col items-center gap-2">
+          <img 
+            src={libro} 
+            alt="Libro" 
+            className="h-5 w-auto dark:brightness-200" 
+          />
+          <span className="font-cormorant leading-tight">Descubre<br />libros</span>
         </div>
-        <div className="login-feature">
-          <span>&#128218;</span>
-          <span>Comparte<br />reseñas</span>
+        <div className="flex flex-col items-center gap-2">
+          <img 
+            src={estrella} 
+            alt="Estreha" 
+            className="h-5 w-auto dark:brightness-200" 
+          />
+          <span className="font-cormorant leading-tight">Comparte<br />reseñas</span>
         </div>
-        <div className="login-feature">
-          <span>&#128101;</span>
-          <span>Conecta con<br />lectores</span>
+        <div className="flex flex-col items-center gap-2">
+          <img 
+            src={personas} 
+            alt="Personas" 
+            className="h-5 w-auto dark:brightness-200" 
+          />
+          <span className="font-cormorant leading-tight">Conecta con<br />lectores</span>
         </div>
       </div>
     </div>
