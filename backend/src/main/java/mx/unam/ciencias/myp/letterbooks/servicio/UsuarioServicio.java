@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.dto.Registro;
+import mx.unam.ciencias.myp.letterbooks.modelo.Perfil;
+import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 
 /**
  * Servicio encargado de la lógica de negocio relacionada con usuarios.
@@ -24,6 +26,15 @@ public class UsuarioServicio {
     private final UsuarioRepositorio usuarioRepositorio;
 
     /**
+     * Repositorio encargado de la persistencia y consulta de perfiles de usuario.
+     * <p>
+     * Se utiliza para crear y guardar el perfil por defecto asociado a cada usuario
+     * durante el proceso de registro.
+     * </p>
+     */
+    private final PerfilRepositorio perfilRepositorio;
+    
+    /**
      * Codificador de contraseñas utilizado para transformar contraseñas
      * en texto plano a hashes seguros antes de almacenarlas en la base de datos.
      *
@@ -37,9 +48,10 @@ public class UsuarioServicio {
      * @param usuarioRepositorio repositorio para acceder a la base de datos de usuarios
      * @param codificadorContrasenas codificador de contraseñas para almacenar passwords de forma segura
      */
-    public UsuarioServicio(UsuarioRepositorio usuarioRepositorio, PasswordEncoder codificadorContrasenas) {
+    public UsuarioServicio(UsuarioRepositorio usuarioRepositorio, PasswordEncoder codificadorContrasenas, PerfilRepositorio perfilRepositorio) {
         this.usuarioRepositorio = usuarioRepositorio;
 	this.codificadorContrasenas = codificadorContrasenas;
+	this.perfilRepositorio = perfilRepositorio;
     }
 
     /**
@@ -82,12 +94,45 @@ public class UsuarioServicio {
         }
 
         Usuario usuario = new Usuario();
-
         usuario.setNombreUsuario(registro.getNombreUsuario());
         usuario.setCorreo(registro.getCorreo());
         usuario.setContrasena(registro.getContrasena());
 
+	Usuario guardado = usuarioRepositorio.save(usuario);	
+	perfilRepositorio.save(crearPerfilPorDefecto(guardado));
+	
         return usuarioRepositorio.save(usuario);	
+    }
+
+    /**
+     * Crea un perfil por defecto para un usuario recién registrado.
+     * <p>
+     * Este método inicializa los valores base del perfil para evitar nulls
+     * y garantizar consistencia en la base de datos desde el momento del registro.
+     * Es necesaria la carpeta ""public"" en el frontend para que no haya problema con las rutas de las imagenes en la BD.
+     * </p>
+     *
+     * Valores iniciales:
+     * <ul>
+     *   <li>Biografía genérica</li>
+     *   <li>Avatar por defecto almacenado en frontend/public/estilos/img/defecto</li>
+     *   <li>Banner por defecto almacenado en frontend/public/estilos/img/defecto</li>
+     *   <li>Fecha de registro actual</li>
+     *   <li>Contador de reportes inicializado en 0</li>
+     * </ul>
+     *
+     * @param usuario usuario al que se le asignará el perfil
+     * @return entidad Perfil lista para ser persistida
+     */
+    private Perfil crearPerfilPorDefecto(Usuario usuario) {
+	Perfil perfil = new Perfil();
+	perfil.setUsuario(usuario);
+	perfil.setBiografia("Aquí va tu biografía.");
+	perfil.setAvatar("/estilos/img/defecto/avatar.jpg");
+	perfil.setBanner("/estilos/img/defecto/banner.png");
+	perfil.setFechaRegistro(java.time.LocalDate.now().toString());
+	perfil.setReportes(0);
+	return perfil;
     }
 
     /**

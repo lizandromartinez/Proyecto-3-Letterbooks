@@ -11,6 +11,9 @@ import java.util.List;
  */
 public class Perfil {
 
+    /* Nombre de usuario del Usuario asociado al perfil. */
+    private String nombreUsuario;
+    
     /* Biografía del usuario. */
     private String biografia;
 
@@ -257,6 +260,12 @@ public class Perfil {
         public void setFechaLike(String fechaLike) { this.fechaLike = fechaLike; }
     }
 
+    /* Nombre de usuario del usuario asociado al perfil. */
+    public String getNombreUsuario() { return nombreUsuario; }
+
+    /* Asigna el nombre de usuario del usuario asociado al perfil. */
+    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    
     /* Biografía del usuario */
     public String getBiografia() { return biografia; }
 

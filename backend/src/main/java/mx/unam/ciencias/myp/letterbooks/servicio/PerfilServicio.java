@@ -11,7 +11,6 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.LikesComentarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LikesResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
-import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
 
 /**
  * Servicio para la gestión y consulta del perfil de un usuario.
@@ -26,10 +25,6 @@ public class PerfilServicio {
     /* Repositorio de perfiles (acceso a datos de perfil). */
     @Autowired
     private PerfilRepositorio perfilRepositorio;
-
-    /* Repositorio de usuarios (consulta de usuarios). */
-    @Autowired
-    private UsuarioRepositorio usuarioRepositorio;
 
     /* Repositorio de likes en reseñas. */
     @Autowired
@@ -57,29 +52,9 @@ public class PerfilServicio {
     public Perfil obtenerPerfilPorUsuario(Integer idUsuario) {
 	mx.unam.ciencias.myp.letterbooks.modelo.Perfil perfil =
             perfilRepositorio.encontrarPorUsuario(idUsuario)
-		.orElseGet(() -> crearPerfilVacio(idUsuario));
+		.orElseThrow(() -> new RuntimeException("Perfil no encontrado para el usuario: " + idUsuario));
 	
 	return construirDTO(perfil, idUsuario);
-    }
-
-    /**
-     * Crea un perfil vacío en caso de que el usuario no tenga uno.
-     * Se usa para evitar nulls y asegurar consistencia en la base de datos.
-     *
-     * @param idUsuario identificador del usuario
-     * @return perfil recién creado y guardado en BD
-     */
-    private mx.unam.ciencias.myp.letterbooks.modelo.Perfil crearPerfilVacio(Integer idUsuario) {
-	mx.unam.ciencias.myp.letterbooks.modelo.Usuario usuario =
-            usuarioRepositorio.findById(idUsuario)
-		.orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + idUsuario));
-	
-	mx.unam.ciencias.myp.letterbooks.modelo.Perfil nuevo =
-            new mx.unam.ciencias.myp.letterbooks.modelo.Perfil();
-	nuevo.setUsuario(usuario);
-	nuevo.setFechaRegistro(java.time.LocalDate.now().toString());
-	nuevo.setReportes(0);
-	return perfilRepositorio.save(nuevo);
     }
 
     /**
@@ -97,6 +72,10 @@ public class PerfilServicio {
         dto.setBanner(perfil.getBanner());
         dto.setFechaRegistro(perfil.getFechaRegistro());
 
+	if (perfil.getUsuario() != null) {
+	    dto.setNombreUsuario(perfil.getUsuario().getNombreUsuario());
+	}	
+	
         // Autor, género y libro favorito
         if (perfil.getAutor() != null)
             dto.setAutorFavorito(perfil.getAutor().getNombreAutor());

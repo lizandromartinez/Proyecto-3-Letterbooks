@@ -69,16 +69,23 @@ function Perfil() {
 
     return (
         <div>
+	    {perfil.banner && (
+		<img
+                    src={perfil.banner}
+                    alt="Banner"
+                    style={{ width: "100%", height: "200px", objectFit: "cover" }}
+		/>
+            )}
             {perfil.avatar && (
                 <img src={perfil.avatar} alt="Avatar" width="150" />
-            )}
+            )}	    
             <h1>{perfil.nombreUsuario || "Sin nombre de usuario"}</h1>
             <p>{perfil.biografia || "Sin biografía aún"}</p>
-            <h3>Libro favorito</h3>
+            <h3>Libro favorito:</h3>
             <p>{perfil.libroFavorito || "No definido"}</p>
-            <h3>Autor favorito</h3>
+            <h3>Autor favorito:</h3>
             <p>{perfil.autorFavorito || "No definido"}</p>
-            <h3>Género favorito</h3>
+            <h3>Género favorito:</h3>
             <p>{perfil.generoFavorito || "No definido"}</p>
         </div>
     );
