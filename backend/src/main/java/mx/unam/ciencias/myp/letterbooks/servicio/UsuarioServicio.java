@@ -65,12 +65,20 @@ public class UsuarioServicio {
 	registro.setCorreo(registro.getCorreo().trim().toLowerCase());
 	registro.setContrasena(codificadorContrasenas.encode(registro.getContrasena().trim()));
 	
-	if (usuarioRepositorio.existePorNombreUsuario(registro.getNombreUsuario())) {
-            throw new IllegalArgumentException("Ese nombre de usuario ya existe");
+	if (usuarioRepositorio.existePorNombreUsuario(
+            registro.getNombreUsuario())) {
+
+            throw new IllegalArgumentException(
+                "Ese nombre de usuario ya existe"
+            );
         }
 
-        if (usuarioRepositorio.existePorCorreo(registro.getCorreo())) {
-            throw new IllegalArgumentException("Ese correo ya está registrado");
+        if (usuarioRepositorio.existePorCorreo(
+            registro.getCorreo())) {
+
+            throw new IllegalArgumentException(
+                "Ese correo ya está registrado"
+            );
         }
 
         Usuario usuario = new Usuario();
@@ -81,4 +89,16 @@ public class UsuarioServicio {
 
         return usuarioRepositorio.save(usuario);	
     }
+
+    /**
+     * Obtiene un usuario a partir de su identificador único.
+     *
+     * @param idUsuario identificador del usuario a buscar
+     * @return el usuario correspondiente al identificador proporcionado
+     * @throws RuntimeException si no existe un usuario con ese identificador
+     */
+    public Usuario obtenerPorId(Integer idUsuario) {
+	return usuarioRepositorio.findById(idUsuario)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + idUsuario));
+    }    
 }

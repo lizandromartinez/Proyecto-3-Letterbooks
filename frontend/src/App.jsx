@@ -4,6 +4,7 @@ import ManejadorVistas from "./ManejadorVistas";
 import PaginaAterrizaje from "./paginas/PaginaAterrizaje";
 import InicioDeSesion from "./paginas/InicioDeSesion";
 import PaginaAterrizajeAutenticado from "./paginas/PaginaAterrizajeAutenticado";
+import Perfil from "./paginas/Perfil";
 
 /**
  * Componente principal de la aplicación.
@@ -16,17 +17,18 @@ import PaginaAterrizajeAutenticado from "./paginas/PaginaAterrizajeAutenticado";
  * @returns {JSX.Element} Aplicación con enrutamiento configurado
  */
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<PaginaAterrizaje />} />
-        <Route path="/paginaAterrizaje" element={<PaginaAterrizaje />} />
-        <Route path="/login" element={<InicioDeSesion />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+	<BrowserRouter>
+	    <Routes>
+		<Route path="/" element={<PaginaAterrizaje />} />
+		<Route path="/paginaAterrizaje" element={<PaginaAterrizaje />} />
+		<Route path="/login" element={<InicioDeSesion />} />
+		<Route path="/registro" element={<Registro />} />
+		<Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
+		<Route path="/perfil" element={<Perfil />} />
+	    </Routes>
+	</BrowserRouter>
+    );
 }
 
 export default App;

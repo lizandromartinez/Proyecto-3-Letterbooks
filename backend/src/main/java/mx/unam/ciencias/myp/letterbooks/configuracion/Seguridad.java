@@ -1,5 +1,8 @@
 package mx.unam.ciencias.myp.letterbooks.configuracion;
 
+import mx.unam.ciencias.myp.letterbooks.seguridad.FiltroAcceso;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +23,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class Seguridad {
 
     /**
+     * Filtro encargado de validar los tokens JWT
+     * enviados en las peticiones HTTP antes de que lleguen a los
+     * controladores protegidos.
+     */
+    @Autowired
+    private FiltroAcceso filtroAcceso;
+    
+    /**
      * Configura la cadena de filtros de seguridad HTTP.
      * @param http El objeto HttpSecurity a configurar.
      * @return La cadena de filtros de seguridad construida.
@@ -34,7 +45,11 @@ public class Seguridad {
                 .requestMatchers("/auth/**").permitAll() // Rutas de login/registro públicas
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );
-        return http.build();
+
+	http.addFilterBefore(filtroAcceso, UsernamePasswordAuthenticationFilter.class);
+
+	return http.build();
+	
     }
 
     /**

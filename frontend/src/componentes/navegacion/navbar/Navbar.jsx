@@ -74,7 +74,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <NavLink href="/dashboard">Feed</NavLink>
                             <NavLink href="/dashboard">Explorar</NavLink>
                             <NavLink href="/dashboard">Nuevo Libro</NavLink>
-                            <AccionRecomendada href="/dashboard" variante="primario">
+                            <AccionRecomendada href="/perfil" variante="primario">
                                 Mi Perfil
                             </AccionRecomendada>
                             <button onClick={manejarLogout} className="text-red-500 font-bold py-2">Cerrar Sesión</button>
@@ -104,7 +104,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Feed</NavLink>
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Explorar</NavLink>
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Nuevo Libro</NavLink>
-                            <AccionRecomendada href="/dashboard" variante="outline" esMovil onClick={cerrarMenu}>
+                            <AccionRecomendada href="/perfil" variante="outline" esMovil onClick={cerrarMenu}>
                                 Mi Perfil
                             </AccionRecomendada>
                             <button onClick={manejarLogout} className="text-red-500 font-bold py-2">Cerrar Sesión</button>
