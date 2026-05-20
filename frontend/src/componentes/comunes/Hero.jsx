@@ -20,7 +20,7 @@ import personas from '../../estilos/img/iconos/personas.png';
  * @param {string} bgIcono - Clase de Tailwind para el fondo del icono.
  */
 const FeatureCard = ({ icono, titulo, descripcion, bgIcono }) => (
-    <div className="bg-white dark:bg-dark-borde p-8 rounded-2xl border border-gold-books-2/20 dark:border-white/5 shadow-sm hover:shadow-md transform hover:-translate-y-1 flex flex-col items-start text-left transition-all duration-300">
+    <div className="bg-white dark:bg-dark-borde p-8 rounded-2xl border border-gold-button/20 dark:border-white/5 shadow-sm hover:shadow-md transform hover:-translate-y-1 flex flex-col items-start text-left transition-all duration-300">
         
         {/* Contenedor del Icono con fondo dinámico */}
         <div className={`${bgIcono} p-4 rounded-xl mb-4 transition-colors duration-300`}>
@@ -51,7 +51,7 @@ const Hero = () => {
             <div className="flex flex-col items-center text-center gap-5">
 
                 {/* BADGE DE BIENVENIDA: Micro-detalle editorial */}
-                <div className="bg-[#f3e9dc] dark:bg-[#4A4E54] dark:text-white text-gold-books-2 px-4 py-2 rounded-full text-xs font-inter mb-6 tracking-wider flex items-center gap-2 border border-transparent dark:border-gold-books-2/10">
+                <div className="bg-[#f3e9dc] dark:bg-[#4A4E54] dark:text-white text-gold-button px-4 py-2 rounded-full text-xs font-inter mb-6 tracking-wider flex items-center gap-2 border border-transparent dark:border-gold-button/10">
                     <img
                         src={estrellas} 
                         alt="Estrellas"                 

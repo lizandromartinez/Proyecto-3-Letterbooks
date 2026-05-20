@@ -17,7 +17,7 @@ const Cita = ({ texto, pagina }) => {
         <div className="
             /* Diseño de Bloque */
             bg-gray-50 dark:bg-white/5 
-            border-l-4 border-gold-books-2 
+            border-l-4 border-gold-button 
             p-5 rounded-r-2xl my-4 
             
             /* Animación y Hover */

@@ -6,9 +6,11 @@
   --color-crema-fondo: #FDF8F3;
   --color-dark-fondo: #121212;
   --color-dark-borde: #1E1E1E;
-  --color-navy-letter: #1B2A47;
-  --color-navy-button: #1E294B;
-  --color-gold-books-2: #C9A675;
+  --color-navy-letter: #1E294B; 
+  --color-navy-button: #1B2A47;
+  --color-navy-button-hover:#323D4D;
+  --color-gold-button: #d4a049;
+  --color-gold-button-hover:#bf9045;
 
   --font-cormorant: "Cormorant Garamond", serif;
   --font-inter: "Inter", sans-serif;

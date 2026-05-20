@@ -17,7 +17,7 @@ const Footer = ({ estaAutenticado = false }) => {
             
                 {/* COLUMNA 1 : Identidad*/}
                 <div className="flex flex-col gap-6">
-                    <Logo className="[&_span:first-child]:text-gray-100 [&_span:last-child]:text-gold-books-2" />   
+                    <Logo className="[&_span:first-child]:text-gray-100 [&_span:last-child]:text-gold-button" />   
                     <p className="text-gray-400 font-inter">
                         La plataforma para amantes de los libros. Descubre, comparte y conecta con otros lectores.
                     </p>
