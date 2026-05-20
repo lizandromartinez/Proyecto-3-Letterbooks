@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mx.unam.ciencias.myp.letterbooks.dto.Perfil;
+import mx.unam.ciencias.myp.letterbooks.dto.ActualizarPerfil;
 import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.seguridad.TokenJWT;
 import mx.unam.ciencias.myp.letterbooks.servicio.PerfilServicio;
@@ -68,7 +69,7 @@ public class Usuarios {
     @PutMapping("/{idUsuario}/perfil")
     public ResponseEntity<?> actualizarPerfil(
             @PathVariable("idUsuario") Integer idUsuario,
-            @RequestBody Perfil perfilDTO,
+            @RequestBody ActualizarPerfil datos,
             @RequestHeader("Authorization") String authHeader) {
         try {
             // Extraemos el token del header
@@ -79,13 +80,14 @@ public class Usuarios {
 
             // Verificamos que el usuario del token es el dueño del perfil
             Usuario usuarioPerfil = usuarioServicio.obtenerPorId(idUsuario);
+	    
             if (!nombreUsuarioToken.equals(usuarioPerfil.getNombreUsuario())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("No tienes permiso para modificar este perfil");
             }
 
             // Procedemos con la actualización
-            Perfil perfilActualizado = perfilServicio.actualizarPerfil(idUsuario, perfilDTO);
+            Perfil perfilActualizado = perfilServicio.actualizarPerfil(idUsuario, datos);
             return ResponseEntity.ok(perfilActualizado);
 
         } catch (RuntimeException e) {

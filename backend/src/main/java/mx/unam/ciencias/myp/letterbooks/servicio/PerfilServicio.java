@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mx.unam.ciencias.myp.letterbooks.dto.Perfil;
+import mx.unam.ciencias.myp.letterbooks.dto.ActualizarPerfil;
 import mx.unam.ciencias.myp.letterbooks.repositorio.CalificacionResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LikesComentarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LikesResenaRepositorio;
@@ -14,9 +15,9 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
-import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
-import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
-import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
+// import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
+// import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
+// import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 
 /**
  * Servicio para la gestión y consulta del perfil de un usuario.
@@ -194,42 +195,37 @@ public class PerfilServicio {
 
     /**
      * Actualiza los campos editables del perfil de un usuario.
+     * Este método permite modificar información personal del perfil,
+     * incluyendo biografía, avatar, banner y libro, género y autor favorito
      *
-     * @param idUsuario id del usuario dueño del perfil
-     * @param perfilDTO datos nuevos enviados desde el frontend
-     * @return perfil actualizado convertido a DTO
+     * @param idUsuario identificador del usuario dueño del perfil
+     * @param datos DTO con los nuevos datos del perfil a actualizar
+     * @return DTO del perfil actualizado
+     * @throws RuntimeException si el perfil no existe o si alguno de los
+     *         identificadores de libro, autor o género no corresponde
+     *         a una entidad válida
      */
     @Transactional
-    public Perfil actualizarPerfil(Integer idUsuario, Perfil perfilDTO) {
+    public Perfil actualizarPerfil(Integer idUsuario, ActualizarPerfil datos) {
 	mx.unam.ciencias.myp.letterbooks.modelo.Perfil perfil =
             perfilRepositorio.encontrarPorUsuario(idUsuario)
 		.orElseThrow(() -> new RuntimeException("Perfil no encontrado para el usuario: " + idUsuario));
 
-	// Actualizamos solo los campos editables
-	if (perfilDTO.getBiografia() != null)
-            perfil.setBiografia(perfilDTO.getBiografia());
-	if (perfilDTO.getAvatar() != null)
-            perfil.setAvatar(perfilDTO.getAvatar());
-	if (perfilDTO.getBanner() != null)
-            perfil.setBanner(perfilDTO.getBanner());
-
-	if (perfilDTO.getIdLibro() != null) {
-	    Libro libro = libroRepositorio.encontrarPorId(perfilDTO.getIdLibro())
-		.orElseThrow(() -> new RuntimeException("Libro no encontrado"));
-	    perfil.setLibro(libro);
-	}
-
-	if (perfilDTO.getIdAutor() != null) {
-	    Autor autor = autorRepositorio.encontrarPorId(perfilDTO.getIdAutor())
-		.orElseThrow(() -> new RuntimeException("Autor no encontrado"));
-	    perfil.setAutor(autor);
-	}
-	
-	if (perfilDTO.getIdGenero() != null) {
-	    Genero genero = generoRepositorio.encontrarPorId(perfilDTO.getIdGenero())
-		.orElseThrow(() -> new RuntimeException("Género no encontrado"));
-	    perfil.setGenero(genero);
-	}
+	if (datos.getBiografia() != null)
+            perfil.setBiografia(datos.getBiografia());
+	if (datos.getAvatar() != null)
+            perfil.setAvatar(datos.getAvatar());
+	if (datos.getBanner() != null)
+            perfil.setBanner(datos.getBanner());
+	if (datos.getIdAutorFavorito() != null)
+            perfil.setAutor(autorRepositorio.encontrarPorId(datos.getIdAutorFavorito())
+		.orElseThrow(() -> new RuntimeException("Autor no encontrado")));
+	if (datos.getIdGeneroFavorito() != null)
+            perfil.setGenero(generoRepositorio.encontrarPorId(datos.getIdGeneroFavorito())
+		.orElseThrow(() -> new RuntimeException("Género no encontrado")));
+	if (datos.getIdLibroFavorito() != null)
+            perfil.setLibro(libroRepositorio.encontrarPorId(datos.getIdLibroFavorito())
+		.orElseThrow(() -> new RuntimeException("Libro no encontrado")));
 
 	perfilRepositorio.save(perfil);
 	return construirDTO(perfil, idUsuario);
