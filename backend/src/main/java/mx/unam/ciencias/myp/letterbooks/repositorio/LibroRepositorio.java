@@ -19,6 +19,14 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 public interface LibroRepositorio extends JpaRepository<Libro, Integer> {
 
     /**
+     * Busca un libro por su identificador único.
+     * @param idLibro identificador del libro a buscar
+     * @return un Optional con el libro si existe, o vacío si no se encuentra
+     */
+    @Query("SELECT l FROM Libro l WHERE l.idLibro = :idLibro")
+    Optional<Libro> encontrarPorId(@Param("idLibro") Integer idLibro);
+    
+    /**
      * Busca un libro por su título exacto.
      * @param titulo título del libro a buscar
      * @return un Optional con el libro si existe, o vacío si no se encuentra

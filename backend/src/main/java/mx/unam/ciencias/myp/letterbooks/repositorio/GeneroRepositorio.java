@@ -18,6 +18,14 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 public interface GeneroRepositorio extends JpaRepository<Genero, Integer> {
 
     /**
+     * Busca un género por su identificador único.
+     * @param idGenero identificador del género a buscar
+     * @return un Optional con el género si existe, o vacío si no se encuentra
+     */
+    @Query("SELECT g FROM Genero g WHERE g.idGenero = :idGenero")
+    Optional<Genero> encontrarPorId(@Param("idGenero") Integer idGenero);
+    
+    /**
      * Busca un género por su nombre.
      * @param nombreGenero nombre del género a buscar
      * @return un Optional con el género si existe, o vacío si no se encuentra

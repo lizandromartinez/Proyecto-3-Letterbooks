@@ -26,15 +26,24 @@ public class Perfil {
     /* Fecha de registro del usuario. */
     private String fechaRegistro;
 
+    /* Id del libro favorito del usuario. */
+    private Integer idLibro;
+
+    /* Id del autor favorito del usuario. */
+    private Integer idAutor;
+
+    /* Id del género favorito del usuario. */
+    private Integer idGenero;
+
+    /** Nombre del libro favorito del usuario. */
+    private String libroFavorito;
+
     /* Nombre del autor favorito del usuario. */
     private String autorFavorito;
 
     /* Nombre del género favorito del usuario. */
     private String generoFavorito;
-
-    /* Título del libro favorito del usuario. */
-    private String libroFavorito;
-
+    
     /* Reseñas a las que el usuario ha dado like. */
     private List<ResenaLikeDTO> resenasLikeadas;
 
@@ -290,24 +299,42 @@ public class Perfil {
     /* Asigna fecha de registro */
     public void setFechaRegistro(String fechaRegistro) { this.fechaRegistro = fechaRegistro; }
 
-    /* Autor favorito */
-    public String getAutorFavorito() { return autorFavorito; }
+    /* Id del autor favorito */
+    public Integer getIdAutor() { return idAutor; }
 
-    /* Asigna autor favorito */
-    public void setAutorFavorito(String autorFavorito) { this.autorFavorito = autorFavorito; } 
+    /* Asigna id del autor favorito */
+    public void setIdAutor(Integer idAutor) { this.idAutor = idAutor; } 
 
-    /* Género favorito */
-    public String getGeneroFavorito() { return generoFavorito; }
+    /* Id del género favorito */
+    public Integer getIdGenero() { return idGenero; }
 
-    /* Asigna género favorito */
-    public void setGeneroFavorito(String generoFavorito) { this.generoFavorito = generoFavorito; }
+    /* Asigna el id del género favorito */
+    public void setIdGenero(Integer idGenero) { this.idGenero = idGenero; }
 
-    /* Libro favorito */
+    /* Id del libro favorito */
+    public Integer getIdLibro() { return idLibro; }
+
+    /* Asigna el id del libro favorito */
+    public void setIdLibro(Integer idLibro) { this.idLibro = idLibro; }
+
+    /* Obtiene el nombre del libro favorito del usuario. */
     public String getLibroFavorito() { return libroFavorito; }
-
-    /* Asigna libro favorito */
+    
+    /* Establece el nombre del libro favorito del usuario. */
     public void setLibroFavorito(String libroFavorito) { this.libroFavorito = libroFavorito; }
 
+    /* Obtiene el nombre del autor favorito del usuario. */
+    public String getAutorFavorito() { return autorFavorito; }
+
+    /* Establece el nombre del autor favorito del usuario. */
+    public void setAutorFavorito(String autorFavorito) { this.autorFavorito = autorFavorito; }
+
+    /* Obtiene el género favorito del usuario. */
+    public String getGeneroFavorito() { return generoFavorito; }
+
+    /* Establece el género favorito del usuario. */
+    public void setGeneroFavorito(String generoFavorito) { this.generoFavorito = generoFavorito; }
+    
     /* Reseñas likeadas */
     public List<ResenaLikeDTO> getResenasLikeadas() { return resenasLikeadas; }
 

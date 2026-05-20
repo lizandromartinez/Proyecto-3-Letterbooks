@@ -11,6 +11,12 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.LikesComentarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LikesResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
+import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
+import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 
 /**
  * Servicio para la gestión y consulta del perfil de un usuario.
@@ -26,6 +32,18 @@ public class PerfilServicio {
     @Autowired
     private PerfilRepositorio perfilRepositorio;
 
+    /* Repositorio de libro. */
+    @Autowired
+    private LibroRepositorio libroRepositorio;
+
+    /* Repositorio de autor. */
+    @Autowired
+    private AutorRepositorio autorRepositorio;
+
+    /* Repositorio de genero. */
+    @Autowired
+    private GeneroRepositorio generoRepositorio;
+    
     /* Repositorio de likes en reseñas. */
     @Autowired
     private LikesResenaRepositorio likesResenaRepositorio;
@@ -72,27 +90,20 @@ public class PerfilServicio {
         dto.setBanner(perfil.getBanner());
         dto.setFechaRegistro(perfil.getFechaRegistro());
 
-	if (perfil.getUsuario() != null) {
-	    dto.setNombreUsuario(perfil.getUsuario().getNombreUsuario());
-	}	
+	if (perfil.getUsuario() != null)
+	    dto.setNombreUsuario(perfil.getUsuario().getNombreUsuario());		
 	
         // Autor, género y libro favorito
-        if (perfil.getAutor() != null)
-            dto.setAutorFavorito(perfil.getAutor().getNombreAutor());
-        if (perfil.getGenero() != null)
-            dto.setGeneroFavorito(perfil.getGenero().getNombreGenero());
-        if (perfil.getLibro() != null)
-            dto.setLibroFavorito(perfil.getLibro().getTitulo());
-
+	dto.setLibroFavorito(perfil.getLibro() != null ? perfil.getLibro().getTitulo() : "Ninguno");	
+	dto.setAutorFavorito(perfil.getAutor() != null ? perfil.getAutor().getNombreAutor() : "Ninguno");
+	dto.setGeneroFavorito(perfil.getGenero() != null ? perfil.getGenero().getNombreGenero() : "Ninguno");
+	
         // Reseñas likeadas
         dto.setResenasLikeadas(construirResenasLikeadas(idUsuario));
-
         // Reseñas calificadas
         dto.setResenasCalificadas(construirResenasCalificadas(idUsuario));
-
         // Libros calificados
         dto.setLibrosCalificados(construirLibrosCalificados(idUsuario));
-
         // Comentarios likeados
         dto.setComentariosLikeados(construirComentariosLikeados(idUsuario));
 
@@ -201,6 +212,24 @@ public class PerfilServicio {
             perfil.setAvatar(perfilDTO.getAvatar());
 	if (perfilDTO.getBanner() != null)
             perfil.setBanner(perfilDTO.getBanner());
+
+	if (perfilDTO.getIdLibro() != null) {
+	    Libro libro = libroRepositorio.encontrarPorId(perfilDTO.getIdLibro())
+		.orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+	    perfil.setLibro(libro);
+	}
+
+	if (perfilDTO.getIdAutor() != null) {
+	    Autor autor = autorRepositorio.encontrarPorId(perfilDTO.getIdAutor())
+		.orElseThrow(() -> new RuntimeException("Autor no encontrado"));
+	    perfil.setAutor(autor);
+	}
+	
+	if (perfilDTO.getIdGenero() != null) {
+	    Genero genero = generoRepositorio.encontrarPorId(perfilDTO.getIdGenero())
+		.orElseThrow(() -> new RuntimeException("Género no encontrado"));
+	    perfil.setGenero(genero);
+	}
 
 	perfilRepositorio.save(perfil);
 	return construirDTO(perfil, idUsuario);

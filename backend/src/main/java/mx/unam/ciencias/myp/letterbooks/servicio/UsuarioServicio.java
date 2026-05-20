@@ -101,7 +101,7 @@ public class UsuarioServicio {
 	Usuario guardado = usuarioRepositorio.save(usuario);	
 	perfilRepositorio.save(crearPerfilPorDefecto(guardado));
 	
-        return usuarioRepositorio.save(usuario);	
+        return guardado;	
     }
 
     /**
@@ -128,6 +128,9 @@ public class UsuarioServicio {
 	Perfil perfil = new Perfil();
 	perfil.setUsuario(usuario);
 	perfil.setBiografia("Aquí va tu biografía.");
+	perfil.setAutor(null);
+	perfil.setGenero(null);
+	perfil.setLibro(null);
 	perfil.setAvatar("/estilos/img/defecto/avatar.jpg");
 	perfil.setBanner("/estilos/img/defecto/banner.png");
 	perfil.setFechaRegistro(java.time.LocalDate.now().toString());

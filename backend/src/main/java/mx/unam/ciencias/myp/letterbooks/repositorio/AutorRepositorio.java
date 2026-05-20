@@ -19,6 +19,14 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 public interface AutorRepositorio extends JpaRepository<Autor, Integer> {
 
     /**
+     * Busca un autor por su identificador único.
+     * @param idAutor identificador del autor a buscar
+     * @return un Optional con el autor si existe, o vacío si no se encuentra
+     */
+    @Query("SELECT a FROM Autor a WHERE a.idAutor = :idAutor")
+    Optional<Autor> encontrarPorId(@Param("idAutor") Integer idAutor);
+    
+    /**
      * Busca un autor por su nombre.
      * @param nombreAutor nombre del autor a buscar
      * @return un Optional con el autor si existe, o vacío si no se encuentra
