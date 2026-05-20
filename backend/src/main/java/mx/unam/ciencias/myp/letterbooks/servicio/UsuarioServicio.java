@@ -65,20 +65,12 @@ public class UsuarioServicio {
 	registro.setCorreo(registro.getCorreo().trim().toLowerCase());
 	registro.setContrasena(codificadorContrasenas.encode(registro.getContrasena().trim()));
 	
-	if (usuarioRepositorio.existsByNombreUsuario(
-            registro.getNombreUsuario())) {
-
-            throw new IllegalArgumentException(
-                "Ese nombre de usuario ya existe"
-            );
+	if (usuarioRepositorio.existePorNombreUsuario(registro.getNombreUsuario())) {
+            throw new IllegalArgumentException("Ese nombre de usuario ya existe");
         }
 
-        if (usuarioRepositorio.existsByCorreo(
-            registro.getCorreo())) {
-
-            throw new IllegalArgumentException(
-                "Ese correo ya está registrado"
-            );
+        if (usuarioRepositorio.existePorCorreo(registro.getCorreo())) {
+            throw new IllegalArgumentException("Ese correo ya está registrado");
         }
 
         Usuario usuario = new Usuario();
