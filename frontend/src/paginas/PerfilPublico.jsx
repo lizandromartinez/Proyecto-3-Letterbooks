@@ -2,56 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { obtenerPerfilPublico } from "../api/Perfil";
 import Navbar from "../componentes/navegacion/navbar/Navbar";
-import avatarDefecto from "../estilos/img/defecto/avatar.jpg";
-import bannerDefecto from "../estilos/img/defecto/banner.png";
-
-/**
- * Resuelve la URL correcta de una imagen según su origen.
- * <p>
- * Si la ruta es nula o corresponde a una imagen por defecto del frontend
- * (rutas que comienzan con "/estilos/"), retorna la imagen de respaldo local.
- * Si la ruta apunta a una imagen subida por el usuario, le agrega el prefijo
- * del servidor backend para formar la URL completa de acceso.
- * </p>
- *
- * @param {string} ruta ruta de la imagen almacenada en la base de datos.
- * @param {string|null} imagenDefecto imagen local a mostrar si no hay ruta válida.
- * @returns {string} URL completa de la imagen a renderizar.
- */
-function resolverUrlImagen(ruta, imagenDefecto) {
-    if (!ruta) return imagenDefecto;
-    if (ruta.startsWith("/estilos/")) return imagenDefecto;
-    return `http://localhost:8080${ruta}`;
-}
-
-/**
- * Componente auxiliar que muestra un mensaje visual cuando
- * una sección de actividad no tiene contenido disponible.
- * <p>
- * Se utiliza en cada tab de la sección de actividad del perfil
- * para indicar al visitante que el usuario aún no tiene registros
- * en esa categoría específica.
- * </p>
- *
- * @param {string} texto mensaje descriptivo a mostrar al usuario.
- * @returns {JSX.Element} contenedor centrado con ícono y mensaje.
- */
-function MensajeVacio({ texto }) {
-    return (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <span className="text-4xl">📚</span>
-            <p className="font-inter text-sm text-gray-400 dark:text-gray-500">{texto}</p>
-        </div>
-    );
-}
+import BannerPerfil from "../componentes/perfil/BannerPerfil";
+import InfoPerfil from "../componentes/perfil/InfoPerfil";
+import FavoritosPerfil from "../componentes/perfil/FavoritosPerfil";
+import ActividadPerfil from "../componentes/perfil/ActividadPerfil";
 
 /**
  * Componente para visualizar el perfil público de cualquier usuario.
  * <p>
- * Obtiene los datos del perfil desde el backend usando el nombre de usuario
- * extraído de los parámetros de la URL. No requiere autenticación ya que
- * los perfiles son públicos. Muestra banner, avatar, información personal,
- * favoritos literarios y la actividad del usuario organizada en tabs.
+ * No requiere autenticación. Para acceder se usa el endpoint: /usuario/<nombreUsuario>
  * </p>
  *
  * @component
@@ -62,24 +21,19 @@ function PerfilPublico() {
     const [perfil, setPerfil] = useState(null);
     const [error, setError] = useState(null);
     const [tabActiva, setTabActiva] = useState("likeadas");
-
-    // Detectar si hay sesión activa para el navbar
     const estaAutenticado = !!localStorage.getItem("token");
 
     useEffect(() => {
-	/**
-	 * Solicita al backend los datos del perfil correspondiente
-	 * al nombre de usuario obtenido desde los parámetros de la URL.
-	 * En caso de error muestra un mensaje al usuario.
-	 */
-	const obtenerPerfil = async () => {
-	    try {
-		const datosPerfil = await obtenerPerfilPublico(nombreUsuario);
-		setPerfil(datosPerfil);
-	    } catch {
-		setError("No se encontró el perfil");
-	    }
-	};
+        /**
+         * Solicita al backend el perfil del usuario indicado en la URL.
+         */
+        const obtenerPerfil = async () => {
+            try {
+                setPerfil(await obtenerPerfilPublico(nombreUsuario));
+            } catch {
+                setError("No se encontró el perfil");
+            }
+        };
         obtenerPerfil();
     }, [nombreUsuario]);
 
@@ -88,266 +42,33 @@ function PerfilPublico() {
             <p className="text-gray-500 dark:text-gray-400 font-inter">{error}</p>
         </div>
     );
-
     if (!perfil) return (
         <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo flex items-center justify-center">
             <p className="text-gray-500 dark:text-gray-400 font-inter">Cargando perfil...</p>
         </div>
     );
 
-    const tabs = [
-        { id: "likeadas",    label: "Reseñas likeadas",      count: perfil.resenasLikeadas?.length    || 0 },
-        { id: "calificadas", label: "Reseñas calificadas",   count: perfil.resenasCalificadas?.length || 0 },
-        { id: "libros",      label: "Libros calificados",    count: perfil.librosCalificados?.length  || 0 },
-        { id: "comentarios", label: "Comentarios likeados",  count: perfil.comentariosLikeados?.length || 0 },
-    ];
-
     return (
-	<div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-500">
-	    <Navbar estaAutenticado={true} />
-
-	    <div className="py-8 px-4">
-		{/* ── TARJETA CONTENEDOR ── */}
-		<div className="max-w-4xl mx-auto bg-white dark:bg-dark-borde rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-white/5">
-
-		    {/* ── BANNER dentro del contenedor ── */}
-		    <div className="relative w-full h-48 md:h-56">
-			<img
-			    src={resolverUrlImagen(perfil.banner, bannerDefecto)}
-	    alt="Banner"
-	    className="w-full h-full object-cover"
-	/>
-	    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-	</div>
-
-		    {/* ── CONTENIDO DEL PERFIL ── */}
-		    <div className="px-6 md:px-10">
-
-			{/* ── CABECERA ── */}
-	    <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-dark-fondo">
-
-		{/* Avatar */}
-		<div className="relative -mt-16 md:-mt-20">
-		    <img
-			src={resolverUrlImagen(perfil.avatar, avatarDefecto)}
-	    alt="Avatar"
-	    className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-white dark:border-dark-borde shadow-lg"
-	/>
-	</div>
-		
-		{/* Sin botones — perfil ajeno, solo lectura */}
-            </div>
-
-            {/* ── MODO VISTA ── */}
-            <div className="py-6 flex flex-col gap-8">
-
-		{/* Nombre y bio */}
-		<div className="flex flex-col gap-1">
-                    <h1 className="font-cormorant text-3xl md:text-4xl font-bold text-navy-letter dark:text-gray-100">
-			{perfil.nombreUsuario}
-                    </h1>
-                    <p className="font-inter text-sm text-gold-button">@{perfil.nombreUsuario}</p>
-                    {perfil.biografia && (
-			<p className="font-inter text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-lg leading-relaxed">
-                            {perfil.biografia}
-			</p>
-                    )}
-		</div>
-
-		{/* Favoritos */}
-		<div className="flex flex-col gap-3">
-
-		    {/* Autor y Género en fila */}
-		    <div className="grid grid-cols-2 gap-3">
-			<div className="bg-crema-fondo dark:bg-dark-fondo rounded-xl border border-gray-100 dark:border-white/5 p-4">
-			    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Autor favorito</p>
-			    <p className="font-cormorant text-lg font-bold text-gold-button">
-				{perfil.autorFavorito !== "Ninguno"
-				    ? perfil.autorFavorito
-				    : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
-			    </p>
-			</div>
-			<div className="bg-crema-fondo dark:bg-dark-fondo rounded-xl border border-gray-100 dark:border-white/5 p-4">
-			    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Género favorito</p>
-			    <p className="font-cormorant text-lg font-bold text-gold-button">
-				{perfil.generoFavorito !== "Ninguno"
-				    ? perfil.generoFavorito
-				    : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
-			    </p>
-			</div>
-		    </div>
-
-		    <div className="flex items-start gap-4">
-			{/* Portada */}
-			<div className="w-16 h-24 bg-gray-200 dark:bg-dark-fondo rounded-lg overflow-hidden flex-shrink-0">
-			    {perfil.imagenLibroFavorito ? (
-				<img
-				    src={resolverUrlImagen(perfil.imagenLibroFavorito, null)}
-				    alt={perfil.libroFavorito}
-				    className="w-full h-full object-cover"
-				/>
-			    ) : (
-				<div className="w-full h-full flex items-center justify-center">
-				    <span className="text-2xl">📖</span>
-				</div>
-			    )}
-			</div>
-
-			{/* Título y autor */}
-			<div className="flex flex-col justify-start gap-1">
-			    <p className="font-cormorant text-xl font-bold text-navy-letter dark:text-gray-100 leading-tight">
-				{perfil.libroFavorito}
-			    </p>
-			    {perfil.autorLibroFavorito && (
-				<p className="font-inter text-sm text-gray-500 dark:text-gray-400">
-				    {perfil.autorLibroFavorito}
-				</p>
-			    )}
-			</div>
-		    </div>
-		</div>
-
-		{/* ── ACTIVIDAD ── */}
-		<div>
-                    <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-4">
-														   Actividad
-                    </h2>
-
-                    {/* Tabs */}
-                    <div className="flex gap-1 border-b border-gray-200 dark:border-dark-borde mb-6 overflow-x-auto">
-			{tabs.map(tab => (
-                            <button
-				key={tab.id}
-				onClick={() => setTabActiva(tab.id)}
-				className={`px-4 py-3 font-inter text-sm font-medium whitespace-nowrap transition-all duration-200 border-b-2 cursor-pointer
-                                        ${tabActiva === tab.id
-                                            ? "border-gold-button text-gold-button"
-                                            : "border-transparent text-gray-500 dark:text-gray-400 hover:text-navy-letter dark:hover:text-gray-200"
-                                        }`}
-                            >
-				{tab.label}
-				<span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs
-                                        ${tabActiva === tab.id
-                                            ? "bg-gold-button/10 text-gold-button"
-                                            : "bg-gray-100 dark:bg-dark-borde text-gray-400"
-                                        }`}>
-                                    {tab.count}
-				</span>
-                            </button>
-			))}
+        <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-500">
+            <Navbar estaAutenticado={estaAutenticado} />
+            <div className="py-8 px-4">
+                <div className="max-w-4xl mx-auto bg-white dark:bg-dark-borde rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-white/5">
+                    <BannerPerfil perfil={perfil} />
+                    <div className="px-6 md:px-10">
+                        <div className="py-6 flex flex-col gap-8">
+                            <InfoPerfil perfil={perfil} />
+                            <FavoritosPerfil perfil={perfil} />
+                            <ActividadPerfil
+                                perfil={perfil}
+                                tabActiva={tabActiva}
+                                setTabActiva={setTabActiva}
+                                tituloSeccion="Actividad"
+                            />
+                        </div>
                     </div>
-
-                    {/* Reseñas likeadas */}
-                    {tabActiva === "likeadas" && (
-			<div className="flex flex-col gap-3">
-                            {perfil.resenasLikeadas?.length > 0 ? perfil.resenasLikeadas.map(r => (
-				<div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                    <div className="flex items-start justify-between gap-4">
-					<div className="flex-1">
-                                            <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
-						{r.tituloLibro}
-                                            </p>
-                                            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-															Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
-                                            </p>
-                                            <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
-						{r.textoResena}
-                                            </p>
-					</div>
-					<span className="text-red-400 text-xl flex-shrink-0">♥</span>
-                                    </div>
-				</div>
-                            )) : <MensajeVacio texto="Aún no ha dado like a ninguna reseña" />}
-			</div>
-                    )}
-
-                    {/* Reseñas calificadas */}
-                    {tabActiva === "calificadas" && (
-			<div className="flex flex-col gap-3">
-                            {perfil.resenasCalificadas?.length > 0 ? perfil.resenasCalificadas.map(r => (
-				<div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                    <div className="flex items-start justify-between gap-4">
-					<div className="flex-1">
-                                            <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
-						{r.tituloLibro}
-                                            </p>
-                                            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-															Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
-                                            </p>
-                                            <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
-						{r.textoResena}
-                                            </p>
-					</div>
-					<div className="flex items-center gap-1 bg-gold-button/10 px-3 py-1 rounded-full flex-shrink-0">
-                                            <span className="text-gold-button text-sm">★</span>
-                                            <span className="font-inter font-bold text-gold-button text-sm">{r.calificacion}</span>
-					</div>
-                                    </div>
-				</div>
-                            )) : <MensajeVacio texto="Aún no ha calificado ninguna reseña" />}
-			</div>
-                    )}
-
-                    {/* Libros calificados */}
-                    {tabActiva === "libros" && (
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
-				<div key={l.idLibro} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200">
-                                    {l.imagen ? (
-					<img
-                                            src={resolverUrlImagen(l.imagen, null)}
-                                            alt={l.titulo}
-                                            className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
-					/>
-                                    ) : (
-					<div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
-                                            <span className="text-2xl">📖</span>
-					</div>
-                                    )}
-                                    <div className="flex flex-col justify-between flex-1">
-					<div>
-                                            <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight">
-						{l.titulo}
-                                            </p>
-                                            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-						{l.autor}
-                                            </p>
-					</div>
-					<div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
-                                            <span className="text-gold-button text-xs">★</span>
-                                            <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/10</span>
-					</div>
-                                    </div>
-				</div>
-                            )) : (
-				<div className="col-span-2">
-                                    <MensajeVacio texto="Aún no ha calificado ningún libro" />
-				</div>
-                            )}
-			</div>
-                    )}
-
-                    {/* Comentarios likeados */}
-                    {tabActiva === "comentarios" && (
-			<div className="flex flex-col gap-3">
-                            {perfil.comentariosLikeados?.length > 0 ? perfil.comentariosLikeados.map(c => (
-				<div key={c.idComentario} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-2">
-														Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
-                                    </p>
-                                    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-					{c.texto}
-                                    </p>
-				</div>
-                            )) : <MensajeVacio texto="Aún no ha dado like a ningún comentario" />}
-			</div>
-                    )}
-		</div>
+                </div>
             </div>
-	</div>
-		</div>
-	    </div>
-	</div>
+        </div>
     );
 }
 
