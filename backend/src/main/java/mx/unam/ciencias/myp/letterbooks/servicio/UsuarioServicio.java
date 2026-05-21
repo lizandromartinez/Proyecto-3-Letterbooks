@@ -109,7 +109,6 @@ public class UsuarioServicio {
      * <p>
      * Este método inicializa los valores base del perfil para evitar nulls
      * y garantizar consistencia en la base de datos desde el momento del registro.
-     * Es necesaria la carpeta ""public"" en el frontend para que no haya problema con las rutas de las imagenes en la BD.
      * </p>
      *
      * Valores iniciales:
@@ -131,8 +130,8 @@ public class UsuarioServicio {
 	perfil.setAutor(null);
 	perfil.setGenero(null);
 	perfil.setLibro(null);
-	perfil.setAvatar("/estilos/img/defecto/avatar.jpg");
-	perfil.setBanner("/estilos/img/defecto/banner.png");
+	// perfil.setAvatar("/estilos/img/defecto/avatar.jpg");
+	// perfil.setBanner("/estilos/img/defecto/banner.png");
 	perfil.setFechaRegistro(java.time.LocalDate.now().toString());
 	perfil.setReportes(0);
 	return perfil;

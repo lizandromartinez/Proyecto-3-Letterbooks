@@ -10,10 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.Arrays;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 /**
  * Clase de configuración para la seguridad web del sistema.
  * Define las reglas de acceso a las rutas y el encriptador de contraseñas.
@@ -43,6 +40,8 @@ public class Seguridad {
             .csrf(csrf -> csrf.disable()) // Desactivamos CSRF por ser una API REST sin estado
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll() // Rutas de login/registro públicas
+		.requestMatchers("/api/archivos/**").permitAll() // para subir archivos
+		.requestMatchers("/almacenamiento/**").permitAll() // para guardar archivos
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );
 
@@ -59,21 +58,5 @@ public class Seguridad {
     @Bean
     public PasswordEncoder codificadorContrasena() {
         return new BCryptPasswordEncoder();
-    }
-
-    /**
-     * Define la configuración de CORS permitiendo peticiones desde el frontend.
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // Permitir solicitudes desde localhost en el puerto 80 (y 3000 si usas npm run dev)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }

@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Mapea la tabla "Usuario" de la base de datos MariaDB.
  */
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuario")
 public class Usuario {
 
     /* ID único del usuario. */
