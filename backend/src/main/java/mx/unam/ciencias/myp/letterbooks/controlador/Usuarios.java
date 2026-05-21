@@ -33,7 +33,7 @@ public class Usuarios {
     /**
      * Servicio encargado de las operaciones relacionadas
      * con los usuarios del sistema.
-    */
+     */
     @Autowired
     private UsuarioServicio usuarioServicio;
 
@@ -60,6 +60,21 @@ public class Usuarios {
     }
 
     /**
+     * Obtiene el perfil público de un usuario dado su nombre de usuario.
+     * @param nombreUsuario nombre de usuario a buscar
+     * @return ResponseEntity con el DTO del perfil
+     */
+    @GetMapping("/perfil/{nombreUsuario}")
+    public ResponseEntity<Perfil> obtenerPerfilPublico(@PathVariable String nombreUsuario) {
+	try {
+            Perfil perfil = perfilServicio.obtenerPerfilPorNombreUsuario(nombreUsuario);
+            return ResponseEntity.ok(perfil);
+	} catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+	}
+    }
+    
+    /**
      * Endpoint para modificar el perfil del usuario autenticado.
      * @param idUsuario identificador del usuario dueño del perfil
      * @param perfilDTO datos nuevos del perfil
@@ -68,9 +83,9 @@ public class Usuarios {
      */
     @PutMapping("/{idUsuario}/perfil")
     public ResponseEntity<?> actualizarPerfil(
-            @PathVariable("idUsuario") Integer idUsuario,
-            @RequestBody ActualizarPerfil datos,
-            @RequestHeader("Authorization") String authHeader) {
+        @PathVariable("idUsuario") Integer idUsuario,
+        @RequestBody ActualizarPerfil datos,
+        @RequestHeader("Authorization") String authHeader) {
         try {
             // Extraemos el token del header
             String token = authHeader.replace("Bearer ", "");

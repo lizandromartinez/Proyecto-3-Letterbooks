@@ -5,6 +5,7 @@ import PaginaAterrizaje from "./paginas/PaginaAterrizaje";
 import InicioDeSesion from "./paginas/InicioDeSesion";
 import PaginaAterrizajeAutenticado from "./paginas/PaginaAterrizajeAutenticado";
 import Perfil from "./paginas/Perfil";
+import PerfilPublico from "./paginas/PerfilPublico";
 
 /**
  * Componente principal de la aplicación.
@@ -26,6 +27,7 @@ function App() {
 		<Route path="/registro" element={<Registro />} />
 		<Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
 		<Route path="/perfil" element={<Perfil />} />
+		<Route path="/usuario/:nombreUsuario" element={<PerfilPublico />} />
 	    </Routes>
 	</BrowserRouter>
     );

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.dto.Perfil;
 import mx.unam.ciencias.myp.letterbooks.dto.ActualizarPerfil;
 import mx.unam.ciencias.myp.letterbooks.repositorio.CalificacionResenaRepositorio;
@@ -15,6 +16,7 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
 // import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 // import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 // import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
@@ -29,6 +31,10 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
 @Service
 public class PerfilServicio {
 
+    /* Repositorio del usuario asociado al perfil. */
+    @Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+    
     /* Repositorio de perfiles (acceso a datos de perfil). */
     @Autowired
     private PerfilRepositorio perfilRepositorio;
@@ -74,6 +80,13 @@ public class PerfilServicio {
 		.orElseThrow(() -> new RuntimeException("Perfil no encontrado para el usuario: " + idUsuario));
 	
 	return construirDTO(perfil, idUsuario);
+    }
+
+    @Transactional
+    public Perfil obtenerPerfilPorNombreUsuario(String nombreUsuario) {
+	Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + nombreUsuario));
+	return obtenerPerfilPorUsuario(usuario.getIdUsuario());
     }
 
     /**
