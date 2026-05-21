@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { obtenerPerfilPublico } from "../api/Perfil";
 import Navbar from "../componentes/navegacion/navbar/Navbar";
 import avatarDefecto from "../estilos/img/defecto/avatar.jpg";
 import bannerDefecto from "../estilos/img/defecto/banner.png";
 
 /**
  * Resuelve la URL correcta de una imagen según su origen.
+ * <p>
+ * Si la ruta es nula o corresponde a una imagen por defecto del frontend
+ * (rutas que comienzan con "/estilos/"), retorna la imagen de respaldo local.
+ * Si la ruta apunta a una imagen subida por el usuario, le agrega el prefijo
+ * del servidor backend para formar la URL completa de acceso.
+ * </p>
+ *
+ * @param {string} ruta ruta de la imagen almacenada en la base de datos.
+ * @param {string|null} imagenDefecto imagen local a mostrar si no hay ruta válida.
+ * @returns {string} URL completa de la imagen a renderizar.
  */
 function resolverUrlImagen(ruta, imagenDefecto) {
     if (!ruta) return imagenDefecto;
@@ -15,7 +25,16 @@ function resolverUrlImagen(ruta, imagenDefecto) {
 }
 
 /**
- * Componente auxiliar para estados vacíos.
+ * Componente auxiliar que muestra un mensaje visual cuando
+ * una sección de actividad no tiene contenido disponible.
+ * <p>
+ * Se utiliza en cada tab de la sección de actividad del perfil
+ * para indicar al visitante que el usuario aún no tiene registros
+ * en esa categoría específica.
+ * </p>
+ *
+ * @param {string} texto mensaje descriptivo a mostrar al usuario.
+ * @returns {JSX.Element} contenedor centrado con ícono y mensaje.
  */
 function MensajeVacio({ texto }) {
     return (
@@ -27,7 +46,16 @@ function MensajeVacio({ texto }) {
 }
 
 /**
- * Componente para ver el perfil público de cualquier usuario.
+ * Componente para visualizar el perfil público de cualquier usuario.
+ * <p>
+ * Obtiene los datos del perfil desde el backend usando el nombre de usuario
+ * extraído de los parámetros de la URL. No requiere autenticación ya que
+ * los perfiles son públicos. Muestra banner, avatar, información personal,
+ * favoritos literarios y la actividad del usuario organizada en tabs.
+ * </p>
+ *
+ * @component
+ * @returns {JSX.Element} vista completa del perfil público del usuario.
  */
 function PerfilPublico() {
     const { nombreUsuario } = useParams();
@@ -39,16 +67,19 @@ function PerfilPublico() {
     const estaAutenticado = !!localStorage.getItem("token");
 
     useEffect(() => {
-        const obtenerPerfil = async () => {
-            try {
-                const respuesta = await axios.get(
-                    `http://localhost:8080/api/usuarios/perfil/${nombreUsuario}`
-                );
-                setPerfil(respuesta.data);
-            } catch {
-                setError("No se encontró el perfil");
-            }
-        };
+	/**
+	 * Solicita al backend los datos del perfil correspondiente
+	 * al nombre de usuario obtenido desde los parámetros de la URL.
+	 * En caso de error muestra un mensaje al usuario.
+	 */
+	const obtenerPerfil = async () => {
+	    try {
+		const datosPerfil = await obtenerPerfilPublico(nombreUsuario);
+		setPerfil(datosPerfil);
+	    } catch {
+		setError("No se encontró el perfil");
+	    }
+	};
         obtenerPerfil();
     }, [nombreUsuario]);
 
@@ -161,7 +192,7 @@ function PerfilPublico() {
                     {/* ── ACTIVIDAD ── */}
                     <div>
                         <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-4">
-                            Actividad
+														       Actividad
                         </h2>
 
                         {/* Tabs */}
@@ -199,7 +230,7 @@ function PerfilPublico() {
                                                     {r.tituloLibro}
                                                 </p>
                                                 <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-                                                    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
+															    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
                                                 </p>
                                                 <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
                                                     {r.textoResena}
@@ -223,7 +254,7 @@ function PerfilPublico() {
                                                     {r.tituloLibro}
                                                 </p>
                                                 <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-                                                    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
+															    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
                                                 </p>
                                                 <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
                                                     {r.textoResena}
@@ -284,7 +315,7 @@ function PerfilPublico() {
                                 {perfil.comentariosLikeados?.length > 0 ? perfil.comentariosLikeados.map(c => (
                                     <div key={c.idComentario} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
                                         <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-2">
-                                            Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
+														    Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
                                         </p>
                                         <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                                             {c.texto}

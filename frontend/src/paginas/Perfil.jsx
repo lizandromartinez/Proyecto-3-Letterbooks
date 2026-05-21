@@ -1,13 +1,26 @@
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../componentes/navegacion/navbar/Navbar";
 import { ContextoSesion } from "../contexto/Sesion";
+import {obtenerPerfil, actualizarPerfil} from "../api/Perfil";
+import {
+    obtenerLibros,
+    obtenerAutores,
+    obtenerGeneros,
+    buscarLibros,
+    buscarAutores
+} from "../api/Catalogo";
+import { subirImagen } from "../api/Archivos";
 import avatarDefecto from "../estilos/img/defecto/avatar.jpg";
 import bannerDefecto from "../estilos/img/defecto/banner.png";
 
 /**
- * Extrae el ID de usuario desde el token JWT.
+ * Extrae el ID de usuario desde el payload del token JWT almacenado
+ * en localStorage. Decodifica la parte central del token (Base64)
+ * y retorna el campo id_usuario si existe.
+ *
+ * @param {string} token token JWT en formato Bearer.
+ * @returns {number|null} ID del usuario o null si el token es inválido.
  */
 function obtenerIdDesdeToken(token) {
     try {
@@ -20,6 +33,16 @@ function obtenerIdDesdeToken(token) {
 
 /**
  * Resuelve la URL correcta de una imagen según su origen.
+ * <p>
+ * Si la ruta es nula o corresponde a una imagen por defecto del frontend
+ * (rutas que comienzan con "/estilos/"), retorna la imagen de respaldo local.
+ * Si la ruta apunta a una imagen subida por el usuario, le agrega el prefijo
+ * del servidor backend para formar la URL completa de acceso.
+ * </p>
+ *
+ * @param {string} ruta ruta de la imagen almacenada en la base de datos.
+ * @param {string|null} imagenDefecto imagen local a mostrar si no hay ruta válida.
+ * @returns {string} URL completa de la imagen a renderizar.
  */
 function resolverUrlImagen(ruta, imagenDefecto) {
     if (!ruta) return imagenDefecto;
@@ -28,7 +51,16 @@ function resolverUrlImagen(ruta, imagenDefecto) {
 }
 
 /**
- * Componente de perfil del usuario autenticado.
+ * Componente principal de la página de perfil del usuario autenticado.
+ * <p>
+ * Carga y muestra los datos del perfil del usuario que tiene sesión activa,
+ * incluyendo banner, avatar, información personal, favoritos literarios
+ * y actividad organizada en tabs. Permite editar todos los campos del perfil
+ * incluyendo imágenes, y gestiona el cierre de sesión.
+ * </p>
+ *
+ * @component
+ * @returns {JSX.Element} vista completa del perfil propio con opciones de edición.
  */
 function Perfil() {
     const navigate = useNavigate();
@@ -64,73 +96,133 @@ function Perfil() {
     const [previstaBanner, setPrevistaBanner] = useState("");
 
     useEffect(() => {
-        const obtenerPerfil = async () => {
+	/**
+	 * Recupera el token de localStorage, extrae el ID del usuario
+	 * y solicita al backend los datos completos del perfil.
+	 * Inicializa los campos del formulario de edición con los valores actuales.
+	 */
+	const cargarPerfil = async () => {
             const tokenGuardado = localStorage.getItem("token");
-            if (!tokenGuardado) { setError("No hay sesión activa"); return; }
+
+            if (!tokenGuardado) {
+		setError("No hay sesión activa");
+		return;
+            }
+
             const id = obtenerIdDesdeToken(tokenGuardado);
-            if (!id) { setError("No se pudo obtener el ID del usuario"); return; }
+
+            if (!id) {
+		setError("No se pudo obtener el ID del usuario");
+		return;
+            }
+
             setToken(tokenGuardado);
             setIdUsuario(id);
-            try {
-                const respuesta = await axios.get(
-                    `http://localhost:8080/api/usuarios/${id}/perfil`,
-                    { headers: { Authorization: `Bearer ${tokenGuardado}` } }
-                );
-                setPerfil(respuesta.data);
-                setBiografia(respuesta.data.biografia || "");
-                setAvatar(respuesta.data.avatar || "");
-                setBanner(respuesta.data.banner || "");
-            } catch {
-                setError("Error al cargar el perfil");
-            }
-        };
-        obtenerPerfil();
-    }, []);
 
-    useEffect(() => {
-        if (!editando) return;
-        const cargarCatalogos = async () => {
             try {
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                const [resLibros, resAutores, resGeneros] = await Promise.all([
-                    axios.get("http://localhost:8080/api/catalogo/libros", config),
-                    axios.get("http://localhost:8080/api/catalogo/autores", config),
-                    axios.get("http://localhost:8080/api/catalogo/generos", config)
-                ]);
-                setLibros(resLibros.data);
-                setAutores(resAutores.data);
-                setGeneros(resGeneros.data);
+		const datosPerfil = await obtenerPerfil(id, tokenGuardado);
+
+		setPerfil(datosPerfil);
+		setBiografia(datosPerfil.biografia || "");
+		setAvatar(datosPerfil.avatar || "");
+		setBanner(datosPerfil.banner || "");
             } catch {
-                console.error("Error al cargar catálogos");
+		setError("Error al cargar el perfil");
             }
-        };
-        cargarCatalogos();
+	};
+
+	cargarPerfil();
+    }, []);
+    
+    useEffect(() => {
+	if (!editando) return;
+	/**
+	 * Se ejecuta cuando el usuario abre el modo edición.
+	 * Carga en paralelo la lista completa de libros, autores y géneros
+	 * disponibles para poblar los selectores del formulario.
+	 */
+	const cargarCatalogos = async () => {
+            try {
+		const [
+                    librosData,
+                    autoresData,
+                    generosData
+		] = await Promise.all([
+                    obtenerLibros(token),
+                    obtenerAutores(token),
+                    obtenerGeneros(token)
+		]);
+
+		setLibros(librosData);
+		setAutores(autoresData);
+		setGeneros(generosData);
+
+            } catch {
+		console.error("Error al cargar catálogos");
+            }
+	};
+
+	cargarCatalogos();
     }, [editando]);
 
     useEffect(() => {
-        if (!editando || busquedaLibro.length < 2) return;
-        const timeout = setTimeout(async () => {
-            const res = await axios.get(
-                `http://localhost:8080/api/catalogo/libros/buscar?titulo=${busquedaLibro}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setLibros(res.data);
-        }, 400);
-        return () => clearTimeout(timeout);
-    }, [busquedaLibro]);
+	/**
+	 * Búsqueda de libros con debounce de 400ms.
+	 * Se activa cuando el usuario escribe en el campo de búsqueda
+	 * de libro favorito y la cadena tiene al menos 2 caracteres.
+	 * Evita hacer una petición por cada tecla presionada.
+	 */
+	if (!editando || busquedaLibro.length < 2) return;
 
+	const timeout = setTimeout(async () => {
+            try {
+		const librosEncontrados = await buscarLibros(
+                    busquedaLibro,
+                    token
+		);
+
+		setLibros(librosEncontrados);
+            } catch {
+		console.error("Error al buscar libros");
+            }
+	}, 400);
+
+	return () => clearTimeout(timeout);
+    }, [busquedaLibro]);
+    
     useEffect(() => {
-        if (!editando || busquedaAutor.length < 2) return;
-        const timeout = setTimeout(async () => {
-            const res = await axios.get(
-                `http://localhost:8080/api/catalogo/autores/buscar?nombre=${busquedaAutor}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setAutores(res.data);
-        }, 400);
-        return () => clearTimeout(timeout);
+	/**
+	 * Búsqueda de autores con debounce de 400ms.
+	 * Se activa cuando el usuario escribe en el campo de búsqueda
+	 * de autor favorito y la cadena tiene al menos 2 caracteres.
+	 * Evita hacer una petición por cada tecla presionada.
+	 */
+	if (!editando || busquedaAutor.length < 2) return;
+
+	const timeout = setTimeout(async () => {
+            try {
+		const autoresEncontrados = await buscarAutores(
+                    busquedaAutor,
+                    token
+		);
+
+		setAutores(autoresEncontrados);
+            } catch {
+		console.error("Error al buscar autores");
+            }
+	}, 400);
+
+	return () => clearTimeout(timeout);
     }, [busquedaAutor]);
 
+    /**
+     * Maneja la selección de un archivo de imagen desde el explorador
+     * de archivos del sistema. Genera una URL de previsualización local
+     * usando URL.createObjectURL para mostrar la imagen antes de subirla.
+     *
+     * @param {Event} e evento de cambio del input de tipo file.
+     * @param {string} tipo indica si la imagen es para "avatar" o "banner".
+     */
     const manejarSeleccionImagen = (e, tipo) => {
         const archivo = e.target.files[0];
         if (!archivo) return;
@@ -139,42 +231,58 @@ function Perfil() {
         else { setArchivoBanner(archivo); setPrevistaBanner(urlPrevia); }
     };
 
-    const subirImagen = async (archivo) => {
-        const formData = new FormData();
-        formData.append("archivo", archivo);
-        const res = await axios.post(
-            "http://localhost:8080/api/archivos/imagen", formData,
-            { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
-        );
-        return res.data.url;
-    };
-
+    /**
+     * Orquesta el guardado de los cambios del perfil.
+     * Si el usuario seleccionó imágenes nuevas, las sube primero al servidor
+     * y obtiene sus URLs antes de enviar el resto de los datos.
+     * Al finalizar limpia los archivos temporales y cierra el modo edición.
+     */
     const guardarCambios = async () => {
-        setGuardando(true);
-        try {
+	setGuardando(true);
+
+	try {
             let urlAvatar = avatar;
             let urlBanner = banner;
-            if (archivoAvatar) urlAvatar = await subirImagen(archivoAvatar);
-            if (archivoBanner) urlBanner = await subirImagen(archivoBanner);
+
+	    if (archivoAvatar) urlAvatar = await subirImagen(archivoAvatar, token, "avatares");
+	    if (archivoBanner) urlBanner = await subirImagen(archivoBanner, token, "banners");
+	    
             const datos = {
-                biografia, avatar: urlAvatar, banner: urlBanner,
-                idAutorFavorito: idAutorFavorito ? parseInt(idAutorFavorito) : null,
-                idGeneroFavorito: idGeneroFavorito ? parseInt(idGeneroFavorito) : null,
-                idLibroFavorito: idLibroFavorito ? parseInt(idLibroFavorito) : null,
+		biografia,
+		avatar: urlAvatar,
+		banner: urlBanner,
+		idAutorFavorito: idAutorFavorito
+                    ? parseInt(idAutorFavorito)
+                    : null,
+		idGeneroFavorito: idGeneroFavorito
+                    ? parseInt(idGeneroFavorito)
+                    : null,
+		idLibroFavorito: idLibroFavorito
+                    ? parseInt(idLibroFavorito)
+                    : null,
             };
-            const respuesta = await axios.put(
-                `http://localhost:8080/api/usuarios/${idUsuario}/perfil`, datos,
-                { headers: { Authorization: `Bearer ${token}` } }
+
+            const perfilActualizado = await actualizarPerfil(
+		idUsuario,
+		datos,
+		token
             );
-            setPerfil(respuesta.data);
-            setArchivoAvatar(null); setArchivoBanner(null);
-            setPrevistaAvatar(""); setPrevistaBanner("");
+
+            setPerfil(perfilActualizado);
+
+            setArchivoAvatar(null);
+            setArchivoBanner(null);
+
+            setPrevistaAvatar("");
+            setPrevistaBanner("");
+
             setEditando(false);
-        } catch {
+
+	} catch {
             setError("Error al guardar los cambios");
-        } finally {
+	} finally {
             setGuardando(false);
-        }
+	}
     };
 
     if (error) return (
@@ -195,7 +303,11 @@ function Perfil() {
         { id: "libros", label: "Libros calificados", count: perfil.librosCalificados?.length || 0 },
         { id: "comentarios", label: "Comentarios likeados", count: perfil.comentariosLikeados?.length || 0 },
     ];
-    
+
+    /**
+     * Cierra la sesión del usuario eliminando el token del contexto
+     * y redirige a la página de inicio.
+     */
     const manejarLogout = () => {
 	cerrarSesion();
 	navigate("/");
@@ -606,7 +718,11 @@ function Perfil() {
 }
 
 /**
- * Componente auxiliar para estados vacíos.
+ * Componente auxiliar que muestra un mensaje visual cuando
+ * una sección de actividad no tiene contenido disponible.
+ *
+ * @param {string} texto mensaje descriptivo a mostrar al usuario.
+ * @returns {JSX.Element} contenedor centrado con ícono y mensaje.
  */
 function MensajeVacio({ texto }) {
     return (

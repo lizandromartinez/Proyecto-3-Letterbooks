@@ -65,7 +65,7 @@ public class Usuarios {
      * @return ResponseEntity con el DTO del perfil
      */
     @GetMapping("/perfil/{nombreUsuario}")
-    public ResponseEntity<Perfil> obtenerPerfilPublico(@PathVariable String nombreUsuario) {
+    public ResponseEntity<Perfil> obtenerPerfilPublico(@PathVariable("nombreUsuario") String nombreUsuario) {
 	try {
             Perfil perfil = perfilServicio.obtenerPerfilPorNombreUsuario(nombreUsuario);
             return ResponseEntity.ok(perfil);

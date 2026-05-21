@@ -41,7 +41,8 @@ public class Seguridad {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll() // Rutas de login/registro públicas
 		.requestMatchers("/api/archivos/**").permitAll() // para subir archivos
-		.requestMatchers("/almacenamiento/**").permitAll() // para guardar archivos
+		.requestMatchers("/api/almacenamiento/**").permitAll() // para guardar archivos
+		.requestMatchers("/almacenamiento/**").permitAll() // visualización de archivos
 		.requestMatchers("/api/usuarios/perfil/**").permitAll()//para ver perfiles ajenos 
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );
