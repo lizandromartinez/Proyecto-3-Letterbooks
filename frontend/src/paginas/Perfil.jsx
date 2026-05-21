@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../componentes/navegacion/navbar/Navbar";
+import { ContextoSesion } from "../contexto/Sesion";
 import avatarDefecto from "../estilos/img/defecto/avatar.jpg";
 import bannerDefecto from "../estilos/img/defecto/banner.png";
 
@@ -17,7 +20,6 @@ function obtenerIdDesdeToken(token) {
 
 /**
  * Resuelve la URL correcta de una imagen según su origen.
- * Si es una ruta por defecto del frontend no le agrega el prefijo del backend.
  */
 function resolverUrlImagen(ruta, imagenDefecto) {
     if (!ruta) return imagenDefecto;
@@ -26,32 +28,36 @@ function resolverUrlImagen(ruta, imagenDefecto) {
 }
 
 /**
- * Componente de perfil del usuario.
+ * Componente de perfil del usuario autenticado.
  */
 function Perfil() {
+    const navigate = useNavigate();
+    const { cerrarSesion } = useContext(ContextoSesion);
+    
     const [perfil, setPerfil] = useState(null);
     const [error, setError] = useState(null);
     const [editando, setEditando] = useState(false);
-    const [esPropietario, setEsPropietario] = useState(false);
     const [token, setToken] = useState(null);
     const [idUsuario, setIdUsuario] = useState(null);
+    const [guardando, setGuardando] = useState(false);
+    const [tabActiva, setTabActiva] = useState("likeadas");
 
     // Catálogos
     const [libros, setLibros] = useState([]);
     const [autores, setAutores] = useState([]);
     const [generos, setGeneros] = useState([]);
-
-    // Búsquedas
     const [busquedaLibro, setBusquedaLibro] = useState("");
     const [busquedaAutor, setBusquedaAutor] = useState("");
 
     // Campos editables
     const [biografia, setBiografia] = useState("");
+    const [avatar, setAvatar] = useState("");
+    const [banner, setBanner] = useState("");
     const [idAutorFavorito, setIdAutorFavorito] = useState("");
     const [idGeneroFavorito, setIdGeneroFavorito] = useState("");
     const [idLibroFavorito, setIdLibroFavorito] = useState("");
 
-    // Archivos e imágenes
+    // Archivos
     const [archivoAvatar, setArchivoAvatar] = useState(null);
     const [archivoBanner, setArchivoBanner] = useState(null);
     const [previstaAvatar, setPrevistaAvatar] = useState("");
@@ -61,14 +67,10 @@ function Perfil() {
         const obtenerPerfil = async () => {
             const tokenGuardado = localStorage.getItem("token");
             if (!tokenGuardado) { setError("No hay sesión activa"); return; }
-
             const id = obtenerIdDesdeToken(tokenGuardado);
             if (!id) { setError("No se pudo obtener el ID del usuario"); return; }
-
             setToken(tokenGuardado);
             setIdUsuario(id);
-            setEsPropietario(true);
-
             try {
                 const respuesta = await axios.get(
                     `http://localhost:8080/api/usuarios/${id}/perfil`,
@@ -76,14 +78,15 @@ function Perfil() {
                 );
                 setPerfil(respuesta.data);
                 setBiografia(respuesta.data.biografia || "");
-            } catch (err) {
+                setAvatar(respuesta.data.avatar || "");
+                setBanner(respuesta.data.banner || "");
+            } catch {
                 setError("Error al cargar el perfil");
             }
         };
         obtenerPerfil();
     }, []);
 
-    // Carga catálogos al abrir edición
     useEffect(() => {
         if (!editando) return;
         const cargarCatalogos = async () => {
@@ -97,14 +100,13 @@ function Perfil() {
                 setLibros(resLibros.data);
                 setAutores(resAutores.data);
                 setGeneros(resGeneros.data);
-            } catch (err) {
-                console.error("Error al cargar catálogos:", err);
+            } catch {
+                console.error("Error al cargar catálogos");
             }
         };
         cargarCatalogos();
     }, [editando]);
 
-    // Búsqueda de libros con debounce
     useEffect(() => {
         if (!editando || busquedaLibro.length < 2) return;
         const timeout = setTimeout(async () => {
@@ -117,7 +119,6 @@ function Perfil() {
         return () => clearTimeout(timeout);
     }, [busquedaLibro]);
 
-    // Búsqueda de autores con debounce
     useEffect(() => {
         if (!editando || busquedaAutor.length < 2) return;
         const timeout = setTimeout(async () => {
@@ -130,388 +131,489 @@ function Perfil() {
         return () => clearTimeout(timeout);
     }, [busquedaAutor]);
 
-    /**
-     * Maneja la selección de imagen y genera previsualización local.
-     */
     const manejarSeleccionImagen = (e, tipo) => {
         const archivo = e.target.files[0];
         if (!archivo) return;
         const urlPrevia = URL.createObjectURL(archivo);
-        if (tipo === "avatar") {
-            setArchivoAvatar(archivo);
-            setPrevistaAvatar(urlPrevia);
-        } else {
-            setArchivoBanner(archivo);
-            setPrevistaBanner(urlPrevia);
-        }
+        if (tipo === "avatar") { setArchivoAvatar(archivo); setPrevistaAvatar(urlPrevia); }
+        else { setArchivoBanner(archivo); setPrevistaBanner(urlPrevia); }
     };
 
-    /**
-     * Sube una imagen al servidor y retorna su URL.
-     */
-    const subirImagen = async (archivo, tipo) => {
-	const formData = new FormData();
-	
-	formData.append("archivo", archivo);
-	
-	const res = await axios.post(
-            `http://localhost:8080/api/almacenamiento/imagen/${tipo}`,
-            formData,
-            {
-		headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
-		}
-            }
-	);
-	
-	return res.data.url;
+    const subirImagen = async (archivo) => {
+        const formData = new FormData();
+        formData.append("archivo", archivo);
+        const res = await axios.post(
+            "http://localhost:8080/api/archivos/imagen", formData,
+            { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
+        );
+        return res.data.url;
     };
-    
-    /**
-     * Guarda los cambios subiendo imágenes si hay nuevas y actualizando el perfil.
-     */
+
     const guardarCambios = async () => {
+        setGuardando(true);
         try {
-            let urlAvatar = perfil.avatar;
-            let urlBanner = perfil.banner;
-
-	    if (archivoAvatar) {
-		urlAvatar = await subirImagen(archivoAvatar, "avatares");
-	    }
-	    
-	    if (archivoBanner) {
-		urlBanner = await subirImagen(archivoBanner, "banners");
-	    }
-	    
+            let urlAvatar = avatar;
+            let urlBanner = banner;
+            if (archivoAvatar) urlAvatar = await subirImagen(archivoAvatar);
+            if (archivoBanner) urlBanner = await subirImagen(archivoBanner);
             const datos = {
-                biografia,
-                avatar: urlAvatar,
-                banner: urlBanner,
+                biografia, avatar: urlAvatar, banner: urlBanner,
                 idAutorFavorito: idAutorFavorito ? parseInt(idAutorFavorito) : null,
                 idGeneroFavorito: idGeneroFavorito ? parseInt(idGeneroFavorito) : null,
                 idLibroFavorito: idLibroFavorito ? parseInt(idLibroFavorito) : null,
             };
-
             const respuesta = await axios.put(
-                `http://localhost:8080/api/usuarios/${idUsuario}/perfil`,
-                datos,
+                `http://localhost:8080/api/usuarios/${idUsuario}/perfil`, datos,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setPerfil(respuesta.data);
-            setArchivoAvatar(null);
-            setArchivoBanner(null);
-            setPrevistaAvatar("");
-            setPrevistaBanner("");
+            setArchivoAvatar(null); setArchivoBanner(null);
+            setPrevistaAvatar(""); setPrevistaBanner("");
             setEditando(false);
-        } catch (err) {
+        } catch {
             setError("Error al guardar los cambios");
+        } finally {
+            setGuardando(false);
         }
     };
 
-    if (error) return <p>{error}</p>;
-    if (!perfil) return <p>Cargando perfil...</p>;
+    if (error) return (
+        <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400 font-inter">{error}</p>
+        </div>
+    );
 
+    if (!perfil) return (
+        <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400 font-inter">Cargando perfil...</p>
+        </div>
+    );
+
+    const tabs = [
+        { id: "likeadas", label: "Reseñas likeadas", count: perfil.resenasLikeadas?.length || 0 },
+        { id: "calificadas", label: "Reseñas calificadas", count: perfil.resenasCalificadas?.length || 0 },
+        { id: "libros", label: "Libros calificados", count: perfil.librosCalificados?.length || 0 },
+        { id: "comentarios", label: "Comentarios likeados", count: perfil.comentariosLikeados?.length || 0 },
+    ];
+    
+    const manejarLogout = () => {
+	cerrarSesion();
+	navigate("/");
+    };
+    
     return (
-        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px", fontFamily: "Arial" }}>
+        <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-300">
+	    <Navbar estaAutenticado={true} /> 
+            {/* ── BANNER ── */}
+            <div className="relative w-full h-52 md:h-64">
+                <img
+                    src={resolverUrlImagen(perfil.banner, bannerDefecto)}
+                    alt="Banner"
+                    className="w-full h-full object-cover"
+                />
+                {/* Overlay sutil para legibilidad */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            </div>
 
-            {/* Banner */}
-            <img
-                src={resolverUrlImagen(perfil.banner, bannerDefecto)}
-                alt="Banner"
-                style={{ width: "100%", height: "220px", objectFit: "cover", borderRadius: "10px" }}
-            />
+            {/* ── CONTENEDOR PRINCIPAL ── */}
+            <div className="max-w-4xl mx-auto px-4 md:px-8">
 
-            {/* Avatar */}
-            <img
-                src={resolverUrlImagen(perfil.avatar, avatarDefecto)}
-                alt="Avatar"
-                style={{
-                    width: "150px", height: "150px", borderRadius: "50%",
-                    marginTop: "-60px", border: "4px solid white", backgroundColor: "white"
-                }}
-            />
-
-            {/* Nombre */}
-            <h1 style={{ marginTop: "10px" }}>
-                {perfil.nombreUsuario || "Sin nombre de usuario"}
-            </h1>
-
-            {/* Botón editar */}
-            {esPropietario && !editando && (
-                <button
-                    style={{
-                        padding: "10px 15px", marginTop: "10px", cursor: "pointer",
-                        border: "1px solid gray", borderRadius: "5px", backgroundColor: "#f0f0f0"
-                    }}
-                    onClick={() => setEditando(true)}
-                >
-                     Editar perfil
-                </button>
-            )}
-
-            {/* FORMULARIO DE EDICIÓN */}
-            {editando ? (
-                <div style={{
-                    marginTop: "20px", padding: "20px",
-                    border: "1px solid #ccc", borderRadius: "10px", backgroundColor: "#fafafa"
-                }}>
-                    <h2>Editar perfil</h2>
+                {/* ── CABECERA DEL PERFIL ── */}
+                <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-dark-borde">
 
                     {/* Avatar */}
-                    <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-												   Avatar:
-                    </label>
-                    <img
-                        src={previstaAvatar || resolverUrlImagen(perfil.avatar, avatarDefecto)}
-                        alt="Preview avatar"
-                        style={{
-                            width: "100px", height: "100px", borderRadius: "50%",
-                            marginTop: "10px", objectFit: "cover", display: "block"
-                        }}
-                    />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "block", marginTop: "10px" }}
-                        onChange={e => manejarSeleccionImagen(e, "avatar")}
-                    />
-
-                    {/* Banner */}
-                    <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-												   Banner:
-                    </label>
-                    <img
-                        src={previstaBanner || resolverUrlImagen(perfil.banner, bannerDefecto)}
-                        alt="Preview banner"
-                        style={{
-                            width: "100%", height: "120px", objectFit: "cover",
-                            marginTop: "10px", borderRadius: "8px", display: "block"
-                        }}
-                    />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "block", marginTop: "10px" }}
-                        onChange={e => manejarSeleccionImagen(e, "banner")}
-                    />
-
-                    {/* Biografía */}
-                    <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-												   Biografía:
-                    </label>
-                    <textarea
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "5px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={biografia}
-                        onChange={e => setBiografia(e.target.value)}
-                    />
-
-                    <hr style={{ margin: "30px 0" }} />
-
-                    {/* Autor favorito */}
-                    <h3>Autor favorito</h3>
-                    <input
-                        placeholder="Buscar autor..."
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "10px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={busquedaAutor}
-                        onChange={e => setBusquedaAutor(e.target.value)}
-                    />
-                    <select
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "10px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={idAutorFavorito}
-                        onChange={e => setIdAutorFavorito(e.target.value)}
-                    >
-                        <option value="">-- Selecciona un autor --</option>
-                        {autores.map(a => (
-                            <option key={a.idAutor} value={a.idAutor}>{a.nombreAutor}</option>
-                        ))}
-                    </select>
-
-                    {/* Género favorito */}
-                    <h3 style={{ marginTop: "25px" }}>Género favorito</h3>
-                    <select
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "10px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={idGeneroFavorito}
-                        onChange={e => setIdGeneroFavorito(e.target.value)}
-                    >
-                        <option value="">-- Selecciona un género --</option>
-                        {generos.map(g => (
-                            <option key={g.idGenero} value={g.idGenero}>{g.nombreGenero}</option>
-                        ))}
-                    </select>
-
-                    {/* Libro favorito */}
-                    <h3 style={{ marginTop: "25px" }}>Libro favorito</h3>
-                    <input
-                        placeholder="Buscar libro..."
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "10px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={busquedaLibro}
-                        onChange={e => setBusquedaLibro(e.target.value)}
-                    />
-                    <select
-                        style={{
-                            width: "100%", padding: "10px", marginTop: "10px",
-                            borderRadius: "5px", border: "1px solid #ccc"
-                        }}
-                        value={idLibroFavorito}
-                        onChange={e => setIdLibroFavorito(e.target.value)}
-                    >
-                        <option value="">-- Selecciona un libro --</option>
-                        {libros.map(l => (
-                            <option key={l.idLibro} value={l.idLibro}>{l.titulo}</option>
-                        ))}
-                    </select>
-
-                    {/* Botones */}
-                    <div style={{ marginTop: "25px" }}>
-                        <button
-                            style={{
-                                padding: "10px 15px", marginRight: "10px", cursor: "pointer",
-                                border: "1px solid gray", borderRadius: "5px", backgroundColor: "#f0f0f0"
-                            }}
-                            onClick={guardarCambios}
-                        >
-                             Guardar
-                        </button>
-                        <button
-                            style={{
-                                padding: "10px 15px", cursor: "pointer",
-                                border: "1px solid gray", borderRadius: "5px", backgroundColor: "#f0f0f0"
-                            }}
-                            onClick={() => setEditando(false)}
-                        >
-                             Cancelar
-                        </button>
+                    <div className="relative -mt-16 md:-mt-20">
+                        <img
+                            src={resolverUrlImagen(perfil.avatar, avatarDefecto)}
+                            alt="Avatar"
+                            className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-crema-fondo dark:border-dark-fondo shadow-lg"
+                        />
                     </div>
+
+                    {/* Botones de acción */}
+                    {!editando && (
+                        <div className="flex gap-3 md:mb-2">
+                            <button
+                                onClick={() => setEditando(true)}
+                                className="flex items-center gap-2 px-5 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter text-sm font-medium hover:bg-gray-100 dark:hover:bg-dark-borde transition-all duration-200 cursor-pointer"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+					  Editar perfil
+                            </button>
+	
+			    <button
+				onClick={manejarLogout}
+				className="flex items-center gap-2 px-5 py-2 rounded-md border border-red-400 text-red-500 font-inter text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-200 cursor-pointer"
+			    >
+				<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+				</svg>
+					  Salir
+			    </button>
+                        </div>
+                    )}
                 </div>
-	    ) : (
-		<div style={{ marginTop: "20px" }}>
 
-		    {/* Biografía */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Biografía</h3>
-			<p>{perfil.biografia || "Sin biografía aún"}</p>
-		    </div>
+                {/* ── MODO EDICIÓN ── */}
+                {editando ? (
+                    <div className="py-8">
+                        <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-6">
+														       Editar información
+                        </h2>
 
-		    {/* Favoritos */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Libro favorito</h3>
-			<p>{perfil.libroFavorito || "No definido"}</p>
-		    </div>
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Autor favorito</h3>
-			<p>{perfil.autorFavorito || "No definido"}</p>
-		    </div>
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Género favorito</h3>
-			<p>{perfil.generoFavorito || "No definido"}</p>
-		    </div>
+                        <div className="bg-white dark:bg-dark-borde rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm p-6 md:p-8 flex flex-col gap-6">
 
-		    {/* Reseñas likeadas */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Reseñas que le gustaron</h3>
-			{perfil.resenasLikeadas && perfil.resenasLikeadas.length > 0 ? (
-			    perfil.resenasLikeadas.map(r => (
-				<div key={r.idResena} style={{
-				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
-				}}>
-				    <strong>{r.tituloLibro}</strong>
-				    <p style={{ fontSize: "12px", color: "gray" }}>
-										       por {r.autorResena} · {r.fechaLike}
-				    </p>
-				    <p>{r.textoResena}</p>
-				</div>
-			    ))
-			) : (
-			    <p>Ninguna aún</p>
-			)}
-		    </div>
+                            {/* Imágenes */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-		    {/* Reseñas calificadas */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Reseñas que ha calificado</h3>
-			{perfil.resenasCalificadas && perfil.resenasCalificadas.length > 0 ? (
-			    perfil.resenasCalificadas.map(r => (
-				<div key={r.idResena} style={{
-				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
-				}}>
-				    <strong>{r.tituloLibro}</strong>
-				    <p style={{ fontSize: "12px", color: "gray" }}>
-										       por {r.autorResena} · {r.fechaCalificacion}
-				    </p>
-				    <p>{r.textoResena}</p>
-				    <p style={{ fontWeight: "bold" }}>Calificación: {r.calificacion}/10</p>
-				</div>
-			    ))
-			) : (
-			    <p>Ninguna aún</p>
-			)}
-		    </div>
+                                {/* Avatar */}
+                                <div className="flex flex-col gap-3">
+                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+																Avatar
+                                    </label>
+                                    <img
+                                        src={previstaAvatar || resolverUrlImagen(perfil.avatar, avatarDefecto)}
+                                        alt="Preview avatar"
+                                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                                    />
+                                    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+						  Cambiar avatar
+                                        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "avatar")} />
+                                    </label>
+                                </div>
 
-		    {/* Libros calificados */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Libros que ha calificado</h3>
-			{perfil.librosCalificados && perfil.librosCalificados.length > 0 ? (
-			    perfil.librosCalificados.map(l => (
-				<div key={l.idLibro} style={{
-				    display: "flex", alignItems: "center", gap: "15px",
-				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
-				}}>
-				    {l.imagen && (
-					<img
-					    src={resolverUrlImagen(l.imagen, null)}
-					    alt={l.titulo}
-					    style={{ width: "60px", height: "90px", objectFit: "cover", borderRadius: "4px" }}
-					/>
-				    )}
-				    <div>
-					<strong>{l.titulo}</strong>
-					<p style={{ fontSize: "12px", color: "gray" }}>{l.autor}</p>
-					<p style={{ fontWeight: "bold" }}>Calificación: {l.calificacion}/10</p>
-				    </div>
-				</div>
-			    ))
-			) : (
-			    <p>Ninguno aún</p>
-			)}
-		    </div>
+                                {/* Banner */}
+                                <div className="flex flex-col gap-3">
+                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+																Banner
+                                    </label>
+                                    <img
+                                        src={previstaBanner || resolverUrlImagen(perfil.banner, bannerDefecto)}
+                                        alt="Preview banner"
+                                        className="w-full h-24 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600"
+                                    />
+                                    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+						  Cambiar banner
+                                        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "banner")} />
+                                    </label>
+                                </div>
+                            </div>
 
-		    {/* Comentarios likeados */}
-		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-			<h3>Comentarios que le gustaron</h3>
-			{perfil.comentariosLikeados && perfil.comentariosLikeados.length > 0 ? (
-			    perfil.comentariosLikeados.map(c => (
-				<div key={c.idComentario} style={{
-				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
-				}}>
-				    <p style={{ fontSize: "12px", color: "gray" }}>
-										       en <strong>{c.tituloLibro}</strong> · por {c.autorComentario} · {c.fechaLike}
-				    </p>
-				    <p>{c.texto}</p>
-				</div>
-			    ))
-			) : (
-			    <p>Ninguno aún</p>
-			)}
-		    </div>
-	        </div>
-	    )}
-	</div>
+                            {/* Biografía */}
+                            <div className="flex flex-col gap-2">
+                                <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Biografía
+                                </label>
+                                <textarea
+                                    rows={3}
+                                    value={biografia}
+                                    onChange={e => setBiografia(e.target.value)}
+                                    placeholder="Cuéntanos sobre ti..."
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+                                />
+                            </div>
+
+                            {/* Favoritos */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                                {/* Autor favorito */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+																Autor favorito
+                                    </label>
+                                    <input
+                                        placeholder="Buscar autor..."
+                                        value={busquedaAutor}
+                                        onChange={e => setBusquedaAutor(e.target.value)}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+                                    />
+                                    <select
+                                        value={idAutorFavorito}
+                                        onChange={e => setIdAutorFavorito(e.target.value)}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+                                    >
+                                        <option value="">-- Selecciona --</option>
+                                        {autores.map(a => <option key={a.idAutor} value={a.idAutor}>{a.nombreAutor}</option>)}
+                                    </select>
+                                </div>
+
+                                {/* Género favorito */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+																Género favorito
+                                    </label>
+                                    <select
+                                        value={idGeneroFavorito}
+                                        onChange={e => setIdGeneroFavorito(e.target.value)}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all mt-8"
+                                    >
+                                        <option value="">-- Selecciona --</option>
+                                        {generos.map(g => <option key={g.idGenero} value={g.idGenero}>{g.nombreGenero}</option>)}
+                                    </select>
+                                </div>
+
+                                {/* Libro favorito */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+																Libro favorito
+                                    </label>
+                                    <input
+                                        placeholder="Buscar libro..."
+                                        value={busquedaLibro}
+                                        onChange={e => setBusquedaLibro(e.target.value)}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+                                    />
+                                    <select
+                                        value={idLibroFavorito}
+                                        onChange={e => setIdLibroFavorito(e.target.value)}
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+                                    >
+                                        <option value="">-- Selecciona --</option>
+                                        {libros.map(l => <option key={l.idLibro} value={l.idLibro}>{l.titulo}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Botones */}
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    onClick={guardarCambios}
+                                    disabled={guardando}
+                                    className="px-6 py-2 rounded-md bg-gold-button hover:bg-gold-button-hover text-white font-inter font-bold text-sm transition-all duration-200 disabled:opacity-60 cursor-pointer"
+                                >
+                                    {guardando ? "Guardando..." : "Guardar cambios"}
+                                </button>
+                                <button
+                                    onClick={() => setEditando(false)}
+                                    className="px-6 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter font-medium text-sm hover:bg-gray-100 dark:hover:bg-dark-fondo transition-all duration-200 cursor-pointer"
+                                >
+                                     Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                ) : (
+
+                    /* ── MODO VISTA ── */
+                    <div className="py-6 flex flex-col gap-8">
+
+                        {/* Nombre y bio */}
+                        <div className="flex flex-col gap-1">
+                            <h1 className="font-cormorant text-3xl md:text-4xl font-bold text-navy-letter dark:text-gray-100">
+                                {perfil.nombreUsuario}
+                            </h1>
+                            <p className="font-inter text-sm text-gold-button">@{perfil.nombreUsuario}</p>
+                            {perfil.biografia && (
+                                <p className="font-inter text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-lg leading-relaxed">
+                                    {perfil.biografia}
+                                </p>
+                            )}			   
+                        </div>
+
+                        {/* Favoritos */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            {/* Autor y Género */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
+                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Autor favorito</p>
+                                    <p className="font-cormorant text-lg font-bold text-gold-button">
+                                        {perfil.autorFavorito !== "Ninguno" ? perfil.autorFavorito : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
+                                    </p>
+                                </div>
+                                <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
+                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Género favorito</p>
+                                    <p className="font-cormorant text-lg font-bold text-gold-button">
+                                        {perfil.generoFavorito !== "Ninguno" ? perfil.generoFavorito : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Libro favorito */}
+                            <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-gold-button">♥</span>
+                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">Libro favorito</p>
+                                </div>
+                                {perfil.libroFavorito !== "Ninguno" ? (
+                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100">
+                                        {perfil.libroFavorito}
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-400 font-inter text-sm">No definido</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ── ACTIVIDAD ── */}
+                        <div>
+                            <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-4">
+															   Tu actividad
+                            </h2>
+
+                            {/* Tabs */}
+                            <div className="flex gap-1 border-b border-gray-200 dark:border-dark-borde mb-6 overflow-x-auto">
+                                {tabs.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setTabActiva(tab.id)}
+                                        className={`px-4 py-3 font-inter text-sm font-medium whitespace-nowrap transition-all duration-200 border-b-2 cursor-pointer
+                                            ${tabActiva === tab.id
+                                                ? "border-gold-button text-gold-button"
+                                                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-navy-letter dark:hover:text-gray-200"
+                                            }`}
+                                    >
+                                        {tab.label}
+                                        <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs
+                                            ${tabActiva === tab.id
+                                                ? "bg-gold-button/10 text-gold-button"
+                                                : "bg-gray-100 dark:bg-dark-borde text-gray-400"
+                                            }`}>
+                                            {tab.count}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Contenido de tabs */}
+
+                            {/* Reseñas likeadas */}
+                            {tabActiva === "likeadas" && (
+                                <div className="flex flex-col gap-3">
+                                    {perfil.resenasLikeadas?.length > 0 ? perfil.resenasLikeadas.map(r => (
+                                        <div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="flex-1">
+                                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
+                                                        {r.tituloLibro}
+                                                    </p>
+                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
+																Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
+                                                    </p>
+                                                    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+                                                        {r.textoResena}
+                                                    </p>
+                                                </div>
+                                                <span className="text-red-400 text-xl flex-shrink-0">♥</span>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <MensajeVacio texto="Aún no has dado like a ninguna reseña" />
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Reseñas calificadas */}
+                            {tabActiva === "calificadas" && (
+                                <div className="flex flex-col gap-3">
+                                    {perfil.resenasCalificadas?.length > 0 ? perfil.resenasCalificadas.map(r => (
+                                        <div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="flex-1">
+                                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
+                                                        {r.tituloLibro}
+                                                    </p>
+                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
+																Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
+                                                    </p>
+                                                    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+                                                        {r.textoResena}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-1 bg-gold-button/10 px-3 py-1 rounded-full flex-shrink-0">
+                                                    <span className="text-gold-button text-sm">★</span>
+                                                    <span className="font-inter font-bold text-gold-button text-sm">{r.calificacion}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <MensajeVacio texto="Aún no has calificado ninguna reseña" />
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Libros calificados */}
+                            {tabActiva === "libros" && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
+                                        <div key={l.idLibro} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200">
+                                            {l.imagen ? (
+                                                <img
+                                                    src={resolverUrlImagen(l.imagen, null)}
+                                                    alt={l.titulo}
+                                                    className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
+                                                />
+                                            ) : (
+                                                <div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
+                                                    <span className="text-2xl">📖</span>
+                                                </div>
+                                            )}
+                                            <div className="flex flex-col justify-between flex-1">
+                                                <div>
+                                                    <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight">
+                                                        {l.titulo}
+                                                    </p>
+                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                                        {l.autor}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
+                                                    <span className="text-gold-button text-xs">★</span>
+                                                    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/10</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <div className="col-span-2">
+                                            <MensajeVacio texto="Aún no has calificado ningún libro" />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Comentarios likeados */}
+                            {tabActiva === "comentarios" && (
+                                <div className="flex flex-col gap-3">
+                                    {perfil.comentariosLikeados?.length > 0 ? perfil.comentariosLikeados.map(c => (
+                                        <div key={c.idComentario} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+                                            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-2">
+															Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
+                                            </p>
+                                            <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                                {c.texto}
+                                            </p>
+                                        </div>
+                                    )) : (
+                                        <MensajeVacio texto="Aún no has dado like a ningún comentario" />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Componente auxiliar para estados vacíos.
+ */
+function MensajeVacio({ texto }) {
+    return (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <span className="text-4xl">📚</span>
+            <p className="font-inter text-sm text-gray-400 dark:text-gray-500">{texto}</p>
+        </div>
     );
 }
 
