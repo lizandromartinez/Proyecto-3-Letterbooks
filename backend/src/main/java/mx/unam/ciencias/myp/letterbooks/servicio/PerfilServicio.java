@@ -17,9 +17,7 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
-// import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
-// import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
-// import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
+
 
 /**
  * Servicio para la gestión y consulta del perfil de un usuario.
@@ -108,7 +106,19 @@ public class PerfilServicio {
 	    dto.setNombreUsuario(perfil.getUsuario().getNombreUsuario());		
 	
         // Autor, género y libro favorito
-	dto.setLibroFavorito(perfil.getLibro() != null ? perfil.getLibro().getTitulo() : "Ninguno");	
+	if (perfil.getLibro() != null) {
+	    dto.setLibroFavorito(perfil.getLibro().getTitulo());
+	    dto.setImagenLibroFavorito(perfil.getLibro().getImagen());
+	    dto.setAutorLibroFavorito(
+		perfil.getLibro().getAutor() != null
+		    ? perfil.getLibro().getAutor().getNombreAutor()
+		    : null
+	    );
+	} else {
+	    dto.setLibroFavorito("Ninguno");
+	    dto.setImagenLibroFavorito(null);
+	    dto.setAutorLibroFavorito(null);
+	}
 	dto.setAutorFavorito(perfil.getAutor() != null ? perfil.getAutor().getNombreAutor() : "Ninguno");
 	dto.setGeneroFavorito(perfil.getGenero() != null ? perfil.getGenero().getNombreGenero() : "Ninguno");
 	

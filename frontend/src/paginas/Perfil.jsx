@@ -314,406 +314,431 @@ function Perfil() {
     };
     
     return (
-        <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-300">
-	    <Navbar estaAutenticado={true} /> 
-            {/* ── BANNER ── */}
-            <div className="relative w-full h-52 md:h-64">
-                <img
-                    src={resolverUrlImagen(perfil.banner, bannerDefecto)}
-                    alt="Banner"
-                    className="w-full h-full object-cover"
-                />
-                {/* Overlay sutil para legibilidad */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-            </div>
+	<div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-500">
+	    <Navbar estaAutenticado={true} />
+	    
+	    {/* ── TARJETA CONTENEDOR ── */}
+	    <div className="py-8 px-4">
+		<div className="max-w-4xl mx-auto bg-white dark:bg-dark-borde rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-white/5">
 
-            {/* ── CONTENEDOR PRINCIPAL ── */}
-            <div className="max-w-4xl mx-auto px-4 md:px-8">
+		    {/* ── BANNER dentro del contenedor ── */}
+		    <div className="relative w-full h-48 md:h-56">
+			<img
+			    src={resolverUrlImagen(perfil.banner, bannerDefecto)}
+			    alt="Banner"
+			    className="w-full h-full object-cover"
+			/>
+			<div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+		    </div>
 
-                {/* ── CABECERA DEL PERFIL ── */}
-                <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-dark-borde">
+		    {/* ── CONTENIDO DEL PERFIL ── */}
+		    <div className="px-6 md:px-10">
 
-                    {/* Avatar */}
-                    <div className="relative -mt-16 md:-mt-20">
-                        <img
-                            src={resolverUrlImagen(perfil.avatar, avatarDefecto)}
-                            alt="Avatar"
-                            className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-crema-fondo dark:border-dark-fondo shadow-lg"
-                        />
-                    </div>
+			{/* ── CABECERA ── */}
+			<div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-dark-fondo">
 
-                    {/* Botones de acción */}
-                    {!editando && (
-                        <div className="flex gap-3 md:mb-2">
-                            <button
-                                onClick={() => setEditando(true)}
-                                className="flex items-center gap-2 px-5 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter text-sm font-medium hover:bg-gray-100 dark:hover:bg-dark-borde transition-all duration-200 cursor-pointer"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-					  Editar perfil
-                            </button>
+			    {/* Avatar */}
+	    <div className="relative -mt-16 md:-mt-20">
+	    <img
+	    src={resolverUrlImagen(perfil.avatar, avatarDefecto)}
+	    alt="Avatar"
+	    className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-white dark:border-dark-borde shadow-lg"
+	/>
+	</div>
+
+	    {/* Botones — para editar y salir*/}
+	    {!editando && (
+	    <div className="flex gap-3 md:mb-2">
+	    <button
+	    onClick={() => setEditando(true)}
+	    className="flex items-center gap-2 px-5 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter text-sm font-medium hover:bg-gray-100 dark:hover:bg-dark-borde transition-all duration-200 cursor-pointer"
+	>
+	    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+	</svg>
+		  Editar perfil
+	</button>
 	
+	    <button
+	    onClick={manejarLogout}
+	    className="flex items-center gap-2 px-5 py-2 rounded-md border border-red-400 text-red-500 font-inter text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-200 cursor-pointer"
+	>
+	    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+	</svg>
+		  Salir
+	</button>
+	</div>
+	)}
+	</div>
+
+			{/* ── MODO EDICIÓN ── */}
+			{editando ? (
+			    <div className="py-8">
+				<h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-6">
+															       Editar información
+				</h2>
+
+		    <div className="bg-white dark:bg-dark-borde rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm p-6 md:p-8 flex flex-col gap-6">
+
+			{/* Imágenes */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+			    {/* Avatar */}
+			    <div className="flex flex-col gap-3">
+				<label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Avatar
+				</label>
+	    <img
+		src={previstaAvatar || resolverUrlImagen(perfil.avatar, avatarDefecto)}
+	        alt="Preview avatar"
+	        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+	    />
+	    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
+		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+		</svg>
+			  Cambiar avatar
+	        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "avatar")} />
+	    </label>
+	</div>
+
+			    {/* Banner */}
+			    <div className="flex flex-col gap-3">
+				<label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Banner
+				</label>
+	    <img
+		src={previstaBanner || resolverUrlImagen(perfil.banner, bannerDefecto)}
+	        alt="Preview banner"
+	        className="w-full h-24 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600"
+	    />
+	    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
+		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+		</svg>
+			  Cambiar banner
+	        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "banner")} />
+	    </label>
+	</div>
+			</div>
+
+			{/* Biografía */}
+			<div className="flex flex-col gap-2">
+			    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															Biografía
+			    </label>
+			    <textarea
+				rows={3}
+				value={biografia}
+				onChange={e => setBiografia(e.target.value)}
+				placeholder="Cuéntanos sobre ti..."
+				className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+			    />
+			</div>
+
+			{/* Favoritos */}
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+			    {/* Autor favorito */}
+			    <div className="flex flex-col gap-2">
+				<label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Autor favorito
+				</label>
+				<input
+				    placeholder="Buscar autor..."
+	    value={busquedaAutor}
+	    onChange={e => setBusquedaAutor(e.target.value)}
+	    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+	/>
+				<select
+				    value={idAutorFavorito}
+	    onChange={e => setIdAutorFavorito(e.target.value)}
+	    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+	>
+	    <option value="">-- Selecciona --</option>
+	    {autores.map(a => <option key={a.idAutor} value={a.idAutor}>{a.nombreAutor}</option>)}
+	</select>
+			    </div>
+
+			    {/* Género favorito */}
+			    <div className="flex flex-col gap-2">
+				<label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Género favorito
+				</label>
+				<select
+				    value={idGeneroFavorito}
+	    onChange={e => setIdGeneroFavorito(e.target.value)}
+	    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all mt-8"
+	>
+	    <option value="">-- Selecciona --</option>
+	    {generos.map(g => <option key={g.idGenero} value={g.idGenero}>{g.nombreGenero}</option>)}
+	</select>
+			    </div>
+
+			    {/* Libro favorito */}
+			    <div className="flex flex-col gap-2">
+				<label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
+															    Libro favorito
+				</label>
+				<input
+				    placeholder="Buscar libro..."
+	    value={busquedaLibro}
+	    onChange={e => setBusquedaLibro(e.target.value)}
+	    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+	/>
+				<select
+				    value={idLibroFavorito}
+	    onChange={e => setIdLibroFavorito(e.target.value)}
+	    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
+	>
+	    <option value="">-- Selecciona --</option>
+	    {libros.map(l => <option key={l.idLibro} value={l.idLibro}>{l.titulo}</option>)}
+	</select>
+			    </div>
+			</div>
+
+			{/* Botones */}
+			<div className="flex gap-3 pt-2">
 			    <button
-				onClick={manejarLogout}
-				className="flex items-center gap-2 px-5 py-2 rounded-md border border-red-400 text-red-500 font-inter text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-200 cursor-pointer"
+				onClick={guardarCambios}
+				disabled={guardando}
+				className="px-6 py-2 rounded-md bg-gold-button hover:bg-gold-button-hover text-white font-inter font-bold text-sm transition-all duration-200 disabled:opacity-60 cursor-pointer"
 			    >
-				<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-				</svg>
-					  Salir
+				{guardando ? "Guardando..." : "Guardar cambios"}
 			    </button>
-                        </div>
-                    )}
-                </div>
+			    <button
+				onClick={() => setEditando(false)}
+				className="px-6 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter font-medium text-sm hover:bg-gray-100 dark:hover:bg-dark-fondo transition-all duration-200 cursor-pointer"
+			    >
+	     Cancelar
+			    </button>
+			</div>
+		    </div>
+		</div>
 
-                {/* ── MODO EDICIÓN ── */}
-                {editando ? (
-                    <div className="py-8">
-                        <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-6">
-														       Editar información
-                        </h2>
+	) : (
 
-                        <div className="bg-white dark:bg-dark-borde rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm p-6 md:p-8 flex flex-col gap-6">
+	    /* ── MODO VISTA ── */
+	    <div className="py-6 flex flex-col gap-8">
 
-                            {/* Imágenes */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+		{/* Nombre y bio */}
+		<div className="flex flex-col gap-1">
+		    <h1 className="font-cormorant text-3xl md:text-4xl font-bold text-navy-letter dark:text-gray-100">
+			{perfil.nombreUsuario}
+	</h1>
+	    <p className="font-inter text-sm text-gold-button">@{perfil.nombreUsuario}</p>
+	    {perfil.biografia && (
+		<p className="font-inter text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-lg leading-relaxed">
+		    {perfil.biografia}
+		</p>
+	    )}			   
+	</div>
 
-                                {/* Avatar */}
-                                <div className="flex flex-col gap-3">
-                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-																Avatar
-                                    </label>
-                                    <img
-                                        src={previstaAvatar || resolverUrlImagen(perfil.avatar, avatarDefecto)}
-                                        alt="Preview avatar"
-                                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                                    />
-                                    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-						  Cambiar avatar
-                                        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "avatar")} />
-                                    </label>
-                                </div>
+		{/* Favoritos */}
+		<div className="flex flex-col gap-3">
 
-                                {/* Banner */}
-                                <div className="flex flex-col gap-3">
-                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-																Banner
-                                    </label>
-                                    <img
-                                        src={previstaBanner || resolverUrlImagen(perfil.banner, bannerDefecto)}
-                                        alt="Preview banner"
-                                        className="w-full h-24 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600"
-                                    />
-                                    <label className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-sm font-inter text-gray-500 dark:text-gray-400 hover:border-gold-button hover:text-gold-button transition-all cursor-pointer w-fit">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-						  Cambiar banner
-                                        <input type="file" accept="image/*" className="hidden" onChange={e => manejarSeleccionImagen(e, "banner")} />
-                                    </label>
-                                </div>
-                            </div>
+		    {/* Autor y Género en fila */}
+		    <div className="grid grid-cols-2 gap-3">
+			<div className="bg-crema-fondo dark:bg-dark-fondo rounded-xl border border-gray-100 dark:border-white/5 p-4">
+			    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Autor favorito</p>
+			    <p className="font-cormorant text-lg font-bold text-gold-button">
+				{perfil.autorFavorito !== "Ninguno"
+				    ? perfil.autorFavorito
+				    : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
+	</p>
+			</div>
+	    <div className="bg-crema-fondo dark:bg-dark-fondo rounded-xl border border-gray-100 dark:border-white/5 p-4">
+	    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Género favorito</p>
+	    <p className="font-cormorant text-lg font-bold text-gold-button">
+	    {perfil.generoFavorito !== "Ninguno"
+	    ? perfil.generoFavorito
+	    : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
+	</p>
+	</div>
+	</div>
 
-                            {/* Biografía */}
-                            <div className="flex flex-col gap-2">
-                                <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-															    Biografía
-                                </label>
-                                <textarea
-                                    rows={3}
-                                    value={biografia}
-                                    onChange={e => setBiografia(e.target.value)}
-                                    placeholder="Cuéntanos sobre ti..."
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm resize-none focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
-                                />
-                            </div>
+		    {/* Libro favorito */}
+		    <div className="flex items-start gap-4">
+			{/* Portada */}
+			<div className="w-16 h-24 bg-gray-200 dark:bg-dark-fondo rounded-lg overflow-hidden flex-shrink-0">
+			    {perfil.imagenLibroFavorito ? (
+				<img
+				    src={resolverUrlImagen(perfil.imagenLibroFavorito, null)}
+				    alt={perfil.libroFavorito}
+				    className="w-full h-full object-cover"
+				/>
+			    ) : (
+				<div className="w-full h-full flex items-center justify-center">
+				    <span className="text-2xl">📖</span>
+				</div>
+			    )}
+			</div>
 
-                            {/* Favoritos */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+			{/* Título y autor */}
+			<div className="flex flex-col justify-start gap-1">
+			    <p className="font-cormorant text-xl font-bold text-navy-letter dark:text-gray-100 leading-tight">
+				{perfil.libroFavorito}
+			    </p>
+			    {perfil.autorLibroFavorito && (
+				<p className="font-inter text-sm text-gray-500 dark:text-gray-400">
+				    {perfil.autorLibroFavorito}
+				</p>
+			    )}
+			</div>
+		    </div>
+		</div>
 
-                                {/* Autor favorito */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-																Autor favorito
-                                    </label>
-                                    <input
-                                        placeholder="Buscar autor..."
-                                        value={busquedaAutor}
-                                        onChange={e => setBusquedaAutor(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
-                                    />
-                                    <select
-                                        value={idAutorFavorito}
-                                        onChange={e => setIdAutorFavorito(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
-                                    >
-                                        <option value="">-- Selecciona --</option>
-                                        {autores.map(a => <option key={a.idAutor} value={a.idAutor}>{a.nombreAutor}</option>)}
-                                    </select>
-                                </div>
+		{/* ── ACTIVIDAD ── */}
+		<div>
+		    <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-4">
+												       Tu actividad
+	</h2>
 
-                                {/* Género favorito */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-																Género favorito
-                                    </label>
-                                    <select
-                                        value={idGeneroFavorito}
-                                        onChange={e => setIdGeneroFavorito(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all mt-8"
-                                    >
-                                        <option value="">-- Selecciona --</option>
-                                        {generos.map(g => <option key={g.idGenero} value={g.idGenero}>{g.nombreGenero}</option>)}
-                                    </select>
-                                </div>
-
-                                {/* Libro favorito */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="font-inter text-sm font-semibold text-navy-letter dark:text-gray-200">
-																Libro favorito
-                                    </label>
-                                    <input
-                                        placeholder="Buscar libro..."
-                                        value={busquedaLibro}
-                                        onChange={e => setBusquedaLibro(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
-                                    />
-                                    <select
-                                        value={idLibroFavorito}
-                                        onChange={e => setIdLibroFavorito(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-dark-fondo text-navy-letter dark:text-gray-200 font-inter text-sm focus:outline-none focus:ring-2 focus:ring-gold-button/50 transition-all"
-                                    >
-                                        <option value="">-- Selecciona --</option>
-                                        {libros.map(l => <option key={l.idLibro} value={l.idLibro}>{l.titulo}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Botones */}
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    onClick={guardarCambios}
-                                    disabled={guardando}
-                                    className="px-6 py-2 rounded-md bg-gold-button hover:bg-gold-button-hover text-white font-inter font-bold text-sm transition-all duration-200 disabled:opacity-60 cursor-pointer"
-                                >
-                                    {guardando ? "Guardando..." : "Guardar cambios"}
-                                </button>
-                                <button
-                                    onClick={() => setEditando(false)}
-                                    className="px-6 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-navy-letter dark:text-gray-200 font-inter font-medium text-sm hover:bg-gray-100 dark:hover:bg-dark-fondo transition-all duration-200 cursor-pointer"
-                                >
-                                     Cancelar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                ) : (
-
-                    /* ── MODO VISTA ── */
-                    <div className="py-6 flex flex-col gap-8">
-
-                        {/* Nombre y bio */}
-                        <div className="flex flex-col gap-1">
-                            <h1 className="font-cormorant text-3xl md:text-4xl font-bold text-navy-letter dark:text-gray-100">
-                                {perfil.nombreUsuario}
-                            </h1>
-                            <p className="font-inter text-sm text-gold-button">@{perfil.nombreUsuario}</p>
-                            {perfil.biografia && (
-                                <p className="font-inter text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-lg leading-relaxed">
-                                    {perfil.biografia}
-                                </p>
-                            )}			   
-                        </div>
-
-                        {/* Favoritos */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                            {/* Autor y Género */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
-                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Autor favorito</p>
-                                    <p className="font-cormorant text-lg font-bold text-gold-button">
-                                        {perfil.autorFavorito !== "Ninguno" ? perfil.autorFavorito : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
-                                    </p>
-                                </div>
-                                <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
-                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Género favorito</p>
-                                    <p className="font-cormorant text-lg font-bold text-gold-button">
-                                        {perfil.generoFavorito !== "Ninguno" ? perfil.generoFavorito : <span className="text-gray-400 text-sm font-inter font-normal">No definido</span>}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Libro favorito */}
-                            <div className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-gold-button">♥</span>
-                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">Libro favorito</p>
-                                </div>
-                                {perfil.libroFavorito !== "Ninguno" ? (
-                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100">
-                                        {perfil.libroFavorito}
-                                    </p>
-                                ) : (
-                                    <p className="text-gray-400 font-inter text-sm">No definido</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* ── ACTIVIDAD ── */}
-                        <div>
-                            <h2 className="font-cormorant text-2xl font-bold text-navy-letter dark:text-gray-100 mb-4">
-															   Tu actividad
-                            </h2>
-
-                            {/* Tabs */}
-                            <div className="flex gap-1 border-b border-gray-200 dark:border-dark-borde mb-6 overflow-x-auto">
-                                {tabs.map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setTabActiva(tab.id)}
-                                        className={`px-4 py-3 font-inter text-sm font-medium whitespace-nowrap transition-all duration-200 border-b-2 cursor-pointer
+	    {/* Tabs */}
+	    <div className="flex gap-1 border-b border-gray-200 dark:border-dark-borde mb-6 overflow-x-auto">
+		{tabs.map(tab => (
+		    <button
+			key={tab.id}
+			onClick={() => setTabActiva(tab.id)}
+			className={`px-4 py-3 font-inter text-sm font-medium whitespace-nowrap transition-all duration-200 border-b-2 cursor-pointer
                                             ${tabActiva === tab.id
                                                 ? "border-gold-button text-gold-button"
                                                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-navy-letter dark:hover:text-gray-200"
                                             }`}
-                                    >
-                                        {tab.label}
-                                        <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs
+		    >
+			{tab.label}
+			<span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs
                                             ${tabActiva === tab.id
                                                 ? "bg-gold-button/10 text-gold-button"
                                                 : "bg-gray-100 dark:bg-dark-borde text-gray-400"
                                             }`}>
-                                            {tab.count}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
+		            {tab.count}
+			</span>
+		    </button>
+		))}
+	    </div>
 
-                            {/* Contenido de tabs */}
+	    {/* Contenido de tabs */}
 
-                            {/* Reseñas likeadas */}
-                            {tabActiva === "likeadas" && (
-                                <div className="flex flex-col gap-3">
-                                    {perfil.resenasLikeadas?.length > 0 ? perfil.resenasLikeadas.map(r => (
-                                        <div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
-                                                        {r.tituloLibro}
-                                                    </p>
-                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-																Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
-                                                    </p>
-                                                    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
-                                                        {r.textoResena}
-                                                    </p>
-                                                </div>
-                                                <span className="text-red-400 text-xl flex-shrink-0">♥</span>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <MensajeVacio texto="Aún no has dado like a ninguna reseña" />
-                                    )}
-                                </div>
-                            )}
+	    {/* Reseñas likeadas */}
+	    {tabActiva === "likeadas" && (
+		<div className="flex flex-col gap-3">
+		    {perfil.resenasLikeadas?.length > 0 ? perfil.resenasLikeadas.map(r => (
+			<div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+			    <div className="flex items-start justify-between gap-4">
+				<div className="flex-1">
+				    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
+					{r.tituloLibro}
+				    </p>
+				    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
+											    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaLike}
+		</p>
+				    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+					{r.textoResena}
+		</p>
+				</div>
+				<span className="text-red-400 text-xl flex-shrink-0">♥</span>
+			    </div>
+			</div>
+		    )) : (
+			<MensajeVacio texto="Aún no has dado like a ninguna reseña" />
+		)}
+		</div>
+	    )}
 
-                            {/* Reseñas calificadas */}
-                            {tabActiva === "calificadas" && (
-                                <div className="flex flex-col gap-3">
-                                    {perfil.resenasCalificadas?.length > 0 ? perfil.resenasCalificadas.map(r => (
-                                        <div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
-                                                        {r.tituloLibro}
-                                                    </p>
-                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
-																Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
-                                                    </p>
-                                                    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
-                                                        {r.textoResena}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center gap-1 bg-gold-button/10 px-3 py-1 rounded-full flex-shrink-0">
-                                                    <span className="text-gold-button text-sm">★</span>
-                                                    <span className="font-inter font-bold text-gold-button text-sm">{r.calificacion}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <MensajeVacio texto="Aún no has calificado ninguna reseña" />
-                                    )}
-                                </div>
-                            )}
+	    {/* Reseñas calificadas */}
+	    {tabActiva === "calificadas" && (
+		<div className="flex flex-col gap-3">
+		    {perfil.resenasCalificadas?.length > 0 ? perfil.resenasCalificadas.map(r => (
+			<div key={r.idResena} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+			    <div className="flex items-start justify-between gap-4">
+				<div className="flex-1">
+				    <p className="font-cormorant text-lg font-bold text-navy-letter dark:text-gray-100 mb-1">
+					{r.tituloLibro}
+				    </p>
+				    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-3">
+											    Reseña de <span className="text-gold-button">@{r.autorResena}</span> · {r.fechaCalificacion}
+		</p>
+				    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+					{r.textoResena}
+		</p>
+				</div>
+				<div className="flex items-center gap-1 bg-gold-button/10 px-3 py-1 rounded-full flex-shrink-0">
+				    <span className="text-gold-button text-sm">★</span>
+	            <span className="font-inter font-bold text-gold-button text-sm">{r.calificacion}</span>
+		</div>
+			    </div>
+			</div>
+		    )) : (
+		        <MensajeVacio texto="Aún no has calificado ninguna reseña" />
+		)}
+		</div>
+	    )}
 
-                            {/* Libros calificados */}
-                            {tabActiva === "libros" && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
-                                        <div key={l.idLibro} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200">
-                                            {l.imagen ? (
-                                                <img
-                                                    src={resolverUrlImagen(l.imagen, null)}
-                                                    alt={l.titulo}
-                                                    className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
-                                                />
-                                            ) : (
-                                                <div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
-                                                    <span className="text-2xl">📖</span>
-                                                </div>
-                                            )}
-                                            <div className="flex flex-col justify-between flex-1">
-                                                <div>
-                                                    <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight">
-                                                        {l.titulo}
-                                                    </p>
-                                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                                        {l.autor}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
-                                                    <span className="text-gold-button text-xs">★</span>
-                                                    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/10</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <div className="col-span-2">
-                                            <MensajeVacio texto="Aún no has calificado ningún libro" />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+	    {/* Libros calificados */}
+	    {tabActiva === "libros" && (
+		<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+		    {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
+			<div key={l.idLibro} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200">
+			    {l.imagen ? (
+				<img
+				    src={resolverUrlImagen(l.imagen, null)}
+				    alt={l.titulo}
+				    className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
+				/>
+			    ) : (
+				<div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
+				    <span className="text-2xl">📖</span>
+	</div>
+	)}
+			    <div className="flex flex-col justify-between flex-1">
+				<div>
+				    <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight">
+					{l.titulo}
+		</p>
+	            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+			{l.autor}
+		    </p>
+		</div>
+	    <div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
+		<span className="text-gold-button text-xs">★</span>
+	        <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/10</span>
+	    </div>
+	</div>
+			</div>
+		    )) : (
+			<div className="col-span-2">
+			    <MensajeVacio texto="Aún no has calificado ningún libro" />
+	</div>
+	)}
+		</div>
+	    )}
 
-                            {/* Comentarios likeados */}
-                            {tabActiva === "comentarios" && (
-                                <div className="flex flex-col gap-3">
-                                    {perfil.comentariosLikeados?.length > 0 ? perfil.comentariosLikeados.map(c => (
-                                        <div key={c.idComentario} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
-                                            <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-2">
-															Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
-                                            </p>
-                                            <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                                {c.texto}
-                                            </p>
-                                        </div>
-                                    )) : (
-                                        <MensajeVacio texto="Aún no has dado like a ningún comentario" />
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
+	    {/* Comentarios likeados */}
+	    {tabActiva === "comentarios" && (
+		<div className="flex flex-col gap-3">
+		    {perfil.comentariosLikeados?.length > 0 ? perfil.comentariosLikeados.map(c => (
+			<div key={c.idComentario} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-5 hover:shadow-md transition-shadow duration-200">
+			    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mb-2">
+													Comentario en <span className="font-semibold text-navy-letter dark:text-gray-300">{c.tituloLibro}</span> · por <span className="text-gold-button">@{c.autorComentario}</span> · {c.fechaLike}
+			    </p>
+			    <p className="font-inter text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+				{c.texto}
+	</p>
+			</div>
+		    )) : (
+			<MensajeVacio texto="Aún no has dado like a ningún comentario" />
+	)}
+		</div>
+	    )}
+	</div>
+	    </div>
+	)}
+		    </div>
+		</div>
+	    </div>
+	</div>
     );
 }
 
@@ -726,10 +751,10 @@ function Perfil() {
  */
 function MensajeVacio({ texto }) {
     return (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <span className="text-4xl">📚</span>
-            <p className="font-inter text-sm text-gray-400 dark:text-gray-500">{texto}</p>
-        </div>
+	<div className="flex flex-col items-center justify-center py-16 gap-3">
+	    <span className="text-4xl">📚</span>
+	    <p className="font-inter text-sm text-gray-400 dark:text-gray-500">{texto}</p>
+	</div>
     );
 }
 

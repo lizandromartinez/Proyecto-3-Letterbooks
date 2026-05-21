@@ -41,6 +41,12 @@ public class Perfil {
     /* Nombre del autor favorito del usuario. */
     private String autorFavorito;
 
+    /* URL de la imagen de portada del libro favorito. */
+    private String imagenLibroFavorito;
+
+    /* Nombre del autor del libro favorito. */
+    private String autorLibroFavorito;
+    
     /* Nombre del género favorito del usuario. */
     private String generoFavorito;
     
@@ -323,6 +329,18 @@ public class Perfil {
     /* Establece el nombre del libro favorito del usuario. */
     public void setLibroFavorito(String libroFavorito) { this.libroFavorito = libroFavorito; }
 
+    /* Obtiene la URL de la imagen del libro favorito del usuario. */
+    public String getImagenLibroFavorito() { return imagenLibroFavorito; }
+
+    /* Obtiene el nombre del autor del libro favorito del usuario. */
+    public String getAutorLibroFavorito() { return autorLibroFavorito; }
+
+    /* Establece el nombre del autor del libro favorito del usuario. */
+    public void setAutorLibroFavorito(String autorLibroFavorito) { this.autorLibroFavorito = autorLibroFavorito; }
+    
+    /* Establece la ruta de la imagen del libro favorito del usuario. */
+    public void setImagenLibroFavorito(String imagenLibroFavorito) { this.imagenLibroFavorito = imagenLibroFavorito; }
+    
     /* Obtiene el nombre del autor favorito del usuario. */
     public String getAutorFavorito() { return autorFavorito; }
 
