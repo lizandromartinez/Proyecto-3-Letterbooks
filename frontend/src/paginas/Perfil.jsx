@@ -246,7 +246,7 @@ function Perfil() {
                     }}
                     onClick={() => setEditando(true)}
                 >
-                    Editar perfil
+                     Editar perfil
                 </button>
             )}
 
@@ -260,7 +260,7 @@ function Perfil() {
 
                     {/* Avatar */}
                     <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-                        Avatar:
+												   Avatar:
                     </label>
                     <img
                         src={previstaAvatar || resolverUrlImagen(perfil.avatar, avatarDefecto)}
@@ -279,7 +279,7 @@ function Perfil() {
 
                     {/* Banner */}
                     <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-                        Banner:
+												   Banner:
                     </label>
                     <img
                         src={previstaBanner || resolverUrlImagen(perfil.banner, bannerDefecto)}
@@ -298,7 +298,7 @@ function Perfil() {
 
                     {/* Biografía */}
                     <label style={{ display: "block", marginTop: "15px", fontWeight: "bold" }}>
-                        Biografía:
+												   Biografía:
                     </label>
                     <textarea
                         style={{
@@ -386,7 +386,7 @@ function Perfil() {
                             }}
                             onClick={guardarCambios}
                         >
-                            Guardar
+                             Guardar
                         </button>
                         <button
                             style={{
@@ -395,31 +395,123 @@ function Perfil() {
                             }}
                             onClick={() => setEditando(false)}
                         >
-                            Cancelar
+                             Cancelar
                         </button>
                     </div>
                 </div>
-            ) : (
-                <div style={{ marginTop: "20px" }}>
-                    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-                        <h3>Biografía</h3>
-                        <p>{perfil.biografia || "Sin biografía aún"}</p>
-                    </div>
-                    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-                        <h3>Libro favorito</h3>
-                        <p>{perfil.libroFavorito || "No definido"}</p>
-                    </div>
-                    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
-                        <h3>Autor favorito</h3>
-                        <p>{perfil.autorFavorito || "No definido"}</p>
-                    </div>
-                    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
-                        <h3>Género favorito</h3>
-                        <p>{perfil.generoFavorito || "No definido"}</p>
-                    </div>
-                </div>
-            )}
-        </div>
+	    ) : (
+		<div style={{ marginTop: "20px" }}>
+
+		    {/* Biografía */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Biografía</h3>
+			<p>{perfil.biografia || "Sin biografía aún"}</p>
+		    </div>
+
+		    {/* Favoritos */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Libro favorito</h3>
+			<p>{perfil.libroFavorito || "No definido"}</p>
+		    </div>
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Autor favorito</h3>
+			<p>{perfil.autorFavorito || "No definido"}</p>
+		    </div>
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Género favorito</h3>
+			<p>{perfil.generoFavorito || "No definido"}</p>
+		    </div>
+
+		    {/* Reseñas likeadas */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Reseñas que le gustaron</h3>
+			{perfil.resenasLikeadas && perfil.resenasLikeadas.length > 0 ? (
+			    perfil.resenasLikeadas.map(r => (
+				<div key={r.idResena} style={{
+				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
+				}}>
+				    <strong>{r.tituloLibro}</strong>
+				    <p style={{ fontSize: "12px", color: "gray" }}>
+										       por {r.autorResena} · {r.fechaLike}
+				    </p>
+				    <p>{r.textoResena}</p>
+				</div>
+			    ))
+			) : (
+			    <p>Ninguna aún</p>
+			)}
+		    </div>
+
+		    {/* Reseñas calificadas */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Reseñas que ha calificado</h3>
+			{perfil.resenasCalificadas && perfil.resenasCalificadas.length > 0 ? (
+			    perfil.resenasCalificadas.map(r => (
+				<div key={r.idResena} style={{
+				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
+				}}>
+				    <strong>{r.tituloLibro}</strong>
+				    <p style={{ fontSize: "12px", color: "gray" }}>
+										       por {r.autorResena} · {r.fechaCalificacion}
+				    </p>
+				    <p>{r.textoResena}</p>
+				    <p style={{ fontWeight: "bold" }}>Calificación: {r.calificacion}/10</p>
+				</div>
+			    ))
+			) : (
+			    <p>Ninguna aún</p>
+			)}
+		    </div>
+
+		    {/* Libros calificados */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Libros que ha calificado</h3>
+			{perfil.librosCalificados && perfil.librosCalificados.length > 0 ? (
+			    perfil.librosCalificados.map(l => (
+				<div key={l.idLibro} style={{
+				    display: "flex", alignItems: "center", gap: "15px",
+				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
+				}}>
+				    {l.imagen && (
+					<img
+					    src={resolverUrlImagen(l.imagen, null)}
+					    alt={l.titulo}
+					    style={{ width: "60px", height: "90px", objectFit: "cover", borderRadius: "4px" }}
+					/>
+				    )}
+				    <div>
+					<strong>{l.titulo}</strong>
+					<p style={{ fontSize: "12px", color: "gray" }}>{l.autor}</p>
+					<p style={{ fontWeight: "bold" }}>Calificación: {l.calificacion}/10</p>
+				    </div>
+				</div>
+			    ))
+			) : (
+			    <p>Ninguno aún</p>
+			)}
+		    </div>
+
+		    {/* Comentarios likeados */}
+		    <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "15px" }}>
+			<h3>Comentarios que le gustaron</h3>
+			{perfil.comentariosLikeados && perfil.comentariosLikeados.length > 0 ? (
+			    perfil.comentariosLikeados.map(c => (
+				<div key={c.idComentario} style={{
+				    padding: "10px", borderBottom: "1px solid #eee", marginBottom: "10px"
+				}}>
+				    <p style={{ fontSize: "12px", color: "gray" }}>
+										       en <strong>{c.tituloLibro}</strong> · por {c.autorComentario} · {c.fechaLike}
+				    </p>
+				    <p>{c.texto}</p>
+				</div>
+			    ))
+			) : (
+			    <p>Ninguno aún</p>
+			)}
+		    </div>
+	        </div>
+	    )}
+	</div>
     );
 }
 
