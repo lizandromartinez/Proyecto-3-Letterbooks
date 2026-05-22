@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.repositorio;
 
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -40,13 +41,6 @@ public interface LibroRepositorio extends JpaRepository<Libro, Integer> {
 
     /**
      * Busca todos los libros que pertenezcan a un año de publicación específico.
-     * @param ano Año de publicación
-     * @return un ArrayList con los libros encontrados
-     */
-    ArrayList<Libro> findByAno(Integer ano);
-
-    /**
-     * Busca todos los libros que tengan ese autor específico.
      * @param ano Año de publicación
      * @return un ArrayList con los libros encontrados
      */
