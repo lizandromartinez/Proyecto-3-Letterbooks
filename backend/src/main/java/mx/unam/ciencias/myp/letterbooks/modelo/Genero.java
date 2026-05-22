@@ -1,4 +1,6 @@
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.util.ArrayList;
 
 /**
  * Clase que representa la tabla {@code genero} en la base de datos.
@@ -22,8 +24,13 @@ public class Genero {
      * Nombre del género.
      * Este campo es obligatorio.
      */
+    @NotBlank(message = "El nombre del género no puede estar vacío")
+    @Size(max = 100, message = "El nombre del género no puede superar los 100 caracteres")
     @Column(name = "nombre_genero", nullable = false, length = 100)
     private String nombreGenero;
+
+    @OneToMany(mappedBy = "genero", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ArrayList<Libro> libros = new ArrayList<>();
 
 
     /**
@@ -37,7 +44,7 @@ public class Genero {
      * @return El ID del genero.
      */
     public Integer getIdGenero() {
-
+        return this.idGenero;
     }
 
     /**
@@ -45,7 +52,7 @@ public class Genero {
      * @param idGenero El nuevo ID del genero.
      */
     public void setIdGenero(Integer idGenero) {
-
+        this.idGenero = idGenero;
     }
 
     /**
@@ -53,7 +60,7 @@ public class Genero {
      * @return El nombre del libro.
      */
     public String getNombreGenero() {
-
+        return this.nombreGenero;
     }
 
     /**
@@ -61,7 +68,15 @@ public class Genero {
      * @param nombreGenero Nombre del género.
      */
     public void setNombreGenero(String nombreGenero) {
+        this.nombreGenero = nombreGenero;
+    }
 
+    public ArrayList<Libro> getLibros() {
+        return this.libros;
+    }
+
+    public void setLibros(ArrayList<Libro> libros) {
+        this.libros = libros;
     }
 
 }

@@ -1,11 +1,12 @@
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 
 /**
  * Clase que representa la tabla {@code libro} en la base de datos.
  * Esta clase mapea la información de los libros, incluyendo sus características
  * principales y sus relaciones con el género, autor y editorial mediante llaves foráneas.
  */
-
 @Entity
 @Table(name = "libro")
 public class Libro {
@@ -47,8 +48,10 @@ public class Libro {
     private Editorial editorial;
 
     /**
-     * Título oficial del libro. Este campo es obligatorio y no permite valores nulos.
+     * Título oficial del libro. Este campo es obligatorio y no permite valores nulos o vacíos.
      */
+    @NotBlank(message = "El título no puede estar vacío")
+    @Size(max = 255, message = "El título no puede superar los 255 caracteres")
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
 
@@ -56,30 +59,35 @@ public class Libro {
      * Resumen o sinopsis detallada del contenido del libro.
      * Se mapea como un tipo de dato {@code TEXT} en la base de datos para almacenar cadenas largas.
      */
+    @Size(max = 10000, message = "La sinopsis supera el límite de caracteres permitido")
     @Column(name = "sinopsis", columnDefinition = "TEXT")
     private String sinopsis;
 
     /**
      * Ruta de la imagen de la portada del libro.
      */
+    @Size(max = 255, message = "La ruta de la imagen no puede superar los 255 caracteres")
     @Column(name = "imagen", length = 255)
     private String imagen;
 
     /**
      * Cantidad total de páginas que componen al libro.
      */
+    @Min(value = 1, message = "El libro debe tener al menos 1 página")
     @Column(name = "paginas")
     private Integer paginas;
 
     /**
      * Año de publicación del libro.
      */
+    @Max(value = 2026, message = "El año de publicación no puede ser en el futuro")
     @Column(name = "ano")
     private Integer ano;
 
     /**
      * Código ISBN (International Standard Book Number) identificador del libro.
      */
+    @Size(max = 20, message = "El ISBN no puede superar los 20 caracteres")
     @Column(name = "isbn", length = 20)
     private String isbn;
 
@@ -87,14 +95,18 @@ public class Libro {
      * Contador de reportes o denuncias que ha recibido el libro.
      * Por defecto se inicializa en 0.
      */
+    @PositiveOrZero(message = "Los reportes no pueden ser un número negativo")
     @Column(name = "reportes")
     private Integer reportes = 0;
 
     /**
      * Calificación promedio asignada por los usuarios.
+     * Se utiliza BigDecimal(3,2) para mantener la precisión exacta de la base de datos.
      */
-    @Column(name = "promedio_calificacion")
-    private Double promedioCalificacion = 0.00;
+    @DecimalMin(value = "0.00", message = "La calificación mínima es 0.00")
+    @DecimalMax(value = "5.00", message = "La calificación máxima es 5.00")
+    @Column(name = "promedio_calificacion", precision = 3, scale = 2)
+    private BigDecimal promedioCalificacion = BigDecimal.ZERO;
     
 
     /**
@@ -109,7 +121,7 @@ public class Libro {
      * @return El ID del libro.
      */
     public Integer getIdLibro() {
-
+        return this.idLibro;
     }
     
     /**
@@ -117,7 +129,7 @@ public class Libro {
      * @param idLibro El nuevo ID del libro.
      */
     public void setIdLibro(Integer idLibro) {
-
+        this.idLibro = idLibro;
     }
 
     /**
@@ -125,7 +137,7 @@ public class Libro {
      * @return El género del libro.
      */
     public Genero getGenero() {
-
+        return this.genero;
     }
 
     /**
@@ -133,7 +145,7 @@ public class Libro {
      * @param genero Genero del libro.
      */
     public void setGenero(Genero genero) {
-
+        this.genero = genero;
     }
 
     /**
@@ -141,7 +153,7 @@ public class Libro {
      * @return El autor del libro.
      */
     public Autor getAutor() {
-
+        return this.autor;
     }
 
     /**
@@ -149,7 +161,7 @@ public class Libro {
      * @param autor Autor del libro.
      */
     public void setAutor(Autor autor) {
-
+        this.autor = autor;
     }
 
     /**
@@ -157,7 +169,7 @@ public class Libro {
      * @return La editorial del libro.
      */
     public Editorial getEditorial() {
-	
+        return this.editorial;
     }
 
     /**
@@ -165,7 +177,7 @@ public class Libro {
      * @param editorial Editorial del libro.
      */
     public void setEditorial(Editorial editorial) {
-
+        this.editorial = editorial;
     }
 
     /**
@@ -173,7 +185,7 @@ public class Libro {
      * @return El título del libro.
      */
     public String getTitulo() {
-
+        return this.titulo;
     }
 
     /**
@@ -181,7 +193,7 @@ public class Libro {
      * @param titulo Titulo del libro.
      */
     public void setTitulo(String titulo) {
-
+        this.titulo = titulo;
     }
 
     /**
@@ -189,7 +201,7 @@ public class Libro {
      * @return Texto con la sinopsis.
      */
     public String getSinopsis() {
-	
+        return this.sinopsis;
     }
 
     /**
@@ -197,7 +209,7 @@ public class Libro {
      * @param sinopsis Sinopsis del libro.
      */
     public void setSinopsis(String sinopsis) {
-
+        this.sinopsis = sinopsis;
     }
 
     /**
@@ -205,7 +217,7 @@ public class Libro {
      * @return ruta con la ruta de la imagen.
      */
     public String getImagen() {
-	
+        return this.imagen;
     }
 
     /**
@@ -213,7 +225,7 @@ public class Libro {
      * @param imagen Imagen de portada del libro.
      */
     public void setImagen(String imagen) {
-
+        this.imagen = imagen;
     }
 
     /**
@@ -221,7 +233,7 @@ public class Libro {
      * @return Cantidad de páginas del libro.
      */
     public Integer getPaginas() {
-
+        return this.paginas;
     }
 
     /**
@@ -229,7 +241,7 @@ public class Libro {
      * @param paginas Paginas del libro.
      */
     public void setPaginas(Integer paginas) {
-
+        this.paginas = paginas;
     }
 
     /**
@@ -237,7 +249,7 @@ public class Libro {
      * @return El año de publicación del libro.
      */
     public Integer getAno() {
-
+        return this.ano;
     }
 
     /**
@@ -245,7 +257,7 @@ public class Libro {
      * @param ano Año de publicación del libro.
      */
     public void setAno(Integer ano) {
-	
+        this.ano = ano;
     }
 
     /**
@@ -253,7 +265,7 @@ public class Libro {
      * @return El código ISBN del libro.
      */    
     public String getIsbn() {
-	
+        return this.isbn;
     }
 
     /**
@@ -261,7 +273,7 @@ public class Libro {
      * @param isbn ISBN del libro.
      */
     public void setIsbn(String isbn) {
-	
+        this.isbn = isbn;
     }
 
     /**
@@ -269,7 +281,7 @@ public class Libro {
      * @return Número de reportes.
      */
     public Integer getReportes() {
-	
+        return this.reportes;
     }
 
     /**
@@ -277,23 +289,23 @@ public class Libro {
      * @param reportes Reportes que tiene el libro.
      */
     public void setReportes(Integer reportes) {
-
+        this.reportes = reportes;
     }
 
     /**
      * Regresa la calificación promedio del libro.
-     * @return Un el promedio de la calificación del libro.
+     * @return El promedio de la calificación del libro.
      */
-    public Double getPromedioCalificacion() {
-	
+    public BigDecimal getPromedioCalificacion() {
+        return this.promedioCalificacion;
     }
 
     /**
      * Define la calificación promedio del libro.
      * @param promedioCalificacion Calificacion del libro.
      */
-    public void setPromedioCalificacion(Double promedioCalificacion) { 
-
+    public void setPromedioCalificacion(BigDecimal promedioCalificacion) { 
+        this.promedioCalificacion = promedioCalificacion;
     }
     
 }

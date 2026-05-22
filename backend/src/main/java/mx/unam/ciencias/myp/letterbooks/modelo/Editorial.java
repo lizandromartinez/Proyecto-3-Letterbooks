@@ -1,4 +1,6 @@
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.util.ArrayList;
 
 /**
  * Clase que representa la tabla {@code editorial} en la base de datos.
@@ -19,8 +21,13 @@ public class Editorial {
     /**
      * Nombre de la casa editorial. Este campo es obligatorio.
      */
+    @NotBlank(message = "El nombre de la editorial no puede estar vacío")
+    @Size(max = 150, message = "El nombre de la editorial no puede superar los 150 caracteres")
     @Column(name = "nombre_editorial", nullable = false, length = 150)
     private String nombreEditorial;
+
+    @OneToMany(mappedBy = "editorial", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ArrayList<Libro> libros = new ArrayList<>();
 
     /**
      * Constructor.
@@ -33,7 +40,7 @@ public class Editorial {
      * @return El ID de la editorial.
      */
     public Integer getIdEditorial() {
-
+        return this.idEditorial;
     }
 
     /**
@@ -41,7 +48,7 @@ public class Editorial {
      * @param idEditorial El nuevo ID de la editorial.
      */
     public void setIdEditorial(Integer idEditorial) {
-
+        this.idEditorial = idEditorial;
     }
 
     /**
@@ -49,7 +56,7 @@ public class Editorial {
      * @return El nombre de la editorial que publicó el libro.
      */
     public String getNombreEditorial() {
-
+        return this.nombreEditorial;
     }
 
     /**
@@ -57,7 +64,15 @@ public class Editorial {
      * @param nombreEditorial Nombre de la editorial.
      */
     public void setNombreEditorial(String nombreEditorial) {
+        this.nombreEditorial = nombreEditorial;
+    }
 
+    public ArrayList<Libro> getLibros() {
+        return this.libros;
+    }
+
+    public void setLibros(ArrayList<Libro> libros) {
+        this.libros = libros;
     }
 
 }

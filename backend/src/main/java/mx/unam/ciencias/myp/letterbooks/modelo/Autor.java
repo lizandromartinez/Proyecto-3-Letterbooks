@@ -1,4 +1,6 @@
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.util.ArrayList;
 
 /**
  * Clase que representa la tabla {@code autor} en la base de datos.
@@ -20,8 +22,13 @@ public class Autor {
     /**
      * Nombre completo del autor. Este campo es obligatorio.
      */
+    @NotBlank(message = "El nombre del autor no puede estar vacío")
+    @Size(max = 150, message = "El nombre del autor no puede superar los 150 caracteres")
     @Column(name = "nombre_autor", nullable = false, length = 150)
     private String nombreAutor;
+
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ArrayList<Libro> libros = new ArrayList<>();
 
 
     /**
@@ -35,7 +42,7 @@ public class Autor {
      * @return El ID del autor.
      */
     public Integer getIdAutor() {
-
+        return this.idAutor;
     }
 
     /**
@@ -43,7 +50,7 @@ public class Autor {
      * @param idAutor El nuevo ID del autor.
      */
     public void setIdAutor(Integer idAutor) {
-
+        this.idAutor = idAutor;
     }
 
     /**
@@ -51,7 +58,7 @@ public class Autor {
      * @return El nombre del autor del libro.
      */
     public String getNombreAutor() {
-
+        return this.nombreAutor;
     }
 
     /**
@@ -59,7 +66,15 @@ public class Autor {
      * @param nombreAutor Nombre del autor.
      */
     public void setNombreAutor(String nombreAutor) {
+        this.nombreAutor = nombreAutor;
+    }
 
+    public ArrayList<Libro> getLibros() {
+        return this.libros;
+    }
+
+    public void setLibros(ArrayList<Libro> libros) {
+        this.libros = libros;
     }
 
 }
