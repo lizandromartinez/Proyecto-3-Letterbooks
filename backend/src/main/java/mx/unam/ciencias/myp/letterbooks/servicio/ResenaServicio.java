@@ -178,4 +178,52 @@ public class ResenaServicio {
 
         return suma / resenas.size();
     }
+
+    /**
+     * Recupera todas las reseñas asociadas a un libro específico.
+     * <p>
+     * Consulta el repositorio utilizando el identificador del libro para
+     * devolver la lista de reseñas que serán enviadas al frontend.
+     * </p>
+     *
+     * @param idLibro el identificador único del libro a consultar
+     * @return una lista de entidades reseña pertenecientes al libro
+     */
+    public List<Resena> obtenerResenasPorLibro(Integer idLibro) {
+        return resenaRepositorio.findByLibro_IdLibro(idLibro);
+    }
+
+    /**
+     * Elimina una reseña existente aplicando filtros estrictos de derecho de autoría.
+     * <p>
+     * <ul>
+     * <li>Recupera la reseña solicitada del repositorio por su identificador</li>
+     * <li>Verifica que el nombre de usuario del token coincida exactamente con el creador</li>
+     * <li>Elimina el registro de la base de datos de manera definitiva</li>
+     * <li>Actualiza en cascada el valor promedio acumulado de la entidad del libro</li>
+     * </ul>
+     * </p>
+     *
+     * @param idResena identificador único de la reseña que se desea eliminar
+     * @param token cadena de autenticación JWT del usuario que solicita la eliminación
+     * @throws IllegalArgumentException si la reseña no existe o si la sesión no es del autor
+     */
+    @Transactional
+    public void eliminarResena(Integer idResena, String token) {
+        Resena resena = resenaRepositorio.findById(idResena)
+            .orElseThrow(() -> new IllegalArgumentException("Reseña no encontrada."));
+
+        String nombreUsuarioFirma = tokenJWT.obtenerNombreUsuario(token);
+        
+        if (!resena.getUsuario().getNombreUsuario().equals(nombreUsuarioFirma)) {
+            throw new IllegalArgumentException("No tienes permiso para eliminar esta reseña.");
+        }
+
+        Libro libro = resena.getLibro();
+        resenaRepositorio.delete(resena);
+
+        Double nuevoPromedio = calcularPromedioLibro(libro.getIdLibro());
+        libro.setPromedioCalificacion(nuevoPromedio);
+        libroRepositorio.save(libro);
+    }
 }
