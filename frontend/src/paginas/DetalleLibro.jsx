@@ -6,6 +6,7 @@ import Navbar from '../componentes/navegacion/navbar/Navbar';
 import Footer from '../componentes/navegacion/footer/Footer';
 import ListaResenas from '../componentes/resenas/ListaResenas';
 import { obtenerLibroPorId } from '../api/Libros';
+import { obtenerUsuarioDelToken } from '../utilidades/DecodificadorToken';
 
 /**
  * DetalleLibro - Componente de vista detallada de un libro en Letterbooks.
@@ -20,6 +21,7 @@ const DetalleLibro = () => {
     // Estado local para los detalles del libro
     const [libro, setLibro] = useState(location.state?.libroData || null);
     const [cargando, setCargando] = useState(!libro);
+    const [miCalificacion, setMiCalificacion] = useState(null);
 
     // Cargar detalles si no existen en el state o en cambio de ID
     useEffect(() => {
@@ -47,6 +49,12 @@ const DetalleLibro = () => {
         } catch (err) {
             console.error("Error al actualizar los detalles del libro:", err);
         }
+    };
+
+    const actualizarMiCalificacion = (resenas) => {
+        const usuarioActual = obtenerUsuarioDelToken(token);
+        const miResena = resenas.find((r) => r.usuario?.nombreUsuario === usuarioActual);
+        setMiCalificacion(miResena?.calificacionLibro ?? null);
     };
 
     // Guarda de seguridad: Redirección forzada al login si el usuario no está autenticado.
@@ -168,16 +176,22 @@ const DetalleLibro = () => {
                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 self-start">
                         Tu calificación
                     </h3>
-                    <div className="w-16 h-16 rounded-full bg-orange-50/50 dark:bg-white/5 border border-amber-900/5 dark:border-white/5 flex items-center justify-center text-gray-400 text-xl font-bold mb-3">
-                        -
+                    <div className="w-16 h-16 rounded-full bg-orange-50/50 dark:bg-white/5 border border-amber-900/5 dark:border-white/5 flex items-center justify-center text-[#d4a373] text-xl font-bold mb-3">
+                        {miCalificacion ?? '-'}
                     </div>
                     <p className="text-gray-400 text-xs font-medium">
-                        no has calificado este libro
+                        {miCalificacion != null
+                            ? 'tu calificación para este libro'
+                            : 'no has calificado este libro'}
                     </p>
                 </div>
 
-                <section className="lg:col-span-3 mt-4 bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xs">
-                    <ListaResenas idLibro={Number(id)} alCambiarResenas={refrescarDetallesLibro} />
+                <section className="lg:col-span-3 mt-4">
+                    <ListaResenas
+                        idLibro={Number(id)}
+                        alCambiarResenas={refrescarDetallesLibro}
+                        alResenasActualizadas={actualizarMiCalificacion}
+                    />
                 </section>
 
             </main>

@@ -15,15 +15,25 @@ import axios from "axios";
 export async function subirImagen(archivo, token, tipo = "avatares") {
     const formData = new FormData();
     formData.append("archivo", archivo);
-    const respuesta = await axios.post(
-        `http://localhost:8080/api/almacenamiento/imagen/${tipo}`,
-        formData,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "multipart/form-data"
+    try {
+        const respuesta = await axios.post(
+            `http://localhost:8080/api/almacenamiento/imagen/${tipo}`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
             }
+        );
+        if (!respuesta.data?.url) {
+            throw new Error(respuesta.data?.error || "No se recibió la URL de la imagen.");
         }
-    );
-    return respuesta.data.url;
+        return respuesta.data.url;
+    } catch (error) {
+        if (error.response?.status === 413) {
+            throw new Error("La imagen supera el límite de 5MB.");
+        }
+        throw new Error(error.response?.data?.error || "Error al subir la imagen.");
+    }
 }

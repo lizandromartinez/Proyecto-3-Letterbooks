@@ -38,7 +38,7 @@ public class Resenas {
      * @return respuesta HTTP 200 con la lista de reseñas asociadas al libro
      */
     @GetMapping("/libro/{idLibro}")
-    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable Integer idLibro) {
+    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable("idLibro") Integer idLibro) {
         List<Resena> resenas = resenaServicio.obtenerResenasPorLibro(idLibro);
         return ResponseEntity.ok(resenas);
     }
@@ -74,7 +74,7 @@ public class Resenas {
      */
     @PutMapping("/{idResena}")
     public ResponseEntity<?> editarResena(
-            @PathVariable Integer idResena,
+            @PathVariable("idResena") Integer idResena,
             @Valid @RequestBody NuevaResena datosResena,
             @RequestHeader("Authorization") String encabezadoAutorizacion) {
         try {
@@ -97,7 +97,7 @@ public class Resenas {
      */
     @DeleteMapping("/{idResena}")
     public ResponseEntity<?> eliminarResena(
-            @PathVariable Integer idResena,
+            @PathVariable("idResena") Integer idResena,
             @RequestHeader("Authorization") String encabezadoAutorizacion) {
         try {
             String token = extraerToken(encabezadoAutorizacion);

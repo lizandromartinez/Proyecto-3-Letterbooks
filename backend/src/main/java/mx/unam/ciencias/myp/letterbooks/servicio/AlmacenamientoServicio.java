@@ -64,8 +64,7 @@ public class AlmacenamientoServicio {
         }
 
         try {
-            // Crear carpeta correspondiente
-            Path dirPath = Paths.get(directorioImagenes, tipo);
+            Path dirPath = Paths.get(directorioImagenes, tipo).toAbsolutePath().normalize();
             Files.createDirectories(dirPath);
 
             //Obtenemos extensión del archivo.

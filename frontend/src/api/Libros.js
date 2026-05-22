@@ -79,8 +79,11 @@ export async function subirPortada(archivo, token) {
         body: formData
     });
 
-    const datos = await respuesta.json();
+    const datos = await respuesta.json().catch(() => ({}));
     if (!respuesta.ok) {
+        if (respuesta.status === 413) {
+            throw new Error('La portada supera el límite de 5MB.');
+        }
         throw new Error(datos.error || 'Error al subir la portada');
     }
     return datos.url;

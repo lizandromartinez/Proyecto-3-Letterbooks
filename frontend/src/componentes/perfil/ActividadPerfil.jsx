@@ -116,7 +116,7 @@ function ActividadPerfil({ perfil, tabActiva, setTabActiva, tituloSeccion = "Act
                                 </div>
                                 <div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
                                     <span className="text-gold-button text-xs">★</span>
-                                    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/10</span>
+                                    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/5</span>
                                 </div>
                             </div>
                         </div>

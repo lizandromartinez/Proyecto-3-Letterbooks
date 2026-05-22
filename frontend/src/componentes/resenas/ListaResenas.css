@@ -3,6 +3,8 @@
     flex-direction: column;
     align-items: center; 
     padding: 20px 0;
+    width: 100%;
+    color: var(--text);
 }
 
 .titulo-seccion {
@@ -99,4 +101,15 @@
 .mensaje-vacio {
     color: var(--muted);
     font-style: italic;
+}
+
+.mensaje-cargando {
+    color: var(--muted);
+    font-family: var(--font-inter);
+}
+
+.mensaje-error-carga {
+    color: #d32f2f;
+    font-family: var(--font-inter);
+    margin-bottom: 1rem;
 }

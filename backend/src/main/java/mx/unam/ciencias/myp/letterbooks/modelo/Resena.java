@@ -3,12 +3,16 @@ package mx.unam.ciencias.myp.letterbooks.modelo;
 import java.util.List;
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Clase que representa una reseña de un libro escrita por un usuario.
  * Mapea la tabla "resena" de la base de datos MariaDB.
  */
 @Entity
 @Table(name = "resena")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Resena {
 
     /* ID único de la reseña. */
@@ -18,6 +22,7 @@ public class Resena {
     private Integer idResena;
 
     /* Libro asociado a la reseña. */
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_libro", nullable = false)
     private Libro libro;
@@ -52,6 +57,7 @@ public class Resena {
     private String fechaPublicacion;
 
     /* Lista de comentarios asociados. */
+    @JsonIgnore
     @OneToMany(mappedBy = "resena", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comentario> comentarios;
     

@@ -1,10 +1,21 @@
 .contenedor-formulario-resena {
     max-width: 440px; 
+    width: 100%;
     background-color: var(--card-bg);
+    color: var(--text);
     padding: 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     margin: 16px auto;
+    border: 1px solid var(--border);
+}
+
+.contenedor-formulario-resena h3 {
+    font-family: var(--font-cormorant);
+    color: var(--navy);
+    font-size: 1.35rem;
+    margin: 0 0 16px;
+    font-weight: 700;
 }
 
 .grupo-entrada {
@@ -24,9 +35,14 @@
     border: 1px solid var(--border);
     border-radius: 999px; 
     background-color: var(--input-bg);
+    color: var(--text);
     font-family: var(--font-inter);
     outline: none;
     transition: border-color 0.3s ease;
+}
+
+.entrada-pildora::placeholder {
+    color: var(--muted);
 }
 
 .entrada-pildora:focus {
@@ -60,7 +76,7 @@
 }
 
 .boton-pildora.primario:hover {
-    background-color: var(--color-navy-button-hover);
+    background-color: #323D4D;
 }
 
 .boton-pildora.secundario {

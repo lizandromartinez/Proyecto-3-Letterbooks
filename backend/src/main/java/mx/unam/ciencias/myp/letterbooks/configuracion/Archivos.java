@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Configuración encargada de exponer archivos estáticos
  * almacenados en el servidor para que puedan ser accedidos
@@ -39,10 +42,11 @@ public class Archivos implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registro) {
 
-        String ubicacion = directorioImagenes.startsWith("/")
-            ? "file:" + directorioImagenes + "/"
-            : "file:" + System.getProperty("user.dir")
-              + "/" + directorioImagenes + "/";
+        Path directorio = Paths.get(directorioImagenes).toAbsolutePath().normalize();
+        String ubicacion = directorio.toUri().toString();
+        if (!ubicacion.endsWith("/")) {
+            ubicacion += "/";
+        }
 
         registro.addResourceHandler("/almacenamiento/usuarios/**")
             .addResourceLocations(ubicacion);

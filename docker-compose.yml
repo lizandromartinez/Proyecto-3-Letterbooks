@@ -28,11 +28,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./almacenamiento/usuarios:/app/almacenamiento/usuarios
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/letterbooks
       SPRING_DATASOURCE_USERNAME: springuser
       SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_UPLOAD_DIR: /app/almacenamiento/usuarios
       # Propiedades adicionales si son necesarias
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MariaDBDialect
 

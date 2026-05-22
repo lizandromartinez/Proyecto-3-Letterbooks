@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -44,6 +45,7 @@ public class Seguridad {
 		.requestMatchers("/api/almacenamiento/**").permitAll() // para guardar archivos
 		.requestMatchers("/almacenamiento/**").permitAll() // visualización de archivos
 		.requestMatchers("/api/usuarios/perfil/**").permitAll()//para ver perfiles ajenos 
+		.requestMatchers(HttpMethod.GET, "/api/resenas/libro/**").permitAll() // listar reseñas es público
 		.requestMatchers("/error").permitAll() // para ver los errores reales (no 403)
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );

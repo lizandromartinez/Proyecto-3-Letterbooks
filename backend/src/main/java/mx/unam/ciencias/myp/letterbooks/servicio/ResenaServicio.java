@@ -194,7 +194,7 @@ public class ResenaServicio {
      * @return una lista de entidades reseña pertenecientes al libro
      */
     public List<Resena> obtenerResenasPorLibro(Integer idLibro) {
-        return resenaRepositorio.findByLibro_IdLibro(idLibro);
+        return resenaRepositorio.encontrarPorLibroConUsuario(idLibro);
     }
 
     /**

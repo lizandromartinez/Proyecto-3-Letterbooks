@@ -48,4 +48,19 @@ public interface ResenaRepositorio extends JpaRepository<Resena, Integer> {
      * @return una lista con las reseñas pertenecientes al libro.
      */
     List<Resena> findByLibro_IdLibro(Integer idLibro);
+
+    /**
+     * Busca las reseñas de un libro ordenadas de la más reciente a la más antigua.
+     * @param idLibro identificador del libro
+     * @return lista de reseñas ordenadas por fecha de publicación descendente
+     */
+    List<Resena> findByLibro_IdLibroOrderByFechaPublicacionDesc(Integer idLibro);
+
+    /**
+     * Busca las reseñas de un libro con el autor cargado, más recientes primero.
+     * @param idLibro identificador del libro
+     * @return lista de reseñas con usuario inicializado
+     */
+    @Query("SELECT r FROM Resena r JOIN FETCH r.usuario u WHERE r.libro.idLibro = :idLibro ORDER BY r.fechaPublicacion DESC")
+    List<Resena> encontrarPorLibroConUsuario(@Param("idLibro") Integer idLibro);
 }

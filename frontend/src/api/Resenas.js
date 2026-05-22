@@ -7,8 +7,10 @@ const URL_BASE = 'http://localhost:8080/api/resenas';
  * @param {number} idLibro identificador del libro.
  * @return {Promise<Array>} lista de reseñas.
  */
-export const obtenerResenas = async (idLibro) => {
-    const respuesta = await axios.get(`${URL_BASE}/libro/${idLibro}`);
+export const obtenerResenas = async (idLibro, token) => {
+    const respuesta = await axios.get(`${URL_BASE}/libro/${idLibro}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
     return respuesta.data;
 };
 

@@ -11,6 +11,7 @@ target/
 .classpath
 almacenamiento/usuarios/avatares/
 almacenamiento/usuarios/banners/
+almacenamiento/usuarios/portadas/
 
 #FRONTEND (React/Vite)
 frontend/node_modules/
