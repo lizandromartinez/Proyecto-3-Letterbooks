@@ -1,3 +1,5 @@
+package mx.unam.ciencias.myp.letterbooks.modelo;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
