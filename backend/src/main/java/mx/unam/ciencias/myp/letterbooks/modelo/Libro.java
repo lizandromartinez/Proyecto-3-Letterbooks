@@ -1,224 +1,267 @@
 package mx.unam.ciencias.myp.letterbooks.modelo;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+import jakarta.validation.constraints.*;
 
 /**
- * Clase que representa un libro en el sistema.
- * Mapea la tabla "libro" de la base de datos MariaDB.
- * Version auxiliar para reseñas
-
+ * Clase que representa la tabla {@code libro} en la base de datos.
+ * Esta clase mapea la información de los libros, incluyendo sus características
+ * principales y sus relaciones con el género, autor y editorial mediante llaves foráneas.
  */
 @Entity
 @Table(name = "libro")
 public class Libro {
 
-    /* ID único del libro. */
+    /**
+     * Identificador único del libro. 
+     * Mapea a la llave primaria autoincremental {@code id_libro}.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_libro")
     private Integer idLibro;
-    /* Género asociado al libro. */
-    @ManyToOne
+
+    /**
+     * Género al que pertenece el libro.
+     * Carga de tipo perezosa (LAZY).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_genero")
     private Genero genero;
 
-    /* Autor asociado al libro. */
-    @ManyToOne
+    /**
+     * Autor que escribió el libro.
+     * Carga de tipo perezosa (LAZY).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_autor")
     private Autor autor;
-    
-    /* Editorial asociada al libro. */
-    @ManyToOne
+
+    /**
+     * Editorial encargada de la publicación del libro.
+     * Carga de tipo perezosa (LAZY).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_editorial")
     private Editorial editorial;
 
-    /* Título del libro. */
+    /**
+     * Título oficial del libro. Este campo es obligatorio.
+     */
+    @NotBlank(message = "El título no puede estar vacío")
+    @Size(max = 255, message = "El título no puede superar los 255 caracteres")
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
 
-    /* Sinopsis del libro. */
+    /**
+     * Resumen o sinopsis detallada del contenido del libro.
+     */
+    @Size(max = 10000, message = "La sinopsis supera el límite de caracteres permitido")
     @Column(name = "sinopsis", columnDefinition = "TEXT")
     private String sinopsis;
 
-    /* Ruta de la imagen de portada del libro. */
+    /**
+     * Ruta de la imagen de la portada del libro.
+     */
+    @Size(max = 255, message = "La ruta de la imagen no puede superar los 255 caracteres")
     @Column(name = "imagen", length = 255)
     private String imagen;
 
-    /* Cantidad de páginas del libro. */
+    /**
+     * Cantidad total de páginas que componen al libro.
+     */
+    @Min(value = 1, message = "El libro debe tener al menos 1 página")
     @Column(name = "paginas")
     private Integer paginas;
-    
-    /* Año de publicación del libro. */
+
+    /**
+     * Año de publicación del libro.
+     */
+    @Max(value = 2026, message = "El año de publicación no puede ser en el futuro")
     @Column(name = "ano")
     private Integer ano;
 
-    /* ISBN del libro. */
+    /**
+     * Código ISBN (International Standard Book Number) identificador del libro.
+     */
+    @Size(max = 20, message = "El ISBN no puede superar los 20 caracteres")
     @Column(name = "isbn", length = 20)
     private String isbn;
 
-    /* Cantidad de reportes del libro. */
-    @Column(name = "reportes", columnDefinition = "INT DEFAULT 0")
+    /**
+     * Contador de reportes o denuncias que ha recibido el libro.
+     */
+    @PositiveOrZero(message = "Los reportes no pueden ser un número negativo")
+    @Column(name = "reportes")
     private Integer reportes = 0;
 
-    /* Promedio de calificaciones del libro. */
+    /**
+     * Calificación promedio asignada por los usuarios.
+     * Mapeamos a Double en la entidad Java para mantener compatibilidad con las operaciones aritméticas de ResenaServicio.
+     */
     @Column(name = "promedio_calificacion")
     private Double promedioCalificacion = 0.00;
-    
+
     /**
-     * Obtiene el id único del libro.
-     * @return idLibro id entero.
+     * Constructor de la clase.
      */
-    public Integer getIdLibro() {
-        return idLibro;
+    public Libro() {
     }
 
     /**
-     * Define el id único del libro.
-     * @param idLibro id del libro.
+     * Regresa el identificador único del libro en la base de datos.
+     * @return El ID del libro.
+     */
+    public Integer getIdLibro() {
+        return this.idLibro;
+    }
+    
+    /**
+     * Define el identificador único del libro.
+     * @param idLibro El nuevo ID del libro.
      */
     public void setIdLibro(Integer idLibro) {
         this.idLibro = idLibro;
     }
 
     /**
-     * Obtiene el género asociado al libro.
-     * @return genero asociado al libro.
+     * Regresa el género del libro.
+     * @return El género del libro.
      */
     public Genero getGenero() {
-        return genero;
+        return this.genero;
     }
 
     /**
-     * Define el género asociado al libro.
-     * @param genero género asociado.
+     * Define el género del libro.
+     * @param genero Genero del libro.
      */
     public void setGenero(Genero genero) {
         this.genero = genero;
     }
 
     /**
-     * Obtiene el autor asociado al libro.
-     * @return autor asociado al libro.
+     * Regresa el autor del libro.
+     * @return El autor del libro.
      */
     public Autor getAutor() {
-        return autor;
+        return this.autor;
     }
 
     /**
-     * Define el autor asociado al libro.
-     * @param autor autor asociado.
+     * Define el autor del libro.
+     * @param autor Autor del libro.
      */
     public void setAutor(Autor autor) {
         this.autor = autor;
     }
 
     /**
-     * Obtiene la editorial asociada al libro.
-     * @return editorial asociada al libro.
+     * Regresa la editorial asociada al libro.
+     * @return La editorial del libro.
      */
     public Editorial getEditorial() {
-        return editorial;
+        return this.editorial;
     }
 
     /**
-     * Define la editorial asociada al libro.
-     * @param editorial editorial asociada.
+     * Define la editorial del libro.
+     * @param editorial Editorial del libro.
      */
     public void setEditorial(Editorial editorial) {
         this.editorial = editorial;
     }
 
     /**
-     * Obtiene el título del libro.
-     * @return titulo título del libro.
+     * Regresa el título del libro.
+     * @return El título del libro.
      */
     public String getTitulo() {
-        return titulo;
+        return this.titulo;
     }
 
     /**
-     * Define el título del libro.
-     * @param titulo título del libro.
+     * Define el titulo del libro.
+     * @param titulo Titulo del libro.
      */
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
 
     /**
-     * Obtiene la sinopsis del libro.
-     * @return sinopsis sinopsis del libro.
+     * Regresa la sinopsis del libro.
+     * @return Texto con la sinopsis.
      */
     public String getSinopsis() {
-        return sinopsis;
+        return this.sinopsis;
     }
 
     /**
      * Define la sinopsis del libro.
-     * @param sinopsis sinopsis del libro.
+     * @param sinopsis Sinopsis del libro.
      */
     public void setSinopsis(String sinopsis) {
         this.sinopsis = sinopsis;
     }
 
     /**
-     * Obtiene la ruta de la imagen del libro.
-     * @return imagen ruta de la imagen.
+     * Regresa la ruta de la imagen de portada del libro.
+     * @return ruta con la ruta de la imagen.
      */
     public String getImagen() {
-        return imagen;
+        return this.imagen;
     }
 
     /**
-     * Define la ruta de la imagen del libro.
-     * @param imagen ruta de la imagen.
+     * Define la ruta de imagen de portada del libro.
+     * @param imagen Imagen de portada del libro.
      */
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
 
     /**
-     * Obtiene la cantidad de páginas del libro.
-     * @return paginas cantidad de páginas.
+     * Regresa el número de páginas del libro.
+     * @return Cantidad de páginas del libro.
      */
     public Integer getPaginas() {
-        return paginas;
+        return this.paginas;
     }
 
     /**
-     * Define la cantidad de páginas del libro.
-     * @param paginas cantidad de páginas.
+     * Define el numero de páginas del libro.
+     * @param paginas Paginas del libro.
      */
     public void setPaginas(Integer paginas) {
         this.paginas = paginas;
     }
 
     /**
-     * Obtiene el año de publicación del libro.
-     * @return ano año de publicación.
+     * Regresa el año de publicación del libro.
+     * @return El año de publicación del libro.
      */
     public Integer getAno() {
-        return ano;
+        return this.ano;
     }
 
     /**
      * Define el año de publicación del libro.
-     * @param ano año de publicación.
+     * @param ano Año de publicación del libro.
      */
     public void setAno(Integer ano) {
         this.ano = ano;
     }
 
     /**
-     * Obtiene el ISBN del libro.
-     * @return isbn ISBN del libro.
-     */
+     * Regresa ISBN del libro.
+     * @return El código ISBN del libro.
+     */    
     public String getIsbn() {
-        return isbn;
+        return this.isbn;
     }
 
     /**
-     * Define el ISBN del libro.
+     * Define el isbn del libro.
      * @param isbn ISBN del libro.
      */
     public void setIsbn(String isbn) {
@@ -226,34 +269,34 @@ public class Libro {
     }
 
     /**
-     * Obtiene la cantidad de reportes del libro.
-     * @return reportes cantidad de reportes.
+     * Regresa la cantidad de reportes que tiene el libro.
+     * @return Número de reportes.
      */
     public Integer getReportes() {
-        return reportes;
+        return this.reportes;
     }
 
     /**
-     * Define la cantidad de reportes del libro.
-     * @param reportes cantidad de reportes.
+     * Define los reportes del libro.
+     * @param reportes Reportes que tiene el libro.
      */
     public void setReportes(Integer reportes) {
         this.reportes = reportes;
     }
 
     /**
-     * Obtiene el promedio de calificaciones del libro.
-     * @return promedioCalificacion promedio de calificaciones.
+     * Regresa la calificación promedio del libro.
+     * @return El promedio de la calificación del libro.
      */
     public Double getPromedioCalificacion() {
-        return promedioCalificacion;
+        return this.promedioCalificacion;
     }
 
     /**
-     * Define el promedio de calificaciones del libro.
-     * @param promedioCalificacion promedio de calificaciones.
+     * Define la calificación promedio del libro.
+     * @param promedioCalificacion Calificacion del libro.
      */
-    public void setPromedioCalificacion(Double promedioCalificacion) {
+    public void setPromedioCalificacion(Double promedioCalificacion) { 
         this.promedioCalificacion = promedioCalificacion;
     }
 }

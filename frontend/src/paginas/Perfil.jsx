@@ -85,6 +85,9 @@ function Perfil() {
                 setBiografia(datosPerfil.biografia || "");
                 setAvatar(datosPerfil.avatar || "");
                 setBanner(datosPerfil.banner || "");
+                setIdAutorFavorito(datosPerfil.idAutor ? String(datosPerfil.idAutor) : "");
+                setIdGeneroFavorito(datosPerfil.idGenero ? String(datosPerfil.idGenero) : "");
+                setIdLibroFavorito(datosPerfil.idLibro ? String(datosPerfil.idLibro) : "");
             } catch {
                 setError("Error al cargar el perfil");
             }

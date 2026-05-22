@@ -1,54 +1,87 @@
 package mx.unam.ciencias.myp.letterbooks.modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * Clase que representa un género en el sistema.
- * Mapea la tabla "genero" de la base de datos MariaDB.
+ * Clase que representa la tabla {@code genero} en la base de datos.
+ * Define las categorías literarias a las que pueden pertenecer los libros.
+ * Mantiene una relación de uno a muchos con la clase {@link Libro}.
  */
 @Entity
 @Table(name = "genero")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Genero {
 
-    /* ID único del género. */
+    /**
+     * Identificador único del género.
+     * Mapea a la llave primaria {@code id_genero}.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_genero")
     private Integer idGenero;
-    
-    /* Nombre del género. */
+
+    /**
+     * Nombre del género.
+     * Este campo es obligatorio.
+     */
+    @NotBlank(message = "El nombre del género no puede estar vacío")
+    @Size(max = 100, message = "El nombre del género no puede superar los 100 caracteres")
     @Column(name = "nombre_genero", nullable = false, length = 100)
     private String nombreGenero;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "genero", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Libro> libros = new ArrayList<>();
+
     /**
-     * Obtiene el id único del género.
-     * @return idGenero id entero.
+     * Constructor.
+     */
+    public Genero() {
+    }
+
+    /**
+     * Regresa el identificador único del genero en la base de datos.
+     * @return El ID del genero.
      */
     public Integer getIdGenero() {
-	return idGenero;
+        return this.idGenero;
     }
 
     /**
-     * Define el id único del género.
-     * @param idGenero id del género.
+     * Asigna el identificador único del genero.
+     * @param idGenero El nuevo ID del genero.
      */
     public void setIdGenero(Integer idGenero) {
-	this.idGenero = idGenero;
+        this.idGenero = idGenero;
     }
 
     /**
-     * Obtiene el nombre del género.
-     * @return nombreGenero nombre del género.
+     * Regresa el nombre del género.
+     * @return El nombre del libro.
      */
     public String getNombreGenero() {
-	return nombreGenero;
+        return this.nombreGenero;
     }
 
     /**
      * Define el nombre del género.
-     * @param nombreGenero nombre del género.
+     * @param nombreGenero Nombre del género.
      */
     public void setNombreGenero(String nombreGenero) {
-	this.nombreGenero = nombreGenero;
-    }    
+        this.nombreGenero = nombreGenero;
+    }
+
+    public List<Libro> getLibros() {
+        return this.libros;
+    }
+
+    public void setLibros(List<Libro> libros) {
+        this.libros = libros;
+    }
 }

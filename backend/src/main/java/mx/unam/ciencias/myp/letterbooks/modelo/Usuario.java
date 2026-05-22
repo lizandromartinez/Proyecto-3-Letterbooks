@@ -56,18 +56,22 @@ public class Usuario {
     private Rol rol = Rol.usuario;
 
     /* Reseñas escritas por el usuario. */
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<Resena> resenas;
 
     /* Reseñas a las que dio like el usuario. */
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<LikesResena> likesResenas;
 
     /* Comentarios a los que dio like el usuario. */
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<LikesComentario> likesComentarios;
 
     /* Reseñas que ha calificado el usuario. */
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<CalificacionResena> calificacionesResenas;
     

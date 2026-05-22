@@ -5,11 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
+import mx.unam.ciencias.myp.letterbooks.modelo.Editorial;
 import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 import mx.unam.ciencias.myp.letterbooks.servicio.AutorServicio;
 import mx.unam.ciencias.myp.letterbooks.servicio.GeneroServicio;
 import mx.unam.ciencias.myp.letterbooks.servicio.LibroServicio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.EditorialRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
 
 /**
  * Controlador REST para la consulta del catálogo de libros, autores y géneros.
@@ -89,5 +93,68 @@ public class Catalogo {
     @GetMapping("/generos")
     public ResponseEntity<List<Genero>> obtenerGeneros() {
         return ResponseEntity.ok(generoServicio.obtenerTodos());
+    }
+
+    /**
+     * Repositorio encargado de acceder a las editoriales.
+     */
+    @Autowired
+    private EditorialRepositorio editorialRepositorio;
+
+    @Autowired
+    private AutorRepositorio autorRepositorio;
+
+    @Autowired
+    private GeneroRepositorio generoRepositorio;
+
+    /**
+     * Obtiene todas las editoriales disponibles.
+     * @return lista de editoriales
+     */
+    @GetMapping("/editoriales")
+    public ResponseEntity<List<Editorial>> obtenerEditoriales() {
+        return ResponseEntity.ok(editorialRepositorio.findAll());
+    }
+
+    /**
+     * Crea un nuevo autor.
+     * @param autor Datos del autor a registrar
+     * @return El autor guardado
+     */
+    @PostMapping("/autores")
+    public ResponseEntity<Autor> crearAutor(@RequestBody Autor autor) {
+        if (autor.getNombreAutor() == null || autor.getNombreAutor().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        autor.setNombreAutor(autor.getNombreAutor().trim());
+        return ResponseEntity.ok(autorRepositorio.save(autor));
+    }
+
+    /**
+     * Crea un nuevo género.
+     * @param genero Datos del género a registrar
+     * @return El género guardado
+     */
+    @PostMapping("/generos")
+    public ResponseEntity<Genero> crearGenero(@RequestBody Genero genero) {
+        if (genero.getNombreGenero() == null || genero.getNombreGenero().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        genero.setNombreGenero(genero.getNombreGenero().trim());
+        return ResponseEntity.ok(generoRepositorio.save(genero));
+    }
+
+    /**
+     * Crea una nueva editorial.
+     * @param editorial Datos de la editorial a registrar
+     * @return La editorial guardada
+     */
+    @PostMapping("/editoriales")
+    public ResponseEntity<Editorial> crearEditorial(@RequestBody Editorial editorial) {
+        if (editorial.getNombreEditorial() == null || editorial.getNombreEditorial().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        editorial.setNombreEditorial(editorial.getNombreEditorial().trim());
+        return ResponseEntity.ok(editorialRepositorio.save(editorial));
     }
 }

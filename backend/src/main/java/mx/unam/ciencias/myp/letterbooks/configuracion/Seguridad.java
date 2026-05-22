@@ -44,6 +44,7 @@ public class Seguridad {
 		.requestMatchers("/api/almacenamiento/**").permitAll() // para guardar archivos
 		.requestMatchers("/almacenamiento/**").permitAll() // visualización de archivos
 		.requestMatchers("/api/usuarios/perfil/**").permitAll()//para ver perfiles ajenos 
+		.requestMatchers("/error").permitAll() // para ver los errores reales (no 403)
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );
 

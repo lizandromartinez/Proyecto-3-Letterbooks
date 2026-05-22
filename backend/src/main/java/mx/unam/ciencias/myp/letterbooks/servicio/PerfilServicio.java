@@ -107,6 +107,7 @@ public class PerfilServicio {
 	
         // Autor, género y libro favorito
 	if (perfil.getLibro() != null) {
+	    dto.setIdLibro(perfil.getLibro().getIdLibro());
 	    dto.setLibroFavorito(perfil.getLibro().getTitulo());
 	    dto.setImagenLibroFavorito(perfil.getLibro().getImagen());
 	    dto.setAutorLibroFavorito(
@@ -115,12 +116,27 @@ public class PerfilServicio {
 		    : null
 	    );
 	} else {
+	    dto.setIdLibro(null);
 	    dto.setLibroFavorito("Ninguno");
 	    dto.setImagenLibroFavorito(null);
 	    dto.setAutorLibroFavorito(null);
 	}
-	dto.setAutorFavorito(perfil.getAutor() != null ? perfil.getAutor().getNombreAutor() : "Ninguno");
-	dto.setGeneroFavorito(perfil.getGenero() != null ? perfil.getGenero().getNombreGenero() : "Ninguno");
+	
+	if (perfil.getAutor() != null) {
+	    dto.setIdAutor(perfil.getAutor().getIdAutor());
+	    dto.setAutorFavorito(perfil.getAutor().getNombreAutor());
+	} else {
+	    dto.setIdAutor(null);
+	    dto.setAutorFavorito("Ninguno");
+	}
+
+	if (perfil.getGenero() != null) {
+	    dto.setIdGenero(perfil.getGenero().getIdGenero());
+	    dto.setGeneroFavorito(perfil.getGenero().getNombreGenero());
+	} else {
+	    dto.setIdGenero(null);
+	    dto.setGeneroFavorito("Ninguno");
+	}
 	
         // Reseñas likeadas
         dto.setResenasLikeadas(construirResenasLikeadas(idUsuario));

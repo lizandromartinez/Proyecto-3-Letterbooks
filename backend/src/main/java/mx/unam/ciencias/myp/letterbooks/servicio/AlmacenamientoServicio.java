@@ -40,7 +40,7 @@ public class AlmacenamientoServicio {
     public String guardarImagen(MultipartFile archivo, String tipo) {
 
 	//Validar tipo de carpeta permitido.
-        if (!tipo.equals("avatares") && !tipo.equals("banners")) {
+        if (!tipo.equals("avatares") && !tipo.equals("banners") && !tipo.equals("portadas")) {
             throw new IllegalArgumentException(
                 "Tipo de imagen inválido"
             );

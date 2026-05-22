@@ -46,9 +46,13 @@ public class FiltroAcceso extends OncePerRequestFilter {
         FilterChain cadenaFiltros
     ) throws ServletException, IOException {
 
+        System.out.println("FiltroAcceso: Request URI: " + solicitud.getRequestURI());
+
         // Obtener encabezado Authorization
         final String encabezadoAutorizacion =
             solicitud.getHeader("Authorization");
+
+        System.out.println("FiltroAcceso: Authorization Header: " + encabezadoAutorizacion);
 
         String token = null;
         String nombreUsuario = null;
@@ -92,6 +96,7 @@ public class FiltroAcceso extends OncePerRequestFilter {
                     .buildDetails(solicitud)
             );
 
+            System.out.println("FiltroAcceso: Autenticando usuario: " + nombreUsuario);
             // Registrar autenticación
             SecurityContextHolder
                 .getContext()
