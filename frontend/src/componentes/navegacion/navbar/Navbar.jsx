@@ -73,7 +73,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                         <>
                             <NavLink href="/dashboard">Feed</NavLink>
                             <NavLink href="/dashboard">Explorar</NavLink>
-                            <NavLink href="/dashboard">Nuevo Libro</NavLink>
+                            <NavLink href="/biblioteca">Biblioteca</NavLink>
                             <AccionRecomendada href="/dashboard" variante="primario">
                                 Mi Perfil
                             </AccionRecomendada>
@@ -103,7 +103,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                         <>
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Feed</NavLink>
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Explorar</NavLink>
-                            <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Nuevo Libro</NavLink>
+                            <NavLink href="/biblioteca" esMovil onClick={cerrarMenu}>Biblioteca</NavLink>
                             <AccionRecomendada href="/dashboard" variante="outline" esMovil onClick={cerrarMenu}>
                                 Mi Perfil
                             </AccionRecomendada>
