@@ -94,6 +94,10 @@ public class ResenaServicio {
         Libro libro = libroRepositorio.findById(datos.getIdLibro())
             .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado."));
 
+        if (resenaRepositorio.existePorUsuarioYLibro(usuario.getIdUsuario(), libro.getIdLibro())) {
+            throw new IllegalArgumentException("Ya has publicado una reseña para este libro.");
+        }
+
         Resena nuevaResena = new Resena();
         nuevaResena.setLibro(libro);
         nuevaResena.setUsuario(usuario);

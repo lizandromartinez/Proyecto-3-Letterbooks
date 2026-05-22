@@ -2,9 +2,9 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, Navigate, Link, useParams } from 'react-router-dom'; 
 import { ContextoSesion } from '../contexto/Sesion';
 
-import AccionRecomendada from '../componentes/comunes/AccionRecomendada';
 import Navbar from '../componentes/navegacion/navbar/Navbar';
 import Footer from '../componentes/navegacion/footer/Footer';
+import ListaResenas from '../componentes/resenas/ListaResenas';
 import { obtenerLibroPorId } from '../api/Libros';
 
 /**
@@ -38,6 +38,16 @@ const DetalleLibro = () => {
             cargarDetalles();
         }
     }, [id, token]);
+
+    const refrescarDetallesLibro = async () => {
+        if (!token || !id) return;
+        try {
+            const data = await obtenerLibroPorId(id, token);
+            setLibro(data);
+        } catch (err) {
+            console.error("Error al actualizar los detalles del libro:", err);
+        }
+    };
 
     // Guarda de seguridad: Redirección forzada al login si el usuario no está autenticado.
     if (!token) return <Navigate to="/login" replace />;
@@ -150,12 +160,6 @@ const DetalleLibro = () => {
                             </p>
                         </div>
 
-                        {/* Acceso directo al módulo de opiniones */}
-                        <div className="mt-8">
-                            <AccionRecomendada href="/" variante="primario">
-                                Escribir Reseña
-                            </AccionRecomendada>
-                        </div>
                     </div>
                 </div>
 
@@ -171,6 +175,10 @@ const DetalleLibro = () => {
                         no has calificado este libro
                     </p>
                 </div>
+
+                <section className="lg:col-span-3 mt-4 bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xs">
+                    <ListaResenas idLibro={Number(id)} alCambiarResenas={refrescarDetallesLibro} />
+                </section>
 
             </main>
 

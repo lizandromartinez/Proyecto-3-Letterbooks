@@ -22,6 +22,7 @@ public class VistaLibro {
     private String nombreGenero;
     private BigDecimal promedioCalificacion;
     private Integer totalReportes;
+    private Integer totalResenas;
 
     /**
      * Constructor vacío por defecto.
@@ -143,6 +144,13 @@ public class VistaLibro {
         return this.totalReportes;
     }
 
+    /**
+     * Obtiene la cantidad total de reseñas publicadas para el libro.
+     * @return entero con el conteo de reseñas.
+     */
+    public Integer getTotalResenas() {
+        return this.totalResenas;
+    }
 
     /**
      * Asigna el ID del libro.
@@ -253,5 +261,13 @@ public class VistaLibro {
      */
     public void setTotalReportes(Integer totalReportes) {
         this.totalReportes = totalReportes;
+    }
+
+    /**
+     * Asigna el conteo total de reseñas del libro.
+     * @param totalResenas cantidad de reseñas publicadas.
+     */
+    public void setTotalResenas(Integer totalResenas) {
+        this.totalResenas = totalResenas;
     }
 }

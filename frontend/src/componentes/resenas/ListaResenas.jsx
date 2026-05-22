@@ -7,9 +7,9 @@ import './ListaResenas.css';
 
 /**
  * Componente que muestra la lista de reseñas de un libro.
- * @param {Object} props contiene el idLibro.
+ * @param {Object} props contiene el idLibro y opcionalmente alCambiarResenas.
  */
-function ListaResenas({ idLibro }) {
+function ListaResenas({ idLibro, alCambiarResenas }) {
     const { token } = useContext(ContextoSesion);
     const [resenas, setResenas] = useState([]);
     const [cargando, setCargando] = useState(true);
@@ -22,6 +22,9 @@ function ListaResenas({ idLibro }) {
             setCargando(true);
             const datos = await obtenerResenas(idLibro);
             setResenas(datos);
+            if (alCambiarResenas) {
+                alCambiarResenas();
+            }
         } catch (error) {
             console.error("Error al cargar reseñas:", error);
         } finally {

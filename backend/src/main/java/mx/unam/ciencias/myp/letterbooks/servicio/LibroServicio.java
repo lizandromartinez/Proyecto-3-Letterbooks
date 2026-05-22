@@ -9,6 +9,7 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 import mx.unam.ciencias.myp.letterbooks.modelo.Editorial;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.EditorialRepositorio;
@@ -24,6 +25,7 @@ import mx.unam.ciencias.myp.letterbooks.dto.VistaLibro;
 public class LibroServicio {
 
     private final LibroRepositorio libroRepositorio;
+    private final ResenaRepositorio resenaRepositorio;
     private final AutorRepositorio autorRepositorio;
     private final GeneroRepositorio generoRepositorio;
     private final EditorialRepositorio editorialRepositorio;
@@ -32,11 +34,13 @@ public class LibroServicio {
      * Constructor con inyección de dependencias.
      * Valida que las llaves foráneas (Autor, Género, Editorial) existan en la base de datos.
      */
-    public LibroServicio(LibroRepositorio libroRepositorio, 
+    public LibroServicio(LibroRepositorio libroRepositorio,
+                         ResenaRepositorio resenaRepositorio,
                          AutorRepositorio autorRepositorio,
                          GeneroRepositorio generoRepositorio, 
                          EditorialRepositorio editorialRepositorio) {
         this.libroRepositorio = libroRepositorio;
+        this.resenaRepositorio = resenaRepositorio;
         this.autorRepositorio = autorRepositorio;
         this.generoRepositorio = generoRepositorio;
         this.editorialRepositorio = editorialRepositorio;
@@ -151,7 +155,9 @@ public class LibroServicio {
             vista.setNombreEditorial(libro.getEditorial().getNombreEditorial());
         
         if (libro.getGenero() != null) 
-            vista.setNombreGenero(libro.getGenero().getNombreGenero());                          
+            vista.setNombreGenero(libro.getGenero().getNombreGenero());
+
+        vista.setTotalResenas(resenaRepositorio.findByLibro_IdLibro(libro.getIdLibro()).size());
 
         return vista;
     }
