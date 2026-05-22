@@ -2,6 +2,8 @@ package mx.unam.ciencias.myp.letterbooks.modelo;
 
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Clase que representa a un usuario en el sistema.
  * Mapea la tabla "Usuario" de la base de datos MariaDB.
@@ -17,6 +19,7 @@ public class Usuario {
     private Integer idUsuario;
 
     /* Correo electrónico único del usuario. */
+    @JsonIgnore
     @Column(
         name = "correo",
         unique = true,
@@ -35,6 +38,7 @@ public class Usuario {
     private String nombreUsuario;
 
     /* Contraseña hasheada del usuario. */
+    @JsonIgnore
     @Column(
         name = "contrasena",
         nullable = false,

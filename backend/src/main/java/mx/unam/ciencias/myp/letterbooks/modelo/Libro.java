@@ -22,7 +22,7 @@ public class Libro {
     private String titulo;
 
     /* Promedio de calificaciones del libro. */
-    @Column(name = "promedio_calificacion", precision = 3, scale = 2)
+    @Column(name = "promedio_calificacion")
     private Double promedioCalificacion = 0.00;
     
     /**
