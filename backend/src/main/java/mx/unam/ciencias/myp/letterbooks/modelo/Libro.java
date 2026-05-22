@@ -21,6 +21,10 @@ public class Libro {
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
 
+    /* Promedio de calificaciones del libro. */
+    @Column(name = "promedio_calificacion", precision = 3, scale = 2)
+    private Double promedioCalificacion = 0.00;
+    
     /**
      * Obtiene el id único del libro.
      * @return idLibro id entero.
@@ -51,5 +55,21 @@ public class Libro {
      */
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    /**
+     * Obtiene el promedio de calificación del libro.
+     * @return promedioCalificacion el promedio de la calificación.
+     */
+    public Double getPromedioCalificacion() {
+        return promedioCalificacion;
+    }
+
+    /**
+     * Define el promedio de calificación del libro.
+     * @param promedioCalificacion el promedio de la calificación.
+     */
+    public void setPromedioCalificacion(Double promedioCalificacion) {
+        this.promedioCalificacion = promedioCalificacion;
     }
 }
