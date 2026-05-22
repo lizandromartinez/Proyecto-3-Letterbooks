@@ -1,5 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.dto;
 
+import java.math.BigDecimal;
+
 /**
  * Representa el modelo de datos optimizado para la pantalla de visualización de un libro.
  * Esta clase se utiliza para el flujo de salida de datos (Response). 
@@ -18,7 +20,7 @@ public class VistaLibro {
     private String nombreAutor;
     private String nombreEditorial;
     private String nombreGenero;
-    private Double promedioDeCalificacion;
+    private BigDecimal promedioCalificacion;
     private Integer totalReportes;
 
     /**
@@ -126,8 +128,8 @@ public class VistaLibro {
      * en el JSON, permitiendo a la interfaz renderizar las estrellas de puntuación.
      * @return Un valor flotante de doble precisión con el promedio de notas asignadas.
      */
-    public Double getPromedioDeCalificacion() {
-        return this.promedioDeCalificacion;
+    public BigDecimal getPromedioCalificacion() {
+        return this.promedioCalificacion;
     }
 
     /**
@@ -238,10 +240,10 @@ public class VistaLibro {
     /**
      * Asigna el promedio de calificación del libro al objeto de vista.
      * Invocado en el Servicio haciendo un {@code libro.getPromedioCalificacion()}.
-     * @param promedioDeCalificacion Valor numérico con el promedio de evaluación.
+     * @param promedioCalificacion Valor numérico con el promedio de evaluación.
      */
-    public void setPromedioDeCalificacion(Double promedioDeCalificacion) {
-        this.promedioDeCalificacion = promedioDeCalificacion;
+    public void setPromedioCalificacion(BigDecimal promedioCalificacion) {
+        this.promedioCalificacion = promedioCalificacion;
     }
 
     /**

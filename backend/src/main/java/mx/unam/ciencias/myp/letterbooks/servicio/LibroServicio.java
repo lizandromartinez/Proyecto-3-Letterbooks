@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.servicio;
 
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
@@ -85,7 +86,7 @@ public class LibroServicio {
         libro.setGenero(genero);
         libro.setEditorial(editorial);
 	libro.setReportes(0);
-        libro.setPromedioDeCalificacion(0.0);
+        libro.setPromedioCalificacion(BigDecimal.ZERO);
 
 
         Libro libroGuardado = libroRepositorio.save(libro);
@@ -121,10 +122,10 @@ public class LibroServicio {
         vista.setAno(libro.getAno());
         vista.setIsbn(libro.getIsbn());
 	vista.setTotalReportes(libro.getReportes());
-        vista.setPromedioDeCalificacion(libro.getPromedioDeCalificacion());
+        vista.setPromedioCalificacion(libro.getPromedioCalificacion());
 
         if (libro.getAutor() != null) 
-            vista.setNombreAutor(libro.getAutor().getNombre()); 
+            vista.setNombreAutor(libro.getAutor().getNombreAutor()); 
         
         if (libro.getEditorial() != null) 
             vista.setNombreEditorial(libro.getEditorial().getNombreEditorial());
