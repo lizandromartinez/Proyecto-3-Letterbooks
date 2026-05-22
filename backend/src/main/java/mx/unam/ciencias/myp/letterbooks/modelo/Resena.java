@@ -4,7 +4,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 /**
- * Clase que representa una reseña en el sistema.
+ * Clase que representa una reseña de un libro escrita por un usuario.
  * Mapea la tabla "resena" de la base de datos MariaDB.
  */
 @Entity
@@ -22,45 +22,45 @@ public class Resena {
     @JoinColumn(name = "id_libro", nullable = false)
     private Libro libro;
 
-    /* Usuario que realizó la reseña. */
+    /* Usuario autor de la reseña. */
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    /* Calificación otorgada al libro. */
+    /* Calificación que el usuario le da al libro. */
     @Column(name = "calificacionLibro")
-    private Byte calificacionLibro;
+    private Integer calificacionLibro;
 
-    /* Calificación recibida por la reseña. */
+    /* Calificación recibida por la reseña (dada por otros usuarios). */
     @Column(name = "calificacionResena")
-    private Byte calificacionResena;
+    private Integer calificacionResena = 0;
 
-    /* Cantidad de likes de la reseña. */
+    /* Cantidad de 'me gusta' recibidos. */
     @Column(name = "likes", columnDefinition = "INT DEFAULT 0")
     private Integer likes = 0;
 
-    /* Cantidad de reportes de la reseña. */
+    /* Cantidad de reportes por infracciones. */
     @Column(name = "reportes", columnDefinition = "INT DEFAULT 0")
     private Integer reportes = 0;
     
-    /* Texto contenido en la reseña. */
+    /* Cuerpo/texto de la reseña. */
     @Column(name = "texto_resena", columnDefinition = "TEXT")
     private String textoResena;
     
-    /* Fecha de publicación de la reseña. */
+    /* Fecha de publicación almacenada como texto (YYYY-MM-DD). */
     @Column(name = "fecha_publicacion", length = 10)
     private String fechaPublicacion;
 
     /* Lista de comentarios asociados. */
-    @OneToMany(mappedBy = "resena")
+    @OneToMany(mappedBy = "resena", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comentario> comentarios;
     
     /**
      * Obtiene el id único de la reseña.
-     * @return idResena id entero.
+     * @return idResena id de la reseña.
      */
     public Integer getIdResena() {
-	return idResena;
+        return idResena;
     }
 
     /**
@@ -68,135 +68,135 @@ public class Resena {
      * @param idResena id de la reseña.
      */
     public void setIdResena(Integer idResena) {
-	this.idResena = idResena;
+        this.idResena = idResena;
     }
 
     /**
-     * Obtiene el libro asociado a la reseña.
-     * @return libro asociado a la reseña.
+     * Obtiene el libro reseñado.
+     * @return libro el Libro.
      */
     public Libro getLibro() {
-	return libro;
+        return libro;
     }
 
     /**
-     * Define el libro asociado a la reseña.
-     * @param libro libro asociado.
+     * Define el libro que se está reseñando.
+     * @param libro el Libro.
      */
     public void setLibro(Libro libro) {
-	this.libro = libro;
+        this.libro = libro;
     }
 
     /**
-     * Obtiene el usuario que realizó la reseña.
-     * @return usuario asociado a la reseña.
+     * Obtiene el usuario que escribió la reseña.
+     * @return usuario el Usuario.
      */
     public Usuario getUsuario() {
-	return usuario;
+        return usuario;
     }
 
     /**
-     * Define el usuario que realizó la reseña.
-     * @param usuario usuario asociado.
+     * Define el usuario autor de la reseña.
+     * @param usuario el Usuario.
      */
     public void setUsuario(Usuario usuario) {
-	this.usuario = usuario;
+        this.usuario = usuario;
     }
     
     /**
      * Obtiene la calificación otorgada al libro.
-     * @return calificacionLibro calificación del libro.
+     * @return calificacionLibro la calificación del libro.
      */
-    public Byte getCalificacionLibro() {
-	return calificacionLibro;
+    public Integer getCalificacionLibro() {
+        return calificacionLibro;
     }
 
     /**
      * Define la calificación otorgada al libro.
-     * @param calificacionLibro calificación del libro.
+     * @param calificacionLibro la calificación.
      */
-    public void setCalificacionLibro(Byte calificacionLibro) {
-	this.calificacionLibro = calificacionLibro;
+    public void setCalificacionLibro(Integer calificacionLibro) {
+        this.calificacionLibro = calificacionLibro;
     }
 
     /**
-     * Obtiene la calificación recibida por la reseña.
-     * @return calificacionResena calificación de la reseña.
+     * Obtiene la calificación general que tiene la reseña.
+     * @return calificacionResena la calificación de la reseña.
      */
-    public Byte getCalificacionResena() {
-	return calificacionResena;
+    public Integer getCalificacionResena() {
+        return calificacionResena;
     }
 
     /**
-     * Define la calificación recibida por la reseña.
-     * @param calificacionResena calificación de la reseña.
+     * Define la calificación de la reseña.
+     * @param calificacionResena la calificación.
      */
-    public void setCalificacionResena(Byte calificacionResena) {
-	this.calificacionResena = calificacionResena;
+    public void setCalificacionResena(Integer calificacionResena) {
+        this.calificacionResena = calificacionResena;
     }
 
     /**
-     * Obtiene la cantidad de likes de la reseña.
-     * @return likes cantidad de likes.
+     * Obtiene la cantidad de 'me gusta' de la reseña.
+     * @return likes número de likes.
      */
     public Integer getLikes() {
-	return likes;
+        return likes;
     }
 
     /**
-     * Define la cantidad de likes de la reseña.
-     * @param likes cantidad de likes.
+     * Define la cantidad de 'me gusta' de la reseña.
+     * @param likes número de likes.
      */
     public void setLikes(Integer likes) {
-	this.likes = likes;
+        this.likes = likes;
     }
 
     /**
      * Obtiene la cantidad de reportes de la reseña.
-     * @return reportes cantidad de reportes.
+     * @return reportes número de reportes.
      */
     public Integer getReportes() {
-	return reportes;
+        return reportes;
     }
 
     /**
      * Define la cantidad de reportes de la reseña.
-     * @param reportes cantidad de reportes.
+     * @param reportes número de reportes.
      */
     public void setReportes(Integer reportes) {
-	this.reportes = reportes;
+        this.reportes = reportes;
     }
 
     /**
-     * Obtiene el texto contenido en la reseña.
-     * @return textoResena texto de la reseña.
+     * Obtiene el texto de la reseña.
+     * @return textoResena la reseña.
      */
     public String getTextoResena() {
-	return textoResena;
+        return textoResena;
     }
 
     /**
-     * Define el texto contenido en la reseña.
-     * @param textoResena texto de la reseña.
+     * Define el texto de la reseña.
+     * @param textoResena la reseña.
      */
     public void setTextoResena(String textoResena) {
-	this.textoResena = textoResena;
+        this.textoResena = textoResena;
     }
 
     /**
-     * Obtiene la fecha de publicación de la reseña.
-     * @return fechaPublicacion fecha de publicación.
+     * Obtiene la fecha de publicación.
+     * @return fechaPublicacion la fecha en formato YYYY-MM-DD.
      */
     public String getFechaPublicacion() {
-	return fechaPublicacion;
+        return fechaPublicacion;
     }
 
     /**
      * Define la fecha de publicación de la reseña.
-     * @param fechaPublicacion fecha de publicación.
+     * @param fechaPublicacion la fecha en formato YYYY-MM-DD.
      */
     public void setFechaPublicacion(String fechaPublicacion) {
-	this.fechaPublicacion = fechaPublicacion;
+        this.fechaPublicacion = fechaPublicacion;
     }
 
     /**
@@ -204,7 +204,7 @@ public class Resena {
      * @return comentarios lista de comentarios.
      */
     public List<Comentario> getComentarios() {
-	return comentarios;
+        return comentarios;
     }
 
     /**
@@ -212,6 +212,6 @@ public class Resena {
      * @param comentarios lista de comentarios.
      */
     public void setComentarios(List<Comentario> comentarios) {
-	this.comentarios = comentarios;
+        this.comentarios = comentarios;
     }
 }

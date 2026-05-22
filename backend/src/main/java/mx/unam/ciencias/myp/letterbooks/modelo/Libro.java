@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 /**
  * Clase que representa un libro en el sistema.
  * Mapea la tabla "libro" de la base de datos MariaDB.
+ * Version auxiliar para reseñas
+
  */
 @Entity
 @Table(name = "libro")
@@ -16,7 +18,6 @@ public class Libro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_libro")
     private Integer idLibro;
-    
     /* Género asociado al libro. */
     @ManyToOne
     @JoinColumn(name = "id_genero")
@@ -61,15 +62,15 @@ public class Libro {
     private Integer reportes = 0;
 
     /* Promedio de calificaciones del libro. */
-    @Column(name = "promedio_calificacion", precision = 3, scale = 2, columnDefinition = "DECIMAL(3,2) DEFAULT 0.00")
-    private BigDecimal promedioCalificacion = BigDecimal.ZERO;
+    @Column(name = "promedio_calificacion")
+    private Double promedioCalificacion = 0.00;
     
     /**
      * Obtiene el id único del libro.
      * @return idLibro id entero.
      */
     public Integer getIdLibro() {
-	return idLibro;
+        return idLibro;
     }
 
     /**
@@ -77,7 +78,7 @@ public class Libro {
      * @param idLibro id del libro.
      */
     public void setIdLibro(Integer idLibro) {
-	this.idLibro = idLibro;
+        this.idLibro = idLibro;
     }
 
     /**
@@ -85,7 +86,7 @@ public class Libro {
      * @return genero asociado al libro.
      */
     public Genero getGenero() {
-	return genero;
+        return genero;
     }
 
     /**
@@ -93,7 +94,7 @@ public class Libro {
      * @param genero género asociado.
      */
     public void setGenero(Genero genero) {
-	this.genero = genero;
+        this.genero = genero;
     }
 
     /**
@@ -101,7 +102,7 @@ public class Libro {
      * @return autor asociado al libro.
      */
     public Autor getAutor() {
-	return autor;
+        return autor;
     }
 
     /**
@@ -109,7 +110,7 @@ public class Libro {
      * @param autor autor asociado.
      */
     public void setAutor(Autor autor) {
-	this.autor = autor;
+        this.autor = autor;
     }
 
     /**
@@ -117,7 +118,7 @@ public class Libro {
      * @return editorial asociada al libro.
      */
     public Editorial getEditorial() {
-	return editorial;
+        return editorial;
     }
 
     /**
@@ -125,7 +126,7 @@ public class Libro {
      * @param editorial editorial asociada.
      */
     public void setEditorial(Editorial editorial) {
-	this.editorial = editorial;
+        this.editorial = editorial;
     }
 
     /**
@@ -133,7 +134,7 @@ public class Libro {
      * @return titulo título del libro.
      */
     public String getTitulo() {
-	return titulo;
+        return titulo;
     }
 
     /**
@@ -141,7 +142,7 @@ public class Libro {
      * @param titulo título del libro.
      */
     public void setTitulo(String titulo) {
-	this.titulo = titulo;
+        this.titulo = titulo;
     }
 
     /**
@@ -149,7 +150,7 @@ public class Libro {
      * @return sinopsis sinopsis del libro.
      */
     public String getSinopsis() {
-	return sinopsis;
+        return sinopsis;
     }
 
     /**
@@ -157,7 +158,7 @@ public class Libro {
      * @param sinopsis sinopsis del libro.
      */
     public void setSinopsis(String sinopsis) {
-	this.sinopsis = sinopsis;
+        this.sinopsis = sinopsis;
     }
 
     /**
@@ -165,7 +166,7 @@ public class Libro {
      * @return imagen ruta de la imagen.
      */
     public String getImagen() {
-	return imagen;
+        return imagen;
     }
 
     /**
@@ -173,7 +174,7 @@ public class Libro {
      * @param imagen ruta de la imagen.
      */
     public void setImagen(String imagen) {
-	this.imagen = imagen;
+        this.imagen = imagen;
     }
 
     /**
@@ -181,7 +182,7 @@ public class Libro {
      * @return paginas cantidad de páginas.
      */
     public Integer getPaginas() {
-	return paginas;
+        return paginas;
     }
 
     /**
@@ -189,7 +190,7 @@ public class Libro {
      * @param paginas cantidad de páginas.
      */
     public void setPaginas(Integer paginas) {
-	this.paginas = paginas;
+        this.paginas = paginas;
     }
 
     /**
@@ -197,7 +198,7 @@ public class Libro {
      * @return ano año de publicación.
      */
     public Integer getAno() {
-	return ano;
+        return ano;
     }
 
     /**
@@ -205,7 +206,7 @@ public class Libro {
      * @param ano año de publicación.
      */
     public void setAno(Integer ano) {
-	this.ano = ano;
+        this.ano = ano;
     }
 
     /**
@@ -213,7 +214,7 @@ public class Libro {
      * @return isbn ISBN del libro.
      */
     public String getIsbn() {
-	return isbn;
+        return isbn;
     }
 
     /**
@@ -221,7 +222,7 @@ public class Libro {
      * @param isbn ISBN del libro.
      */
     public void setIsbn(String isbn) {
-	this.isbn = isbn;
+        this.isbn = isbn;
     }
 
     /**
@@ -229,7 +230,7 @@ public class Libro {
      * @return reportes cantidad de reportes.
      */
     public Integer getReportes() {
-	return reportes;
+        return reportes;
     }
 
     /**
@@ -237,22 +238,22 @@ public class Libro {
      * @param reportes cantidad de reportes.
      */
     public void setReportes(Integer reportes) {
-	this.reportes = reportes;
+        this.reportes = reportes;
     }
 
     /**
      * Obtiene el promedio de calificaciones del libro.
      * @return promedioCalificacion promedio de calificaciones.
      */
-    public BigDecimal getPromedioCalificacion() {
-	return promedioCalificacion;
+    public Double getPromedioCalificacion() {
+        return promedioCalificacion;
     }
 
     /**
      * Define el promedio de calificaciones del libro.
      * @param promedioCalificacion promedio de calificaciones.
      */
-    public void setPromedioCalificacion(BigDecimal promedioCalificacion) {
-	this.promedioCalificacion = promedioCalificacion;
+    public void setPromedioCalificacion(Double promedioCalificacion) {
+        this.promedioCalificacion = promedioCalificacion;
     }
 }

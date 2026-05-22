@@ -1,0 +1,80 @@
+.contenedor-formulario-resena {
+    max-width: 440px; 
+    background-color: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 16px auto;
+}
+
+.grupo-entrada {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.grupo-entrada label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--navy);
+}
+
+.entrada-pildora {
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 999px; 
+    background-color: var(--input-bg);
+    font-family: var(--font-inter);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.entrada-pildora:focus {
+    border-color: var(--gold);
+}
+
+.area-texto {
+    border-radius: 24px;
+    resize: none;
+    min-height: 100px;
+}
+
+.acciones-formulario {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.boton-pildora {
+    padding: 10px 24px;
+    border-radius: 999px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.boton-pildora.primario {
+    background-color: var(--navy);
+    color: white;
+}
+
+.boton-pildora.primario:hover {
+    background-color: var(--color-navy-button-hover);
+}
+
+.boton-pildora.secundario {
+    background-color: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.boton-pildora.secundario:hover {
+    background-color: var(--bg);
+}
+
+.mensaje-error {
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+}

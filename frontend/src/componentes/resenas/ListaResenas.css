@@ -1,0 +1,102 @@
+.contenedor-lista-resenas {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    padding: 20px 0;
+}
+
+.titulo-seccion {
+    font-family: var(--font-cormorant);
+    color: var(--navy);
+    font-size: 2rem;
+    margin-bottom: 24px;
+}
+
+.listado-tarjetas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    align-items: center;
+}
+
+.tarjeta-resena {
+    max-width: 440px;
+    width: 100%;
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.cabecera-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--bg);
+    padding-bottom: 8px;
+}
+
+.autor-reseña {
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.calificacion-estrellas {
+    color: var(--navy);
+    font-weight: 600;
+}
+
+.texto-reseña {
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.fecha-reseña {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: right;
+}
+
+.acciones-autor {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+}
+
+.boton-accion-pildora {
+    padding: 6px 16px;
+    border-radius: 999px; 
+    border: 1px solid var(--gold);
+    background-color: transparent;
+    color: var(--gold);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.boton-accion-pildora:hover {
+    background-color: var(--gold);
+    color: white;
+}
+
+.boton-accion-pildora.peligro {
+    border-color: #d32f2f;
+    color: #d32f2f;
+}
+
+.boton-accion-pildora.peligro:hover {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.mensaje-vacio {
+    color: var(--muted);
+    font-style: italic;
+}

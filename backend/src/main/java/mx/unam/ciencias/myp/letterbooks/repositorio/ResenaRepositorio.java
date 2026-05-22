@@ -41,4 +41,11 @@ public interface ResenaRepositorio extends JpaRepository<Resena, Integer> {
      */
     @Query("SELECT COUNT(r) > 0 FROM Resena r WHERE r.usuario.idUsuario = :idUsuario AND r.libro.idLibro = :idLibro")
     boolean existePorUsuarioYLibro(@Param("idUsuario") Integer idUsuario, @Param("idLibro") Integer idLibro);
+
+    /**
+     * Busca y regresa todas las reseñas asociadas a un libro específico.
+     * @param idLibro el identificador único del libro.
+     * @return una lista con las reseñas pertenecientes al libro.
+     */
+    List<Resena> findByLibro_IdLibro(Integer idLibro);
 }
