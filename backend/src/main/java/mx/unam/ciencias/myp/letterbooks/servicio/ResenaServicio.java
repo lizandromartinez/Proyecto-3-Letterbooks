@@ -88,7 +88,7 @@ public class ResenaServicio {
     public Resena crearResena(NuevaResena datos, String token) {
         String nombreUsuario = tokenJWT.obtenerNombreUsuario(token);
         
-        Usuario usuario = usuarioRepositorio.findByNombreUsuario(nombreUsuario)
+        Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
             
         Libro libro = libroRepositorio.findById(datos.getIdLibro())

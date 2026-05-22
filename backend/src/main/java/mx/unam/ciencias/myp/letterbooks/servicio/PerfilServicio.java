@@ -190,7 +190,7 @@ public class PerfilServicio {
             libroCalificadoDTO.setTitulo(resena.getLibro().getTitulo());
             libroCalificadoDTO.setAutor(resena.getLibro().getAutor().getNombreAutor());
             libroCalificadoDTO.setImagen(resena.getLibro().getImagen());
-            libroCalificadoDTO.setCalificacion(resena.getCalificacionLibro());
+            libroCalificadoDTO.setCalificacion(resena.getCalificacionLibro().byteValue());
             return libroCalificadoDTO;
         })
             .collect(Collectors.toList());
