@@ -1,13 +1,16 @@
 package mx.unam.ciencias.myp.letterbooks.modelo;
 
+import java.util.List;
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Clase que representa a un usuario en el sistema.
  * Mapea la tabla "Usuario" de la base de datos MariaDB.
  */
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuario")
 public class Usuario {
 
     /* ID único del usuario. */
@@ -17,6 +20,7 @@ public class Usuario {
     private Integer idUsuario;
 
     /* Correo electrónico único del usuario. */
+    @JsonIgnore
     @Column(
         name = "correo",
         unique = true,
@@ -35,6 +39,7 @@ public class Usuario {
     private String nombreUsuario;
 
     /* Contraseña hasheada del usuario. */
+    @JsonIgnore
     @Column(
         name = "contrasena",
         nullable = false,
@@ -50,6 +55,26 @@ public class Usuario {
     )
     private Rol rol = Rol.usuario;
 
+    /* Reseñas escritas por el usuario. */
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario")
+    private List<Resena> resenas;
+
+    /* Reseñas a las que dio like el usuario. */
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario")
+    private List<LikesResena> likesResenas;
+
+    /* Comentarios a los que dio like el usuario. */
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario")
+    private List<LikesComentario> likesComentarios;
+
+    /* Reseñas que ha calificado el usuario. */
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario")
+    private List<CalificacionResena> calificacionesResenas;
+    
     /**
      * Enumeración para los tipos de roles.
      */
@@ -136,5 +161,69 @@ public class Usuario {
      */
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    /**
+     * Obtiene las reseñas escritas por el usuario.
+     * @return resenas lista de reseñas del usuario.
+     */
+    public List<Resena> getResenas() {
+	return resenas;
+    }
+
+    /**
+     * Define las reseñas escritas por el usuario.
+     * @param resenas lista de reseñas del usuario.
+     */
+    public void setResenas(List<Resena> resenas) {
+	this.resenas = resenas;
+    }
+
+    /**
+     * Obtiene las reseñas a las que el usuario dio like.
+     * @return likesResenas lista de likes en reseñas.
+     */
+    public List<LikesResena> getLikesResenas() {
+	return likesResenas;
+    }
+    
+    /**
+     * Define las reseñas a las que el usuario dio like.
+     * @param likesResenas lista de likes en reseñas.
+     */
+    public void setLikesResenas(List<LikesResena> likesResenas) {
+	this.likesResenas = likesResenas;
+    }
+
+    /**
+     * Obtiene los comentarios a los que el usuario dio like.
+     * @return likesComentarios lista de likes en comentarios.
+     */
+    public List<LikesComentario> getLikesComentarios() {
+	return likesComentarios;
+    }
+    
+    /**
+     * Define los comentarios a los que el usuario dio like.
+     * @param likesComentarios lista de likes en comentarios.
+     */
+    public void setLikesComentarios(List<LikesComentario> likesComentarios) {
+	this.likesComentarios = likesComentarios;
+    }
+
+    /**
+     * Obtiene las reseñas calificadas por el usuario.
+     * @return calificacionesResenas lista de calificaciones de reseñas.
+     */
+    public List<CalificacionResena> getCalificacionesResenas() {
+	return calificacionesResenas;
+    }
+
+    /**
+     * Define las reseñas calificadas por el usuario.
+     * @param calificacionesResenas lista de calificaciones de reseñas.
+     */
+    public void setCalificacionesResenas(List<CalificacionResena> calificacionesResenas) {
+	this.calificacionesResenas = calificacionesResenas;
     }
 }
