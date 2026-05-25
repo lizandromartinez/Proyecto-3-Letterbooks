@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { crearResena, editarResena } from '../../api/Resenas';
 import { ContextoSesion } from '../../contexto/Sesion';
-import FormularioCita from './FormularioCita';
+import FormularioCita from '../citas/FormularioCita';
 import './FormularioResena.css';
 
 /**

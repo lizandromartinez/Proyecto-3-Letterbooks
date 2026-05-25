@@ -3,12 +3,9 @@ import { obtenerResenas, eliminarResena } from '../../api/Resenas';
 import { ContextoSesion } from '../../contexto/Sesion';
 import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import FormularioResena from './FormularioResena';
+import Cita from '../citas/Cita'; 
 import './ListaResenas.css';
 
-/**
- * Componente que muestra la lista de reseñas de un libro.
- * @param {Object} props contiene el idLibro y opcionalmente alCambiarResenas.
- */
 function ListaResenas({ idLibro, alCambiarResenas, alResenasActualizadas }) {
     const { token } = useContext(ContextoSesion);
     const [resenas, setResenas] = useState([]);
@@ -33,7 +30,7 @@ function ListaResenas({ idLibro, alCambiarResenas, alResenasActualizadas }) {
             }
         } catch (error) {
             console.error("Error al cargar reseñas:", error);
-            setErrorCarga("No se pudieron cargar las reseñas. Intenta recargar la página.");
+            setErrorCarga("No se pudieron cargar las reseñas.");
         } finally {
             setCargando(false);
         }
@@ -81,10 +78,20 @@ function ListaResenas({ idLibro, alCambiarResenas, alResenasActualizadas }) {
                             <div className="cabecera-tarjeta">
                                 <span className="autor-reseña">@{resena.usuario?.nombreUsuario ?? 'usuario'}</span>
                                 <span className="calificacion-estrellas">
-                                    {resena.calificacionLibro} / 5 Estrellas
+                                    {"★".repeat(resena.calificacionLibro)}{"☆".repeat(5 - resena.calificacionLibro)}
                                 </span>
                             </div>
                             <p className="texto-reseña">{resena.textoResena}</p>
+
+                            {/* Renderizado dinámico */}
+                            {resena.citas && resena.citas.length > 0 && (
+                                <div className="bloque-citas-contenedor" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    {resena.citas.map((cita) => (
+                                        <Cita key={cita.idCita} cita={cita} />
+                                    ))}
+                                </div>
+                            )}
+
                             <span className="fecha-reseña">{resena.fechaPublicacion}</span>
 
                             {/* Controles de autoría */}
