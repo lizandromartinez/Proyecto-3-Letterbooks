@@ -1,0 +1,32 @@
+.contenedor-agregar-cita {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.area-texto-cita {
+    min-height: 70px;
+    font-style: italic;
+}
+
+.controles-cita {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.entrada-pagina {
+    width: 140px;
+    padding: 8px 16px;
+}
+
+.boton-agregar-cita {
+    padding: 8px 16px;
+    white-space: nowrap;
+}
+
+.boton-agregar-cita:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
