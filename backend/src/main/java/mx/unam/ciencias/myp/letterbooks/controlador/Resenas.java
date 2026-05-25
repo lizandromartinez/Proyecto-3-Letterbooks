@@ -38,13 +38,13 @@ public class Resenas {
      * @return respuesta HTTP 200 con la lista de reseñas asociadas al libro
      */
     @GetMapping("/libro/{idLibro}")
-    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable("idLibro") Integer idLibro) {
+    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable Integer idLibro) {
         List<Resena> resenas = resenaServicio.obtenerResenasPorLibro(idLibro);
         return ResponseEntity.ok(resenas);
     }
 
     /**
-     * Endpoint protegido para crear una nueva reseña en el sistema.
+     * Endpoint protegido para crear una nueva reseña en el sistema con sus citas.
      * @param datosResena el DTO con la información validada del formulario
      * @param encabezadoAutorizacion el encabezado HTTP con el token JWT de sesión
      * @return respuesta HTTP 201 con la entidad creada, o HTTP 400 si hay error de validación
@@ -66,7 +66,7 @@ public class Resenas {
     }
 
     /**
-     * Endpoint protegido para editar una reseña existente.
+     * Endpoint protegido para editar una reseña existente y sus citas.
      * @param idResena el identificador de la reseña a modificar
      * @param datosResena el DTO con los nuevos datos ingresados
      * @param encabezadoAutorizacion el encabezado HTTP con el token JWT de sesión
@@ -74,7 +74,7 @@ public class Resenas {
      */
     @PutMapping("/{idResena}")
     public ResponseEntity<?> editarResena(
-            @PathVariable("idResena") Integer idResena,
+            @PathVariable Integer idResena,
             @Valid @RequestBody NuevaResena datosResena,
             @RequestHeader("Authorization") String encabezadoAutorizacion) {
         try {
@@ -90,14 +90,14 @@ public class Resenas {
     }
 
     /**
-     * Endpoint protegido para eliminar una reseña del sistema.
+     * Endpoint protegido para eliminar una reseña del sistema y sus citas en cascada.
      * @param idResena el identificador único de la reseña a borrar
      * @param encabezadoAutorizacion el encabezado HTTP con el token JWT de sesión
      * @return respuesta HTTP 200 indicando éxito, o HTTP 400 si el autor no coincide
      */
     @DeleteMapping("/{idResena}")
     public ResponseEntity<?> eliminarResena(
-            @PathVariable("idResena") Integer idResena,
+            @PathVariable Integer idResena,
             @RequestHeader("Authorization") String encabezadoAutorizacion) {
         try {
             String token = extraerToken(encabezadoAutorizacion);
