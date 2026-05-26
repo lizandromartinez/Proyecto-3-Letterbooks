@@ -51,7 +51,7 @@ public class LibroControlador {
      * @return El DTO VistaLibro con los datos del libro.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<VistaLibro> obtenerPorId(@PathVariable Integer id) {
+    public ResponseEntity<VistaLibro> obtenerPorId(@PathVariable("id") Integer id) {
 
         VistaLibro libroVista = libroServicio.obtenerPorId(id);        
         return ResponseEntity.ok(libroVista);
