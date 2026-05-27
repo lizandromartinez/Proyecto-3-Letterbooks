@@ -171,7 +171,6 @@ const RegistrarLibro = () => {
             };
 
             await registrarLibro(datosLibro, token);
-            alert("¡Libro registrado exitosamente!");
             navigate("/biblioteca");
         } catch (err) {
             console.error("Error al registrar libro:", err);
@@ -180,6 +179,10 @@ const RegistrarLibro = () => {
             setCargando(false);
         }
     };
+
+    const formularioInvalido =  !titulo.trim() || !idAutor || !ano || !paginas || 
+                                !idGenero || !idEditorial || !isbn || !sinopsis || 
+                                !portada || cargando;
 
     return (
         <div className="bg-crema-fondo min-h-screen dark:bg-dark-fondo transition-colors duration-500 flex flex-col">
@@ -294,19 +297,31 @@ const RegistrarLibro = () => {
                             {/* Año y Páginas */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1">
-                                    <label className="font-medium text-xs">Año de publicación *</label>
-                                    <input 
-                                        type="number" required value={ano} onChange={(e) => setAno(e.target.value)}
-                                        className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="font-medium text-xs">Número de páginas *</label>
-                                    <input 
-                                        type="number" required value={paginas} onChange={(e) => setPaginas(e.target.value)}
-                                        className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
-                                    />
-                                </div>
+				    <label className="font-medium text-xs">Año de publicación *</label>
+				    <input 
+					type="text" 
+					inputMode="numeric" 
+					pattern="[0-9]*"
+					required 
+					value={ano} 
+					onChange={(e) => setAno(e.target.value.replace(/[^0-9]/g, ''))}
+					className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
+				    />
+				</div>
+
+				<div className="flex flex-col gap-1">
+				    <label className="font-medium text-xs">Número de páginas *</label>
+				    <input 
+					type="text" 
+					inputMode="numeric" 
+					pattern="[0-9]*"
+					required 
+					value={paginas} 
+					onChange={(e) => setPaginas(e.target.value.replace(/[^0-9]/g, ''))}
+					className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
+				    />
+				</div>
+
                             </div>
 
                             {/* DROPDOWN: Género */}
@@ -394,13 +409,57 @@ const RegistrarLibro = () => {
                             </div>
 
                             {/* ISBN */}
-                            <div className="flex flex-col gap-1">
-                                <label className="font-medium text-xs">ISBN</label>
-                                <input 
-                                    type="text" placeholder="978-0756404079" value={isbn} onChange={(e) => setIsbn(e.target.value)}
-                                    className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
-                                />
-                            </div>
+			    <div className="flex flex-col gap-1">
+				<label className="font-medium text-xs">ISBN *</label>
+				<input 
+				    type="text" 
+				    inputMode="numeric" 
+				    required 
+				    value={isbn} 
+				    onChange={(e) => {
+
+					// Extrae solo los números 
+					const numerosPuros = e.target.value.replace(/[^0-9]/g, "");
+					
+					// Limita a un máximo de 13 números 
+					if (numerosPuros.length <= 13) {
+					    let resultadoFormateado = "";
+					    
+					    // Construye el formato 978-0-00-000000-0 dinámicamente
+
+					    // Primer bloque: primeros 3 dígitos (Ej: 978)
+					    if (numerosPuros.length > 0) {
+						resultadoFormateado += numerosPuros.substring(0, 3);
+					    }
+
+					    // Segundo bloque: 1 dígito (Ej: 978-3)
+					    if (numerosPuros.length > 3) {
+						resultadoFormateado += "-" + numerosPuros.substring(3, 4);
+					    }
+
+					    // Tercer bloque: 2 dígitos (Ej: 978-3-16)
+					    if (numerosPuros.length > 4) {
+						resultadoFormateado += "-" + numerosPuros.substring(4, 6);
+					    }
+
+					    // Cuarto bloque: 6 dígitos (Ej: 978-3-16-148410)
+					    if (numerosPuros.length > 6) {
+						resultadoFormateado += "-" + numerosPuros.substring(6, 12);
+					    }
+
+					    // Quinto bloque: último dígito (Ej: 978-3-16-148410-0)
+					    if (numerosPuros.length > 12) {
+						resultadoFormateado += "-" + numerosPuros.substring(12, 13);
+					    }
+					    
+					    setIsbn(resultadoFormateado);
+					}
+				    }}
+				    placeholder="000-0-00-000000-0"
+				    className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
+				/>
+			    </div>
+
 
                             {/* Sinopsis */}
                             <div className="flex flex-col gap-1">
@@ -413,11 +472,16 @@ const RegistrarLibro = () => {
 
                             {/* Botones de acción */}
                             <div className="flex gap-4 mt-4 border-t border-gray-100 dark:border-white/5 pt-4">
-                                <button 
-                                    type="submit" disabled={cargando}
-                                    className="bg-gold-button dark:bg-navy-button text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
-                                >                                    
-                                    {cargando ? 'Añadiendo...' : '+ Añadir libro'}
+                                <button
+				    type="submit"
+				    disabled={formularioInvalido}
+				    className={`w-full p-3 rounded-lg font-medium transition-colors
+                                       ${ formularioInvalido
+                                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-700 dark:text-zinc-400'
+                                           : 'bg-gold-button text-white hover:bg-gold-button-hover cursor-pointer'
+                                     }`}
+                                 >
+                                    {cargando ? 'Registrando...' : 'Añadir libro +'}
                                 </button>
                                 <button 
                                     type="button" onClick={() => navigate('/biblioteca')}
