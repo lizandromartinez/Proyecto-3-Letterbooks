@@ -33,6 +33,25 @@ public class Autor {
     @Column(name = "nombre_autor", nullable = false, length = 150)
     private String nombreAutor;
 
+    /**
+     * Breve biografía del autor. 
+     */
+    @Column(columnDefinition = "TEXT")
+    private String biografia;
+
+    /**
+     * Fecha de nacimiento del autor en formato YYYY-MM-DD.
+     */
+    @Column(name = "fecha_nacimiento", length = 10)
+    private String fechaNacimiento;
+
+    /**
+     * Ruta de la foto del autor.
+     */
+    @Size(max = 255, message = "La ruta de la foto del autor no puede superar los 255 caracteres.")
+    @Column(name = "foto", length = 255)
+    private String foto;
+
     @JsonIgnore
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Libro> libros = new ArrayList<>();
@@ -75,10 +94,66 @@ public class Autor {
         this.nombreAutor = nombreAutor;
     }
 
+    /**
+     * Regresa la biografía del autor.
+     * @return La biografía detallada del autor.
+     */
+    public String getBiografia() {
+        return this.biografia;
+    }
+
+    /**
+     * Define la biografía del autor.
+     * @param biografia Biografía del autor.
+     */
+    public void setBiografia(String biografia) {
+        this.biografia = biografia;
+    }
+
+    /**
+     * Regresa la fecha de nacimiento del autor.
+     * @return La fecha de nacimiento en formato YYYY-MM-DD.
+     */
+    public String getFechaNacimiento() {
+        return this.fechaNacimiento;
+    }
+
+    /**
+     * Define la fecha de nacimiento del autor.
+     * @param fechaNacimiento Fecha de nacimiento (YYYY-MM-DD).
+     */
+    public void setFechaNacimiento(String fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    /**
+     * Regresa la ruta de la fotografía del autor.
+     * @return La URL o ruta interna de la foto.
+     */
+    public String getFoto() {
+        return this.foto;
+    }
+
+    /**
+     * Define la ruta de la fotografía del autor.
+     * @param foto URL o ruta interna de la foto.
+     */
+    public void setFoto(String foto) {
+        this.foto = foto;
+    }
+
+    /**
+     * Regresa la colección de libros asociados a este autor.
+     * @return Lista de instancias de {@link Libro}.
+     */
     public List<Libro> getLibros() {
         return this.libros;
     }
 
+    /**
+     * Define la colección de libros asociados a este autor.
+     * @param libros Lista de libros.
+     */
     public void setLibros(List<Libro> libros) {
         this.libros = libros;
     }
