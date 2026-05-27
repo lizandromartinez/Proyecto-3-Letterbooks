@@ -196,3 +196,30 @@ export async function crearEditorial(nombreEditorial, token) {
     }
     return await respuesta.json();
 }
+
+/**
+ * Edita un libro existente.
+ */
+export async function editarLibro(idLibro, datosLibro, token) {
+    const respuesta = await fetch(`${URL_BASE}/libros/${idLibro}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(datosLibro)
+    });
+
+    const texto = await respuesta.text();
+    let datos;
+    try {
+        datos = JSON.parse(texto);
+    } catch {
+        datos = texto;
+    }
+
+    if (!respuesta.ok) {
+        throw datos;
+    }
+    return datos;
+}

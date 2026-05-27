@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ContextoSesion } from '../contexto/Sesion';
 
 import subir from '../estilos/img/iconos/subir.png';
@@ -12,6 +12,8 @@ import {
     obtenerEditoriales, 
     subirPortada, 
     registrarLibro,
+    editarLibro,
+    obtenerLibroPorId,
     crearAutor,
     crearGenero,
     crearEditorial
@@ -21,10 +23,13 @@ import {
  * COMPONENTE: RegistrarLibro
  * Vista completa con selección de archivo local para vista previa
  * y menús desplegables para Autor, Género y Editorial con creación rápida.
+ * Soporta modo creación y edición según el parámetro :id de la URL.
  */
 const RegistrarLibro = () => {
     const { token } = useContext(ContextoSesion);
     const navigate = useNavigate();
+    const { id } = useParams();
+    const esEdicion = !!id;
 
     // ESTADOS PARA EL FORMULARIO
     const [listaGeneros, setListaGeneros] = useState([]);
@@ -55,27 +60,63 @@ const RegistrarLibro = () => {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState('');
 
-    // Fetch lists from backend
-    const cargarDatos = async () => {
-        try {
-            const autores = await obtenerAutores(token);
-            setListaAutores(autores);
-            
-            const generos = await obtenerGeneros(token);
-            setListaGeneros(generos);
-
-            const editoriales = await obtenerEditoriales(token);
-            setListaEditoriales(editoriales);
-        } catch (err) {
-            console.error("Error al cargar datos del catálogo:", err);
-        }
-    };
-
     useEffect(() => {
-        if (token) {
-            cargarDatos();
-        }
-    }, [token]);
+        if (!token) return;
+
+        const cargarTodo = async () => {
+            setCargando(true);
+            setError('');
+            try {
+                // Cargar catálogos
+                const autores = await obtenerAutores(token);
+                setListaAutores(autores);
+                
+                const generos = await obtenerGeneros(token);
+                setListaGeneros(generos);
+
+                const editoriales = await obtenerEditoriales(token);
+                setListaEditoriales(editoriales);
+
+                // Si estamos editando, cargar los detalles del libro
+                if (esEdicion) {
+                    const libro = await obtenerLibroPorId(id, token);
+                    setTitulo(libro.titulo || '');
+                    setAno(libro.ano ? String(libro.ano) : '');
+                    setPaginas(libro.paginas ? String(libro.paginas) : '');
+                    setIsbn(libro.isbn || '');
+                    setSinopsis(libro.sinopsis || '');
+                    
+                    if (libro.imagen) {
+                        if (libro.imagen.startsWith('http')) {
+                            setVistaPrevia(libro.imagen);
+                        } else {
+                            setVistaPrevia(`http://localhost:8080${libro.imagen}`);
+                        }
+                    }
+
+                    // Emparejar autor, género y editorial seleccionados por nombre
+                    const autorNom = libro.nombreAutor || libro.autor?.nombreAutor;
+                    const autorEncontrado = autores.find(a => a.nombreAutor === autorNom);
+                    if (autorEncontrado) setIdAutor(autorEncontrado.idAutor);
+
+                    const generoNom = libro.nombreGenero || libro.genero?.nombreGenero;
+                    const generoEncontrado = generos.find(g => g.nombreGenero === generoNom);
+                    if (generoEncontrado) setIdGenero(generoEncontrado.idGenero);
+
+                    const edNom = libro.nombreEditorial || libro.editorial?.nombreEditorial;
+                    const edEncontrada = editoriales.find(e => e.nombreEditorial === edNom);
+                    if (edEncontrada) setIdEditorial(edEncontrada.idEditorial);
+                }
+            } catch (err) {
+                console.error("Error al cargar datos:", err);
+                setError("Error al obtener los detalles del libro o catálogos del servidor.");
+            } finally {
+                setCargando(false);
+            }
+        };
+
+        cargarTodo();
+    }, [token, id, esEdicion]);
 
     if (!token) {
         return <Navigate to="/login" replace />;
@@ -154,6 +195,11 @@ const RegistrarLibro = () => {
 
         try {
             let rutaImagen = '';
+            // Si ya hay una vista previa y no es un archivo nuevo, conservar la ruta
+            if (vistaPrevia && !portada) {
+                rutaImagen = vistaPrevia.replace('http://localhost:8080', '');
+            }
+
             if (portada) {
                 rutaImagen = await subirPortada(portada, token);
             }
@@ -170,12 +216,18 @@ const RegistrarLibro = () => {
                 imagen: rutaImagen || null
             };
 
-            await registrarLibro(datosLibro, token);
-            alert("¡Libro registrado exitosamente!");
-            navigate("/biblioteca");
+            if (esEdicion) {
+                await editarLibro(id, datosLibro, token);
+                alert("¡Libro actualizado exitosamente!");
+                navigate(`/libro/${id}`);
+            } else {
+                await registrarLibro(datosLibro, token);
+                alert("¡Libro registrado exitosamente!");
+                navigate("/biblioteca");
+            }
         } catch (err) {
-            console.error("Error al registrar libro:", err);
-            setError(err.message || 'Error al registrar el libro. Verifica los campos.');
+            console.error("Error al procesar libro:", err);
+            setError(err.message || 'Error al guardar el libro. Verifica los campos.');
         } finally {
             setCargando(false);
         }
@@ -190,9 +242,11 @@ const RegistrarLibro = () => {
                     
                     {/* Encabezado */}
                     <div className="flex flex-col text-left mb-6">
-                        <h2 className="font-cormorant text-3xl font-bold">Añadir nuevo libro</h2>
+                        <h2 className="font-cormorant text-3xl font-bold">
+                            {esEdicion ? 'Editar libro' : 'Añadir nuevo libro'}
+                        </h2>
                         <p className="text-gray-500 dark:text-gray-400 font-inter text-sm">
-                            Comparte un libro con la comunidad
+                            {esEdicion ? 'Modifica los detalles del libro en el catálogo' : 'Comparte un libro con la comunidad'}
                         </p>
                     </div>
 
@@ -206,7 +260,7 @@ const RegistrarLibro = () => {
                     {/* Contenedor Principal del Formulario */}
                     <form onSubmit={handleEnviar} className="bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-8 shadow-sm flex flex-col md:flex-row gap-8 text-left transition-colors duration-300">
                         
-                        {/* COLUMNA IZQUIERDA: Selección de archivo e Imagen local */}
+                        {/* COLUMNA IZQUIERDA: Portada */}
                         <div className="w-full md:w-1/3 flex flex-col items-center md:items-start">                           
                             <span className="font-inter text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 self-start">
                                 Portada del libro
@@ -237,7 +291,7 @@ const RegistrarLibro = () => {
                             </p>
                         </div>
 
-                        {/* COLUMNA DERECHA: Campos de texto y Dropdowns */}
+                        {/* COLUMNA DERECHA: Campos */}
                         <div className="w-full md:w-2/3 flex flex-col gap-4 font-inter text-sm">
                             
                             {/* Título */}
@@ -415,13 +469,13 @@ const RegistrarLibro = () => {
                             <div className="flex gap-4 mt-4 border-t border-gray-100 dark:border-white/5 pt-4">
                                 <button 
                                     type="submit" disabled={cargando}
-                                    className="bg-gold-button dark:bg-navy-button text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                                    className="bg-gold-button dark:bg-navy-button text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 border-none"
                                 >                                    
-                                    {cargando ? 'Añadiendo...' : '+ Añadir libro'}
+                                    {cargando ? (esEdicion ? 'Guardando...' : 'Añadiendo...') : (esEdicion ? 'Guardar cambios' : '+ Añadir libro')}
                                 </button>
                                 <button 
-                                    type="button" onClick={() => navigate('/biblioteca')}
-                                    className="bg-amber-900/5 text-gray-700 dark:bg-white/5 dark:text-gray-300 px-6 py-2.5 rounded-lg font-medium hover:bg-amber-900/10 dark:hover:bg-white/10 transition-colors"
+                                    type="button" onClick={() => navigate(esEdicion ? `/libro/${id}` : '/biblioteca')}
+                                    className="bg-amber-900/5 text-gray-700 dark:bg-white/5 dark:text-gray-300 px-6 py-2.5 rounded-lg font-medium hover:bg-amber-900/10 dark:hover:bg-white/10 transition-colors border-none cursor-pointer"
                                 >
                                     Cancelar
                                 </button>
@@ -432,7 +486,7 @@ const RegistrarLibro = () => {
                     {/* Bloque de Consejos Inferior */}
                     <div className="mt-6 bg-orange-50/50 dark:bg-white/5 border border-amber-900/5 dark:border-white/5 rounded-2xl p-6 text-left text-xs text-amber-900/80 dark:text-gray-300 font-inter">
                         <div className="flex items-center gap-2 font-bold mb-3 text-amber-900 dark:text-amber-200">                            
-                            Consejos para añadir libros
+                            Consejos para añadir/editar libros
                         </div>
                         <ul className="list-disc list-inside flex flex-col gap-1.5 pl-1 text-gray-600 dark:text-gray-400">
                             <li>Verifica que el libro no esté ya en la biblioteca antes de añadirlo.</li>

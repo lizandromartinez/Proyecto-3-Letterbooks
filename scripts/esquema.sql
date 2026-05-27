@@ -39,6 +39,7 @@ CREATE TABLE libro (
     id_genero INT,
     id_autor INT,
     id_editorial INT,
+    id_usuario INT,
     titulo VARCHAR(255) NOT NULL,
     sinopsis TEXT,
     imagen VARCHAR(255),	
@@ -49,7 +50,8 @@ CREATE TABLE libro (
     promedio_calificacion DECIMAL(3,2) DEFAULT 0.00,
     FOREIGN KEY (id_genero) REFERENCES genero(id_genero),
     FOREIGN KEY (id_autor) REFERENCES autor(id_autor),
-    FOREIGN KEY (id_editorial) REFERENCES editorial(id_editorial)
+    FOREIGN KEY (id_editorial) REFERENCES editorial(id_editorial),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 -- 5. Tabla Perfil

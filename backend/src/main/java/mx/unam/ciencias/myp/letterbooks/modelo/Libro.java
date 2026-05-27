@@ -2,6 +2,7 @@ package mx.unam.ciencias.myp.letterbooks.modelo;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Clase que representa la tabla {@code libro} en la base de datos.
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.*;
  */
 @Entity
 @Table(name = "libro")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Libro {
 
     /**
@@ -44,6 +46,14 @@ public class Libro {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_editorial")
     private Editorial editorial;
+
+    /**
+     * Usuario que registró o creó el libro en el sistema.
+     * Carga de tipo perezosa (LAZY).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     /**
      * Título oficial del libro. Este campo es obligatorio.
@@ -298,5 +308,21 @@ public class Libro {
      */
     public void setPromedioCalificacion(Double promedioCalificacion) { 
         this.promedioCalificacion = promedioCalificacion;
+    }
+
+    /**
+     * Regresa el usuario creador del libro.
+     * @return El usuario creador.
+     */
+    public Usuario getUsuario() {
+        return this.usuario;
+    }
+
+    /**
+     * Define el usuario creador del libro.
+     * @param usuario El nuevo usuario creador.
+     */
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

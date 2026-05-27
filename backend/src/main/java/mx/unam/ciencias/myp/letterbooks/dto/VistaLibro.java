@@ -23,6 +23,8 @@ public class VistaLibro {
     private BigDecimal promedioCalificacion;
     private Integer totalReportes;
     private Integer totalResenas;
+    private Integer idUsuarioCreador;
+    private String nombreUsuarioCreador;
 
     /**
      * Constructor vacío por defecto.
@@ -269,5 +271,21 @@ public class VistaLibro {
      */
     public void setTotalResenas(Integer totalResenas) {
         this.totalResenas = totalResenas;
+    }
+
+    public Integer getIdUsuarioCreador() {
+        return this.idUsuarioCreador;
+    }
+
+    public void setIdUsuarioCreador(Integer idUsuarioCreador) {
+        this.idUsuarioCreador = idUsuarioCreador;
+    }
+
+    public String getNombreUsuarioCreador() {
+        return this.nombreUsuarioCreador;
+    }
+
+    public void setNombreUsuarioCreador(String nombreUsuarioCreador) {
+        this.nombreUsuarioCreador = nombreUsuarioCreador;
     }
 }

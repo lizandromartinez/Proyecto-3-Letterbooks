@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/libros")
+@CrossOrigin(origins = "*")
 public class LibroControlador {
 
     private final LibroServicio libroServicio;
@@ -32,15 +33,50 @@ public class LibroControlador {
      * Endpoint para registrar o subir un nuevo libro al sistema.
      * Escucha peticiones POST en la URL: /api/libros
      *
-     * @param datosFormulario DTO que recibe el JSON de la web. La anotación {@code @Valid} 
-     * activa las reglas como {@code @NotBlank} o {@code @Min} declaradas en el DTO.
+     * @param datosFormulario DTO que recibe el JSON de la web.
+     * @param encabezadoAutorizacion encabezado HTTP con el token JWT de sesión.
      * @return El libro recién creado transformado en VistaLibro.
      */
     @PostMapping
-    public ResponseEntity<VistaLibro> registrarLibro(@Valid @RequestBody RegistroLibro datosFormulario) {
+    public ResponseEntity<?> registrarLibro(
+            @Valid @RequestBody RegistroLibro datosFormulario,
+            @RequestHeader("Authorization") String encabezadoAutorizacion) {
+        try {
+            String token = extraerToken(encabezadoAutorizacion);
+            VistaLibro libroCreado = libroServicio.registrar(datosFormulario, token);        
+            return new ResponseEntity<>(libroCreado, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno al registrar el libro.");
+        }
+    }
 
-        VistaLibro libroCreado = libroServicio.registrar(datosFormulario);        
-	return new ResponseEntity<VistaLibro>(libroCreado, HttpStatus.CREATED);
+    /**
+     * Endpoint para editar un libro existente.
+     * Escucha peticiones PUT en la URL: /api/libros/{id}
+     *
+     * @param id identificador del libro a editar.
+     * @param datosFormulario nuevos datos del libro.
+     * @param encabezadoAutorizacion encabezado HTTP con el token JWT de sesión.
+     * @return El libro actualizado en formato VistaLibro.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editarLibro(
+            @PathVariable("id") Integer id,
+            @Valid @RequestBody RegistroLibro datosFormulario,
+            @RequestHeader("Authorization") String encabezadoAutorizacion) {
+        try {
+            String token = extraerToken(encabezadoAutorizacion);
+            VistaLibro libroActualizado = libroServicio.editar(id, datosFormulario, token);
+            return ResponseEntity.ok(libroActualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno al editar el libro.");
+        }
     }
 
     /**
@@ -52,9 +88,17 @@ public class LibroControlador {
      */
     @GetMapping("/{id}")
     public ResponseEntity<VistaLibro> obtenerPorId(@PathVariable("id") Integer id) {
-
         VistaLibro libroVista = libroServicio.obtenerPorId(id);        
         return ResponseEntity.ok(libroVista);
     }
-    
+
+    /**
+     * Extrae de forma segura el token JWT del encabezado HTTP Authorization.
+     */
+    private String extraerToken(String encabezado) {
+        if (encabezado == null || !encabezado.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Token de autorización inválido o ausente.");
+        }
+        return encabezado.substring(7);
+    }
 }

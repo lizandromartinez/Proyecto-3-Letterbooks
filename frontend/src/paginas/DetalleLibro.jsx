@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useLocation, Navigate, useParams } from 'react-router-dom'; 
+import { useLocation, Navigate, useParams, useNavigate } from 'react-router-dom'; 
 import { ContextoSesion } from '../contexto/Sesion';
 
 import Navbar from '../componentes/navegacion/navbar/Navbar';
@@ -7,7 +7,7 @@ import Footer from '../componentes/navegacion/footer/Footer';
 import EnlaceRuta from '../componentes/navegacion/EnlaceRuta';
 import ListaResenas from '../componentes/resenas/ListaResenas';
 import { obtenerLibroPorId } from '../api/Libros';
-import { obtenerUsuarioDelToken } from '../utilidades/DecodificadorToken';
+import { obtenerUsuarioDelToken, obtenerRolDelToken, obtenerIdUsuarioDelToken } from '../utilidades/DecodificadorToken';
 
 const coincideLibro = (datos, idRuta) =>
     datos && String(datos.idLibro) === String(idRuta);
@@ -19,6 +19,10 @@ const DetalleLibro = () => {
     const { token } = useContext(ContextoSesion);
     const { id } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const rolUsuarioActual = obtenerRolDelToken(token);
+    const idUsuarioActual = obtenerIdUsuarioDelToken(token);
 
     const datosNavegacion = location.state?.libroData;
     const tieneVistaPrevia = coincideLibro(datosNavegacion, id);
@@ -26,6 +30,8 @@ const DetalleLibro = () => {
     const [libro, setLibro] = useState(tieneVistaPrevia ? datosNavegacion : null);
     const [cargando, setCargando] = useState(!tieneVistaPrevia);
     const [miCalificacion, setMiCalificacion] = useState(null);
+
+    const puedeEditar = libro && (rolUsuarioActual === 'admin' || !libro.idUsuarioCreador || libro.idUsuarioCreador === idUsuarioActual);
 
     useEffect(() => {
         if (!token || !id) return;
@@ -194,18 +200,34 @@ const DetalleLibro = () => {
                     </div>
                 </div>
 
-                <div className="w-full bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 shadow-xs text-center flex flex-col items-center justify-center min-h-[180px]">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 self-start">
-                        Tu calificación
-                    </h3>
-                    <div className="w-16 h-16 rounded-full bg-orange-50/50 dark:bg-white/5 border border-amber-900/5 dark:border-white/5 flex items-center justify-center text-[#d4a373] text-xl font-bold mb-3">
-                        {miCalificacion ?? '-'}
+                <div className="flex flex-col gap-4">
+                    <div className="w-full bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 shadow-xs text-center flex flex-col items-center justify-center min-h-[180px]">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 self-start">
+                            Tu calificación
+                        </h3>
+                        <div className="w-16 h-16 rounded-full bg-orange-50/50 dark:bg-white/5 border border-amber-900/5 dark:border-white/5 flex items-center justify-center text-[#d4a373] text-xl font-bold mb-3">
+                            {miCalificacion ?? '-'}
+                        </div>
+                        <p className="text-gray-400 text-xs font-medium">
+                            {miCalificacion != null
+                                ? 'tu calificación para este libro'
+                                : 'no has calificado este libro'}
+                        </p>
                     </div>
-                    <p className="text-gray-400 text-xs font-medium">
-                        {miCalificacion != null
-                            ? 'tu calificación para este libro'
-                            : 'no has calificado este libro'}
-                    </p>
+
+                    {puedeEditar && (
+                        <div className="w-full bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 shadow-xs flex flex-col gap-3">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider self-start mb-1">
+                                Gestión del libro
+                            </h3>
+                            <button
+                                onClick={() => navigate(`/editarLibro/${libro.idLibro}`)}
+                                className="w-full py-2.5 px-4 bg-[#d4a373] hover:bg-[#c39262] text-white font-bold rounded-xl transition-all duration-300 shadow-sm text-xs font-inter flex items-center justify-center gap-2 cursor-pointer border-none"
+                            >
+                                Editar Libro
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <section className="lg:col-span-3 mt-4">

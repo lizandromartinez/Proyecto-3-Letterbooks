@@ -10,11 +10,14 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
 import mx.unam.ciencias.myp.letterbooks.modelo.Editorial;
+import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.GeneroRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.EditorialRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
+import mx.unam.ciencias.myp.letterbooks.seguridad.TokenJWT;
 import mx.unam.ciencias.myp.letterbooks.dto.RegistroLibro;
 import mx.unam.ciencias.myp.letterbooks.dto.VistaLibro;
 
@@ -31,6 +34,8 @@ public class LibroServicio {
     private final AutorRepositorio autorRepositorio;
     private final GeneroRepositorio generoRepositorio;
     private final EditorialRepositorio editorialRepositorio;
+    private final UsuarioRepositorio usuarioRepositorio;
+    private final TokenJWT tokenJWT;
 
     /**
      * Constructor con inyección de dependencias.
@@ -40,12 +45,16 @@ public class LibroServicio {
                          ResenaRepositorio resenaRepositorio,
                          AutorRepositorio autorRepositorio,
                          GeneroRepositorio generoRepositorio, 
-                         EditorialRepositorio editorialRepositorio) {
+                         EditorialRepositorio editorialRepositorio,
+                         UsuarioRepositorio usuarioRepositorio,
+                         TokenJWT tokenJWT) {
         this.libroRepositorio = libroRepositorio;
         this.resenaRepositorio = resenaRepositorio;
         this.autorRepositorio = autorRepositorio;
         this.generoRepositorio = generoRepositorio;
         this.editorialRepositorio = editorialRepositorio;
+        this.usuarioRepositorio = usuarioRepositorio;
+        this.tokenJWT = tokenJWT;
     }
 
     /**
@@ -67,9 +76,7 @@ public class LibroServicio {
     }
 
     /**
-     * Obtiene los libros más populares según su calificación promedio.
-     * @param limite cantidad máxima de libros a devolver
-     * @return lista de DTOs listos para la landing
+     * Obtiene los libros destacados de la landing en orden fijo.
      */
     private static final List<String> TITULOS_DESTACADOS = List.of(
         "Cien años de soledad",
@@ -107,10 +114,12 @@ public class LibroServicio {
      * Registra un nuevo libro en el sistema.
      *
      * @param registro DTO con los datos del formulario de entrada.
+     * @param token token JWT del usuario creador.
      * @return DTO VistaLibro listo para mostrarse en la vista.
      * @throws IllegalArgumentException si algún ID de autor, género o editorial no existe.
      */
-    public VistaLibro registrar(RegistroLibro registro) {
+    @Transactional
+    public VistaLibro registrar(RegistroLibro registro, String token) {
         registro.setTitulo(registro.getTitulo().trim());
         
         if (registro.getIsbn() != null) 
@@ -125,6 +134,10 @@ public class LibroServicio {
         Editorial editorial = editorialRepositorio.findById(registro.getIdEditorial())
                 .orElseThrow(() -> new IllegalArgumentException("La editorial seleccionada no existe en la base de datos."));
 
+        String nombreUsuario = tokenJWT.obtenerNombreUsuario(token);
+        Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+
         Libro libro = new Libro();
         libro.setTitulo(registro.getTitulo());
         libro.setSinopsis(registro.getSinopsis());
@@ -135,11 +148,63 @@ public class LibroServicio {
         libro.setAutor(autor);
         libro.setGenero(genero);
         libro.setEditorial(editorial);
+        libro.setUsuario(usuario);
         libro.setReportes(0);
         libro.setPromedioCalificacion(0.00);
 
         Libro libroGuardado = libroRepositorio.save(libro);
 
+        return mapearAVista(libroGuardado);
+    }
+
+    /**
+     * Modifica un libro existente en el sistema.
+     *
+     * @param idLibro ID del libro a editar.
+     * @param registro DTO con los nuevos datos.
+     * @param token token JWT del usuario que realiza la operación.
+     * @return El libro actualizado en formato VistaLibro.
+     */
+    @Transactional
+    public VistaLibro editar(Integer idLibro, RegistroLibro registro, String token) {
+        Libro libro = libroRepositorio.findById(idLibro)
+                .orElseThrow(() -> new IllegalArgumentException("El libro buscado no existe en la base de datos."));
+
+        String nombreUsuario = tokenJWT.obtenerNombreUsuario(token);
+        Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+
+        boolean esAdmin = usuario.getRol() == Usuario.Rol.admin;
+        boolean esCreador = libro.getUsuario() == null || libro.getUsuario().getIdUsuario().equals(usuario.getIdUsuario());
+
+        if (!esAdmin && !esCreador) {
+            throw new IllegalArgumentException("No tienes permiso para editar este libro. Solo el creador o un administrador pueden editarlo.");
+        }
+
+        registro.setTitulo(registro.getTitulo().trim());
+        if (registro.getIsbn() != null) 
+            registro.setIsbn(registro.getIsbn().trim());
+
+        Autor autor = autorRepositorio.findById(registro.getIdAutor())
+                .orElseThrow(() -> new IllegalArgumentException("El autor seleccionado no existe en la base de datos."));
+
+        Genero genero = generoRepositorio.findById(registro.getIdGenero())
+                .orElseThrow(() -> new IllegalArgumentException("El género seleccionado no existe en la base de datos."));
+
+        Editorial editorial = editorialRepositorio.findById(registro.getIdEditorial())
+                .orElseThrow(() -> new IllegalArgumentException("La editorial seleccionada no existe en la base de datos."));
+
+        libro.setTitulo(registro.getTitulo());
+        libro.setSinopsis(registro.getSinopsis());
+        libro.setImagen(registro.getImagen());
+        libro.setPaginas(registro.getPaginas());
+        libro.setAno(registro.getAno());
+        libro.setIsbn(registro.getIsbn());       
+        libro.setAutor(autor);
+        libro.setGenero(genero);
+        libro.setEditorial(editorial);
+
+        Libro libroGuardado = libroRepositorio.save(libro);
         return mapearAVista(libroGuardado);
     }
 
@@ -188,6 +253,11 @@ public class LibroServicio {
         
         if (libro.getGenero() != null) 
             vista.setNombreGenero(libro.getGenero().getNombreGenero());
+
+        if (libro.getUsuario() != null) {
+            vista.setIdUsuarioCreador(libro.getUsuario().getIdUsuario());
+            vista.setNombreUsuarioCreador(libro.getUsuario().getNombreUsuario());
+        }
 
         vista.setTotalResenas(resenaRepositorio.findByLibro_IdLibro(libro.getIdLibro()).size());
 

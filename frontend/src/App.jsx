@@ -34,6 +34,7 @@ function App() {
                     <Route path="/perfil" element={<Perfil />} />
                     <Route path="/usuario/:nombreUsuario" element={<PerfilPublico />} />
                     <Route path="/registrarLibro" element={<RegistrarLibro />} />
+                    <Route path="/editarLibro/:id" element={<RegistrarLibro />} />
                     <Route path="/biblioteca" element={<Biblioteca />} />
                     <Route path="/libro/:id" element={<DetalleLibro />} />
                 </Route>

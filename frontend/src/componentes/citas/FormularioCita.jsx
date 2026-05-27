@@ -9,6 +9,12 @@ import './FormularioCita.css';
 function FormularioCita({ alAgregar, deshabilitado }) {
     const [texto, setTexto] = useState('');
     const [pagina, setPagina] = useState('');
+    const manejarCambioPagina = (e) => {
+        const valor = e.target.value;
+        // Permitir solo dígitos (0-9)
+        const soloNumeros = valor.replace(/[^0-9]/g, '');
+        setPagina(soloNumeros);
+    };
 
     const manejarAgregado = () => {
         if (!texto.trim()) return;
@@ -35,13 +41,12 @@ function FormularioCita({ alAgregar, deshabilitado }) {
             />
             <div className="controles-cita">
                 <input 
-                    type="number" 
+                    type="text" 
                     value={pagina}
-                    onChange={(e) => setPagina(e.target.value)}
+                    onChange={manejarCambioPagina}
                     className="entrada-pildora entrada-pagina"
                     placeholder="Página (opcional)"
                     disabled={deshabilitado}
-                    min="1"
                 />
                 <button 
                     type="button" 
