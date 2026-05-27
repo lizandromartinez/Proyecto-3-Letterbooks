@@ -1,6 +1,5 @@
-/* frontend/src/estilos/Globales.css */
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Lato:wght@300;400;700&display=swap');
+@import "tailwindcss";
 
 @theme {
   --color-crema-fondo: #FDF8F3;

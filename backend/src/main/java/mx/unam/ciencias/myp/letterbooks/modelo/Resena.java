@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.modelo;
 
 import java.util.List;
+import java.util.ArrayList;
 import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @Entity
 @Table(name = "resena")
+/* Ignora las propiedades internas de Hibernate al serializar a JSON. */
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Resena {
 
@@ -56,6 +58,10 @@ public class Resena {
     @Column(name = "fecha_publicacion", length = 10)
     private String fechaPublicacion;
 
+    /* Citas asociadas a la reseña. */
+    @OneToMany(mappedBy = "resena", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cita> citas = new ArrayList<>();
+    
     /* Lista de comentarios asociados. */
     @JsonIgnore
     @OneToMany(mappedBy = "resena", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -206,6 +212,22 @@ public class Resena {
     }
 
     /**
+     * Obtiene la lista de citas asociadas a la reseña.
+     * @return citas lista de citas.
+     */
+    public List<Cita> getCitas() {
+        return citas;
+    }
+
+    /**
+     * Define la lista de citas asociadas a la reseña.
+     * @param citas lista de citas.
+     */
+    public void setCitas(List<Cita> citas) {
+        this.citas = citas;
+    }
+    
+    /**
      * Obtiene la lista de comentarios asociados.
      * @return comentarios lista de comentarios.
      */
@@ -219,5 +241,23 @@ public class Resena {
      */
     public void setComentarios(List<Comentario> comentarios) {
         this.comentarios = comentarios;
+    }
+
+    /**
+     * Sincroniza la relación bidireccional al agregar una cita.
+     * @param cita la cita a agregar a la reseña.
+     */
+    public void agregarCita(Cita cita) {
+        citas.add(cita);
+        cita.setResena(this);
+    }
+
+    /**
+     * Sincroniza la relación bidireccional al remover una cita.
+     * @param cita la cita a remover de la reseña.
+     */
+    public void removerCita(Cita cita) {
+        citas.remove(cita);
+        cita.setResena(null);
     }
 }

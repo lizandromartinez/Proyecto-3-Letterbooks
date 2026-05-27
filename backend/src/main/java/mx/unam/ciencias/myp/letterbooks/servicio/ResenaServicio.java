@@ -1,8 +1,10 @@
 package mx.unam.ciencias.myp.letterbooks.servicio;
 
+import mx.unam.ciencias.myp.letterbooks.dto.NuevaCita;
 import mx.unam.ciencias.myp.letterbooks.dto.NuevaResena;
 import mx.unam.ciencias.myp.letterbooks.dto.VistaCitaReciente;
 import mx.unam.ciencias.myp.letterbooks.dto.VistaResenaReciente;
+import mx.unam.ciencias.myp.letterbooks.modelo.Cita;
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 import mx.unam.ciencias.myp.letterbooks.modelo.Perfil;
 import mx.unam.ciencias.myp.letterbooks.modelo.Resena;
@@ -25,31 +27,15 @@ import java.util.List;
 
 /**
  * Servicio encargado de la lógica de negocio para las reseñas.
- * <p>
- * Esta clase gestiona operaciones de creación y edición de reseñas de libros,
- * aplicando validaciones de identidad, control de autoría y asegurando la
- * actualización síncrona del promedio de calificaciones de los textos.
- * </p>
+ * Gestiona operaciones de creación, edición y eliminación de reseñas,
+ * vinculando las citas adjuntas mediante relaciones bidireccionales y asegurando
+ * la actualización síncrona del promedio de calificaciones del libro.
  */
 @Service
 public class ResenaServicio {
 
-    /**
-     * Repositorio encargado de realizar operaciones de persistencia
-     * sobre la entidad Resena en la base de datos.
-     */
     private final ResenaRepositorio resenaRepositorio;
-
-    /**
-     * Repositorio encargado de realizar operaciones de persistencia
-     * y consulta sobre la entidad Libro en la base de datos.
-     */
     private final LibroRepositorio libroRepositorio;
-
-    /**
-     * Repositorio encargado de realizar búsquedas y validaciones
-     * sobre las cuentas de la entidad Usuario en la base de datos.
-     */
     private final UsuarioRepositorio usuarioRepositorio;
 
     /**
@@ -67,10 +53,6 @@ public class ResenaServicio {
      */
     private final PerfilRepositorio perfilRepositorio;
 
-    /**
-     * Componente de seguridad utilizado para decodificar, validar
-     * y extraer la información de identidad de los tokens de sesión JWT.
-     */
     private final TokenJWT tokenJWT;
 
     /**
@@ -100,17 +82,7 @@ public class ResenaServicio {
     }
 
     /**
-     * Crea una nueva reseña en el sistema y actualiza la calificación del libro.
-     * <p>
-     * Este método:
-     * <ul>
-     * <li>Extrae la identidad del usuario desde el token JWT de la sesión</li>
-     * <li>Valida que tanto el usuario como el libro existan en el sistema</li>
-     * <li>Inicializa los contadores de interacción y asigna la fecha actual en formato texto</li>
-     * <li>Persiste la reseña y recalcula de forma inmediata el promedio global del libro</li>
-     * </ul>
-     * </p>
-     *
+     * Crea una nueva reseña en el sistema y procesa sus citas asociadas.
      * @param datos DTO con la información y calificación de la nueva reseña
      * @param token cadena con el token JWT del usuario que realiza la operación
      * @return la entidad reseña recién creada y persistida en el sistema
@@ -126,19 +98,21 @@ public class ResenaServicio {
         Libro libro = libroRepositorio.findById(datos.getIdLibro())
             .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado."));
 
-        if (resenaRepositorio.existePorUsuarioYLibro(usuario.getIdUsuario(), libro.getIdLibro())) {
-            throw new IllegalArgumentException("Ya has publicado una reseña para este libro.");
-        }
-
         Resena nuevaResena = new Resena();
         nuevaResena.setLibro(libro);
         nuevaResena.setUsuario(usuario);
         nuevaResena.setCalificacionLibro(datos.getCalificacionLibro());
         nuevaResena.setTextoResena(datos.getTextoResena());
-        nuevaResena.setCalificacionResena(0);
-        nuevaResena.setLikes(0);
-        nuevaResena.setReportes(0);
         nuevaResena.setFechaPublicacion(LocalDate.now().toString());
+
+        if (datos.getCitas() != null) {
+            for (NuevaCita dtoCita : datos.getCitas()) {
+                Cita nuevaCita = new Cita();
+                nuevaCita.setTexto(dtoCita.getTexto());
+                nuevaCita.setPagina(dtoCita.getPagina());
+                nuevaResena.agregarCita(nuevaCita);
+            }
+        }
 
         Resena resenaGuardada = resenaRepositorio.save(nuevaResena);
 
@@ -150,17 +124,7 @@ public class ResenaServicio {
     }
 
     /**
-     * Edita una reseña existente aplicando filtros estrictos de derecho de autoría.
-     * <p>
-     * Este método:
-     * <ul>
-     * <li>Recupera la reseña solicitada del repositorio por su identificador</li>
-     * <li>Verifica que el nombre de usuario del token coincida exactamente con el creador</li>
-     * <li>Modifica el texto de la opinión y la puntuación de estrellas asignada</li>
-     * <li>Actualiza el valor promedio acumulado de la entidad del libro</li>
-     * </ul>
-     * </p>
-     *
+     * Edita una reseña existente y actualiza sus citas asociadas.
      * @param idResena identificador único de la reseña que se desea modificar
      * @param datos DTO con los nuevos valores de texto y calificación del formulario
      * @param token cadena de autenticación JWT del usuario que solicita el cambio
@@ -180,6 +144,23 @@ public class ResenaServicio {
 
         resena.setCalificacionLibro(datos.getCalificacionLibro());
         resena.setTextoResena(datos.getTextoResena());
+
+        // Limpieza segura de las citas previas para evitar registros huérfanos
+        List<Cita> citasAnteriores = new ArrayList<>(resena.getCitas());
+        for (Cita cita : citasAnteriores) {
+            resena.removerCita(cita);
+        }
+
+        // Incorporación de las nuevas citas asignadas en la edición
+        if (datos.getCitas() != null) {
+            for (NuevaCita dtoCita : datos.getCitas()) {
+                Cita nuevaCita = new Cita();
+                nuevaCita.setTexto(dtoCita.getTexto());
+                nuevaCita.setPagina(dtoCita.getPagina());
+                resena.agregarCita(nuevaCita);
+            }
+        }
+
         Resena resenaActualizada = resenaRepositorio.save(resena);
 
         Libro libro = resena.getLibro();
@@ -192,12 +173,6 @@ public class ResenaServicio {
 
     /**
      * Calcula el promedio de calificaciones de un libro basado en sus reseñas.
-     * <p>
-     * Este método recupera la lista completa de críticas asociadas al identificador del
-     * libro para computar la media aritmética. En caso de no existir registros, el método
-     * normaliza el resultado devolviendo un valor por defecto.
-     * </p>
-     *
      * @param idLibro el identificador único del libro a evaluar
      * @return el promedio numérico de calificación obtenido, o cero si no cuenta con aportes
      */
@@ -216,17 +191,15 @@ public class ResenaServicio {
     }
 
     /**
-     * Recupera todas las reseñas asociadas a un libro específico.
-     * <p>
-     * Consulta el repositorio utilizando el identificador del libro para
-     * devolver la lista de reseñas que serán enviadas al frontend.
-     * </p>
-     *
+     * Recupera todas las reseñas asociadas a un libro específico inicializando sus citas.
+     * Utiliza una transacción de solo lectura y una consulta estructurada con FETCH JOIN
+     * para mitigar el problema de consultas N+1 y prevenir fallos de inicialización perezosa.
      * @param idLibro el identificador único del libro a consultar
-     * @return una lista de entidades reseña pertenecientes al libro
+     * @return una lista de entidades reseña pertenecientes al libro con sus citas cargadas
      */
+    @Transactional(readOnly = true)
     public List<Resena> obtenerResenasPorLibro(Integer idLibro) {
-        return resenaRepositorio.encontrarPorLibroConUsuario(idLibro);
+        return resenaRepositorio.encontrarPorLibroConCitas(idLibro);
     }
 
     /**

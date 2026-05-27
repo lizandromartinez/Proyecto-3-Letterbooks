@@ -90,6 +90,8 @@ CREATE TABLE cita (
     id_cita INT AUTO_INCREMENT PRIMARY KEY,
     id_resena INT NOT NULL,
     texto TEXT NOT NULL,
+    pagina INT,
+    likes INT DEFAULT 0,
     FOREIGN KEY (id_resena) REFERENCES resena(id_resena) 
 );
 

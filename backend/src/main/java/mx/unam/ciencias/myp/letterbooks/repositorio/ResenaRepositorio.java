@@ -72,4 +72,14 @@ public interface ResenaRepositorio extends JpaRepository<Resena, Integer> {
      */
     @Query("SELECT r FROM Resena r JOIN FETCH r.usuario JOIN FETCH r.libro l LEFT JOIN FETCH l.autor ORDER BY r.fechaPublicacion DESC, r.idResena DESC")
     List<Resena> encontrarRecientes(Pageable pageable);
+
+    /**
+     * Busca todas las reseñas de un libro cargando de forma síncrona sus citas.
+     * Utiliza un JOIN FETCH para evitar excepciones de inicialización perezosa
+     * durante la serialización a JSON.
+     * @param idLibro el identificador único del libro.
+     * @return una lista de reseñas con sus colecciones de citas inicializadas.
+     */
+    @Query("SELECT DISTINCT r FROM Resena r LEFT JOIN FETCH r.citas WHERE r.libro.idLibro = :idLibro")
+    List<Resena> encontrarPorLibroConCitas(@Param("idLibro") Integer idLibro);
 }

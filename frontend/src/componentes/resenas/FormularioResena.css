@@ -1,96 +1,128 @@
-.contenedor-formulario-resena {
-    max-width: 440px; 
-    width: 100%;
-    background-color: var(--card-bg);
-    color: var(--text);
+.tarjeta-formulario-resena {
+    background-color: var(--color-dark-borde, #1E1E1E);
+    border: 1px solid var(--color-navy-button-hover, #323D4D);
+    border-radius: 16px;
     padding: 24px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin: 16px auto;
-    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.contenedor-formulario-resena h3 {
-    font-family: var(--font-cormorant);
-    color: var(--navy);
-    font-size: 1.35rem;
-    margin: 0 0 16px;
+.subtitulo-formulario {
+    font-size: 1.25rem;
     font-weight: 700;
+    color: var(--color-crema-fondo, #FDF8F3);
+    margin-bottom: 20px;
 }
 
-.grupo-entrada {
+.etiqueta-formulario {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.contenedor-estrellas-interactivas {
     display: flex;
-    flex-direction: column;
+    gap: 6px;
     margin-bottom: 16px;
 }
 
-.grupo-entrada label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--navy);
+.icono-estrella {
+    font-size: 1.75rem;
+    color: #475569;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out, transform 0.1s;
 }
 
-.entrada-pildora {
-    padding: 12px 20px;
-    border: 1px solid var(--border);
-    border-radius: 999px; 
-    background-color: var(--input-bg);
-    color: var(--text);
-    font-family: var(--font-inter);
+.icono-estrella.activa {
+    color: var(--color-gold-button, #d4a049);
+}
+
+.icono-estrella:hover {
+    transform: scale(1.15);
+}
+
+.area-texto-opinion {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 16px;
+    background-color: var(--color-dark-fondo, #121212);
+    color: var(--color-crema-fondo, #FDF8F3);
+    border: 1px solid var(--color-navy-button-hover, #323D4D);
+    border-radius: 8px;
+    resize: vertical;
     outline: none;
-    transition: border-color 0.3s ease;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
 }
 
-.entrada-pildora::placeholder {
-    color: var(--muted);
+.contenedor-previsualizacion-citas {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-.entrada-pildora:focus {
-    border-color: var(--gold);
+.pildora-cita-previa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-dark-fondo, #121212);
+    border-left: 3px solid var(--color-gold-button, #d4a049);
+    padding: 10px 14px;
+    border-radius: 6px;
 }
 
-.area-texto {
-    border-radius: 24px;
-    resize: none;
-    min-height: 100px;
+.resumen-texto-pildora {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: #cbd5e1;
+    margin: 0;
 }
 
-.acciones-formulario {
+.boton-remover-pildora {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.boton-remover-pildora:hover {
+    color: #ef4444;
+}
+
+.mensaje-limite-citas {
+    font-size: 0.8rem;
+    color: var(--color-gold-button, #d4a049);
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+
+.acciones-formulario-pie {
     display: flex;
     gap: 12px;
-    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .boton-pildora {
-    padding: 10px 24px;
-    border-radius: 999px;
-    border: none;
-    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border: none;
+    font-size: 0.9rem;
 }
 
 .boton-pildora.primario {
-    background-color: var(--navy);
-    color: white;
+    background-color: var(--color-navy-button, #1B2A47);
+    color: var(--color-crema-fondo, #FDF8F3);
 }
 
-.boton-pildora.primario:hover {
-    background-color: #323D4D;
-}
-
-.boton-pildora.secundario {
-    background-color: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-.boton-pildora.secundario:hover {
-    background-color: var(--bg);
-}
-
-.mensaje-error {
-    color: #d32f2f;
-    font-size: 0.9em;
-    margin-bottom: 12px;
+.boton-pildora.cancelar {
+    background-color: var(--color-navy-button-hover, #323D4D);
+    color: #cbd5e1;
 }
