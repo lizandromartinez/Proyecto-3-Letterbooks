@@ -59,6 +59,12 @@ function Registro() {
     const [cargando, setCargando] = useState(false);
 
     /**
+     * Estado que controla si la contraseña se muestra en texto plano
+     * o permanece oculta en el formulario.
+     */
+    const [verContrasena, setVerContrasena] = useState(false);
+    
+    /**
      * Maneja los cambios en los campos del formulario.
      *
      * @param {React.ChangeEvent<HTMLInputElement>} evento evento del input
@@ -212,7 +218,7 @@ function Registro() {
 			)}
                     </div>
 
-                     <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
                         <label htmlFor="correo" className="text-sm text-gray-700 dark:text-gray-300">Correo</label>
                         <input
                             id="correo"
@@ -229,23 +235,42 @@ function Registro() {
 			)}
                     </div>
 
-			       
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="contrasena" className="text-sm text-gray-700 dark:text-gray-300">Contraseña</label>
-                        <input
-                            id="contrasena"
-                            className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
-                            type="password"
-                            name="contrasena"
-                            placeholder="••••••••"
-                            value={datosFormulario.contrasena}
-                            onChange={manejarCambio}
-                            required
-                        />
+		    <div className="flex flex-col gap-2">
+			<label htmlFor="contrasena" className="text-sm text-gray-700 dark:text-gray-300">Contraseña</label>
+			<div className="relative">
+			    <input
+				id="contrasena"
+				className="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 pr-11 font-sans text-sm text-gray-800 dark:text-white outline-none focus:border-navy-letter transition-colors placeholder:text-gray-400"
+				type={verContrasena ? "text" : "password"}
+				name="contrasena"
+				placeholder="••••••••"
+				value={datosFormulario.contrasena}
+				onChange={manejarCambio}
+				required
+			    />
+			    <button
+				type="button"
+				onClick={() => setVerContrasena(!verContrasena)}
+				className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
+			    >
+				{verContrasena ? (
+				    /* Ocultar contraseña */
+				    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" />
+				    </svg>
+				) : (
+				    /* Mostrar contraseña */
+				    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+				    </svg>
+				)}
+			    </button>
+			</div>
 			{errores.contrasena && (
 			    <small className="text-red-500 text-xs mt-0.5">{errores.contrasena}</small>
 			)}
-                    </div>
+		    </div>
 
                     <button type="submit" className="mt-2 py-3 px-4 rounded-lg font-semibold text-white cursor-pointer transition-all duration-200 bg-gold-button hover:bg-gold-button dark:bg-navy-button dark:hover:bg-navy-button-hover hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled={cargando}>
                         {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
@@ -265,30 +290,30 @@ function Registro() {
 
             {/* características */}
             <div className="flex justify-center gap-8 sm:gap-12 mt-10 text-navy-letter dark:text-gray-400 text-xs text-center opacity-80">
-                    <div className="flex flex-col items-center gap-2">
-                      <img 
+                <div className="flex flex-col items-center gap-2">
+                    <img 
                         src={libro} 
                         alt="Libro" 
                         className="h-5 w-auto dark:brightness-200" 
-                      />
-                      <span className="font-cormorant leading-tight">Descubre<br />libros</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <img 
+                    />
+                    <span className="font-cormorant leading-tight">Descubre<br />libros</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <img 
                         src={estrella} 
                         alt="Estreha" 
                         className="h-5 w-auto dark:brightness-200" 
-                      />
-                      <span className="font-cormorant leading-tight">Comparte<br />reseñas</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <img 
+                    />
+                    <span className="font-cormorant leading-tight">Comparte<br />reseñas</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <img 
                         src={personas} 
                         alt="Personas" 
                         className="h-5 w-auto dark:brightness-200" 
-                      />
-                      <span className="font-cormorant leading-tight">Conecta con<br />lectores</span>
-                    </div>
+                    />
+                    <span className="font-cormorant leading-tight">Conecta con<br />lectores</span>
+                </div>
             </div>
         </div>
     );
