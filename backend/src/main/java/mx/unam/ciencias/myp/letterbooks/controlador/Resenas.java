@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.controlador;
 
 import mx.unam.ciencias.myp.letterbooks.dto.NuevaResena;
+import mx.unam.ciencias.myp.letterbooks.dto.VistaResenaReciente;
 import mx.unam.ciencias.myp.letterbooks.modelo.Resena;
 import mx.unam.ciencias.myp.letterbooks.servicio.ResenaServicio;
 
@@ -41,6 +42,17 @@ public class Resenas {
     public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable("idLibro") Integer idLibro) {
         List<Resena> resenas = resenaServicio.obtenerResenasPorLibro(idLibro);
         return ResponseEntity.ok(resenas);
+    }
+
+    /**
+     * Endpoint público para consultar las reseñas más recientes de la landing.
+     * @param limite cantidad máxima de reseñas (por defecto 5)
+     * @return respuesta HTTP 200 con la lista de reseñas recientes
+     */
+    @GetMapping("/recientes")
+    public ResponseEntity<List<VistaResenaReciente>> obtenerResenasRecientes(
+            @RequestParam(value = "limite", defaultValue = "5") int limite) {
+        return ResponseEntity.ok(resenaServicio.obtenerRecientes(limite));
     }
 
     /**

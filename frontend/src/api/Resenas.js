@@ -3,6 +3,18 @@ import axios from 'axios';
 const URL_BASE = 'http://localhost:8080/api/resenas';
 
 /**
+ * Consulta las reseñas más recientes para la landing page (público).
+ * @param {number} limite cantidad máxima de reseñas.
+ * @return {Promise<Array>} lista de reseñas recientes.
+ */
+export const obtenerResenasRecientes = async (limite = 5) => {
+    const respuesta = await axios.get(`${URL_BASE}/recientes`, {
+        params: { limite }
+    });
+    return respuesta.data;
+};
+
+/**
  * Consulta todas las reseñas asociadas a un libro.
  * @param {number} idLibro identificador del libro.
  * @return {Promise<Array>} lista de reseñas.

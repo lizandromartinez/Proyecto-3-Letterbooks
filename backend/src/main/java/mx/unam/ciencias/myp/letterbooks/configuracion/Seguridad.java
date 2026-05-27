@@ -46,6 +46,8 @@ public class Seguridad {
 		.requestMatchers("/almacenamiento/**").permitAll() // visualización de archivos
 		.requestMatchers("/api/usuarios/perfil/**").permitAll()//para ver perfiles ajenos 
 		.requestMatchers(HttpMethod.GET, "/api/resenas/libro/**").permitAll() // listar reseñas es público
+		.requestMatchers(HttpMethod.GET, "/api/resenas/recientes").permitAll() // reseñas recientes en landing
+		.requestMatchers(HttpMethod.GET, "/api/catalogo/libros/populares").permitAll() // libros populares en landing
 		.requestMatchers("/error").permitAll() // para ver los errores reales (no 403)
                 .anyRequest().authenticated() // Todo lo demás requiere autenticación
             );

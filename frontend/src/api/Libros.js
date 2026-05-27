@@ -1,6 +1,17 @@
 const URL_BASE = 'http://localhost:8080/api';
 
 /**
+ * Obtiene los libros más populares para la landing page (público).
+ */
+export async function obtenerLibrosPopulares(limite = 3) {
+    const respuesta = await fetch(`${URL_BASE}/catalogo/libros/populares?limite=${limite}`);
+    if (!respuesta.ok) {
+        throw new Error('Error al obtener los libros populares');
+    }
+    return await respuesta.json();
+}
+
+/**
  * Obtiene todos los libros disponibles.
  */
 export async function obtenerTodosLosLibros(token) {

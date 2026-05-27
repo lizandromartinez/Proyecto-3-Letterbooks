@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.repositorio;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -63,4 +64,12 @@ public interface ResenaRepositorio extends JpaRepository<Resena, Integer> {
      */
     @Query("SELECT r FROM Resena r JOIN FETCH r.usuario u WHERE r.libro.idLibro = :idLibro ORDER BY r.fechaPublicacion DESC")
     List<Resena> encontrarPorLibroConUsuario(@Param("idLibro") Integer idLibro);
+
+    /**
+     * Obtiene las reseñas más recientes con usuario y libro cargados.
+     * @param pageable paginación con límite de resultados
+     * @return lista de reseñas recientes
+     */
+    @Query("SELECT r FROM Resena r JOIN FETCH r.usuario JOIN FETCH r.libro l LEFT JOIN FETCH l.autor ORDER BY r.fechaPublicacion DESC, r.idResena DESC")
+    List<Resena> encontrarRecientes(Pageable pageable);
 }

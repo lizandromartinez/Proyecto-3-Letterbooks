@@ -9,6 +9,7 @@ import PerfilPublico from "./paginas/PerfilPublico";
 import RegistrarLibro from "./paginas/RegistrarLibro";
 import Biblioteca from "./paginas/Biblioteca";  
 import DetalleLibro from './paginas/DetalleLibro';
+import LayoutScroll from './componentes/navegacion/LayoutScroll';
 
 /**
  * Componente principal de la aplicación.
@@ -24,16 +25,18 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<PaginaAterrizaje />} />
-                <Route path="/paginaAterrizaje" element={<PaginaAterrizaje />} />
-                <Route path="/login" element={<InicioDeSesion />} />
-                <Route path="/registro" element={<Registro />} />
-                <Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/usuario/:nombreUsuario" element={<PerfilPublico />} />
-                <Route path="/registrarLibro" element={<RegistrarLibro />} />
-                <Route path="/biblioteca" element={<Biblioteca />} />
-                <Route path="/libro/:id" element={<DetalleLibro />} />
+                <Route element={<LayoutScroll />}>
+                    <Route path="/" element={<PaginaAterrizaje />} />
+                    <Route path="/paginaAterrizaje" element={<PaginaAterrizaje />} />
+                    <Route path="/login" element={<InicioDeSesion />} />
+                    <Route path="/registro" element={<Registro />} />
+                    <Route path="/dashboard" element={<PaginaAterrizajeAutenticado />} />
+                    <Route path="/perfil" element={<Perfil />} />
+                    <Route path="/usuario/:nombreUsuario" element={<PerfilPublico />} />
+                    <Route path="/registrarLibro" element={<RegistrarLibro />} />
+                    <Route path="/biblioteca" element={<Biblioteca />} />
+                    <Route path="/libro/:id" element={<DetalleLibro />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

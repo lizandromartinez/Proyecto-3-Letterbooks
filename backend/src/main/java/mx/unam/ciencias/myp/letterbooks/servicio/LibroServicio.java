@@ -2,8 +2,10 @@ package mx.unam.ciencias.myp.letterbooks.servicio;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
 import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
@@ -50,6 +52,7 @@ public class LibroServicio {
      * Obtiene todos los libros disponibles.
      * @return lista de todos los libros
      */
+    @Transactional(readOnly = true)
     public List<Libro> obtenerTodos() {
         return libroRepositorio.findAll();
     }
@@ -61,6 +64,33 @@ public class LibroServicio {
      */
     public List<Libro> buscarPorTitulo(String titulo) {
         return libroRepositorio.encontrarPorTituloContiene(titulo);
+    }
+
+    /**
+     * Obtiene los libros más populares según su calificación promedio.
+     * @param limite cantidad máxima de libros a devolver
+     * @return lista de DTOs listos para la landing
+     */
+    private static final List<String> TITULOS_DESTACADOS = List.of(
+        "Cien años de soledad",
+        "1984",
+        "Orgullo y Prejuicio"
+    );
+
+    /**
+     * Obtiene los libros destacados de la landing en orden fijo.
+     * @param limite cantidad máxima de libros a devolver
+     * @return lista de DTOs listos para la landing
+     */
+    @Transactional(readOnly = true)
+    public List<VistaLibro> obtenerPopulares(int limite) {
+        int cantidad = Math.max(1, limite);
+        return TITULOS_DESTACADOS.stream()
+            .map(libroRepositorio::findByTitulo)
+            .flatMap(Optional::stream)
+            .limit(cantidad)
+            .map(this::mapearAVista)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -120,16 +150,18 @@ public class LibroServicio {
      * @return El DTO VistaLibro con los nombres de las relaciones ya "aplanados".
      * @throws IllegalArgumentException si el ID del libro no existe.
      */
+    @Transactional(readOnly = true)
     public VistaLibro obtenerPorId(Integer idLibro) {
-        Libro libro = libroRepositorio.findById(idLibro)
+        Libro libro = libroRepositorio.encontrarPorIdConRelaciones(idLibro)
                 .orElseThrow(() -> new IllegalArgumentException("El libro buscado no existe en la base de datos."));
-        
+
         return mapearAVista(libro);
     }
 
     /**
      * Método auxiliar para pasar los datos de la Entidad Libro al DTO plano (VistaLibro).
      */
+    @Transactional(readOnly = true)
     public VistaLibro mapearAVista(Libro libro) {
         VistaLibro vista = new VistaLibro();
         

@@ -68,6 +68,7 @@
         <configuration>
           <compilerArgument>-Xlint:deprecation</compilerArgument>
           <compilerArgument>-Xlint:unchecked</compilerArgument>
+          <parameters>true</parameters>
           <debug>true</debug>
           <debuglevel>lines,vars,source</debuglevel>
           <showDeprecation>true</showDeprecation>

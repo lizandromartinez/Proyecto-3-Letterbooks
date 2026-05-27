@@ -3,6 +3,7 @@ package mx.unam.ciencias.myp.letterbooks.repositorio;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -131,4 +132,23 @@ public interface LibroRepositorio extends JpaRepository<Libro, Integer> {
      * @return un ArrayList con los libros de esa editorial
      */
     List<Libro> findByEditorialNombreEditorial(String nombreEditorial);
+
+    /**
+     * Obtiene los libros con mayor calificación promedio.
+     * @param pageable paginación con límite de resultados
+     * @return lista de libros ordenados por popularidad
+     */
+    List<Libro> findAllByOrderByPromedioCalificacionDescIdLibroAsc(Pageable pageable);
+
+    /**
+     * Busca un libro por ID cargando autor, género y editorial.
+     * @param idLibro identificador del libro
+     * @return libro con relaciones inicializadas
+     */
+    @Query("SELECT l FROM Libro l "
+         + "LEFT JOIN FETCH l.autor "
+         + "LEFT JOIN FETCH l.genero "
+         + "LEFT JOIN FETCH l.editorial "
+         + "WHERE l.idLibro = :idLibro")
+    Optional<Libro> encontrarPorIdConRelaciones(@Param("idLibro") Integer idLibro);
 }

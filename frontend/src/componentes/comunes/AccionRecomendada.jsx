@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import EnlaceRuta from '../navegacion/EnlaceRuta';
 
 /**
  * AccionRecomendada - Componente de botón/enlace de alta jerarquía.
@@ -54,7 +54,7 @@ const AccionRecomendada = ({
     : "px-6 py-2 text-sm inline-block";
 
   return (
-    <Link 
+    <EnlaceRuta 
       to={href}
       onClick={onClick}
       className={`
@@ -68,7 +68,7 @@ const AccionRecomendada = ({
       `}
     >
       {children}
-    </Link>
+    </EnlaceRuta>
   );
 };
 

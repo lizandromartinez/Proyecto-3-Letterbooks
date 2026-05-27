@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom'; 
+import { Navigate } from 'react-router-dom'; 
 import { ContextoSesion } from '../contexto/Sesion';
 
 import AccionRecomendada from '../componentes/comunes/AccionRecomendada';
+import EnlaceRuta from '../componentes/navegacion/EnlaceRuta';
 import Navbar from '../componentes/navegacion/navbar/Navbar';
 import Footer from '../componentes/navegacion/footer/Footer';
 
@@ -159,7 +160,7 @@ const Biblioteca = () => {
                     /* MODALIDAD A: VISTA EN CUADRÍCULA (GRID) */
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-8 text-left">
                         {librosOrdenados.map((libro) => (
-                            <Link 
+                            <EnlaceRuta 
                                 to={`/libro/${libro.idLibro}`} 
                                 state={{ libroData: libro }}
                                 key={libro.idLibro} 
@@ -188,14 +189,14 @@ const Biblioteca = () => {
                                         {libro.autor?.nombreAutor || 'Autor desconocido'}
                                     </p>
                                 </div>
-                            </Link>
+                            </EnlaceRuta>
                         ))}
                     </div>
                 ) : (
                     /* MODALIDAD B: VISTA EN LISTA COMPACTA */
                     <div className="flex flex-col gap-3 text-left">
                         {librosOrdenados.map((libro) => (
-                            <Link 
+                            <EnlaceRuta 
                                 to={`/libro/${libro.idLibro}`} 
                                 key={libro.idLibro} 
                                 state={{ libroData: libro }}                                
@@ -209,7 +210,7 @@ const Biblioteca = () => {
                                 <div className="bg-amber-400/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1">
                                     ★ {libro.promedioCalificacion != null ? Number(libro.promedioCalificacion).toFixed(1) : '0.0'}
                                 </div>
-                            </Link>
+                            </EnlaceRuta>
                         ))}
                     </div>
                 )}

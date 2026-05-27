@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import mx.unam.ciencias.myp.letterbooks.dto.VistaLibro;
 import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 import mx.unam.ciencias.myp.letterbooks.modelo.Editorial;
 import mx.unam.ciencias.myp.letterbooks.modelo.Genero;
@@ -65,6 +66,17 @@ public class Catalogo {
     @GetMapping("/libros/buscar")
     public ResponseEntity<List<Libro>> buscarLibros(@RequestParam("titulo") String titulo) {
         return ResponseEntity.ok(libroServicio.buscarPorTitulo(titulo));
+    }
+
+    /**
+     * Obtiene los libros más populares para la landing page.
+     * @param limite cantidad máxima de libros (por defecto 3)
+     * @return lista de libros con datos aplanados
+     */
+    @GetMapping("/libros/populares")
+    public ResponseEntity<List<VistaLibro>> obtenerLibrosPopulares(
+            @RequestParam(value = "limite", defaultValue = "3") int limite) {
+        return ResponseEntity.ok(libroServicio.obtenerPopulares(limite));
     }
 
     /**

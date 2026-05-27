@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ContextoSesion } from '../contexto/Sesion';
 import { peticionLogin } from '../api/Usuarios';
 import { validarNombreUsuario, validarContrasena } from '../utilidades/Validadores';
@@ -14,6 +14,8 @@ import personas from '../estilos/img/iconos/personas.png';
 const InicioDeSesion = () => {
   const { iniciarSesion } = useContext(ContextoSesion);
   const navigate = useNavigate();
+  const location = useLocation();
+  const destinoTrasLogin = location.state?.from || '/dashboard';
 
   const [credenciales, setCredenciales] = useState({
     nombreUsuario: '',
@@ -52,7 +54,9 @@ const InicioDeSesion = () => {
     try {
       const respuesta = await peticionLogin(credenciales);
       iniciarSesion(respuesta.token);
-      navigate('/dashboard');
+      navigate(destinoTrasLogin, {
+        state: { libroData: location.state?.libroData },
+      });
     } catch (err) {
       setError(err.message);
     }

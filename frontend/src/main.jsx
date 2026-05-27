@@ -4,6 +4,10 @@ import App from './App.jsx'
 import { ProveedorSesion } from './contexto/Sesion'
 import './estilos/Globales.css'
 
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual'
+}
+
 /**
  * Renderiza la aplicación React en el DOM.
  * <p>

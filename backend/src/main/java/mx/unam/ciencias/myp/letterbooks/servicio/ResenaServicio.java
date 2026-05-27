@@ -1,18 +1,26 @@
 package mx.unam.ciencias.myp.letterbooks.servicio;
 
 import mx.unam.ciencias.myp.letterbooks.dto.NuevaResena;
+import mx.unam.ciencias.myp.letterbooks.dto.VistaCitaReciente;
+import mx.unam.ciencias.myp.letterbooks.dto.VistaResenaReciente;
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
+import mx.unam.ciencias.myp.letterbooks.modelo.Perfil;
 import mx.unam.ciencias.myp.letterbooks.modelo.Resena;
 import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
+import mx.unam.ciencias.myp.letterbooks.repositorio.CitaRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.ComentarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.seguridad.TokenJWT;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,6 +53,21 @@ public class ResenaServicio {
     private final UsuarioRepositorio usuarioRepositorio;
 
     /**
+     * Repositorio de citas literarias asociadas a reseñas.
+     */
+    private final CitaRepositorio citaRepositorio;
+
+    /**
+     * Repositorio de comentarios en reseñas.
+     */
+    private final ComentarioRepositorio comentarioRepositorio;
+
+    /**
+     * Repositorio de perfiles de usuario.
+     */
+    private final PerfilRepositorio perfilRepositorio;
+
+    /**
      * Componente de seguridad utilizado para decodificar, validar
      * y extraer la información de identidad de los tokens de sesión JWT.
      */
@@ -55,15 +78,24 @@ public class ResenaServicio {
      * @param resenaRepositorio repositorio para acceder a las reseñas
      * @param libroRepositorio repositorio para acceder al catálogo de libros
      * @param usuarioRepositorio repositorio para acceder a los datos de cuentas
+     * @param citaRepositorio repositorio para acceder a las citas
+     * @param comentarioRepositorio repositorio para acceder a los comentarios
+     * @param perfilRepositorio repositorio para acceder a los perfiles
      * @param tokenJWT utilidad para el procesamiento y lectura de firmas JWT
      */
     public ResenaServicio(ResenaRepositorio resenaRepositorio,
                           LibroRepositorio libroRepositorio,
                           UsuarioRepositorio usuarioRepositorio,
+                          CitaRepositorio citaRepositorio,
+                          ComentarioRepositorio comentarioRepositorio,
+                          PerfilRepositorio perfilRepositorio,
                           TokenJWT tokenJWT) {
         this.resenaRepositorio = resenaRepositorio;
         this.libroRepositorio = libroRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
+        this.citaRepositorio = citaRepositorio;
+        this.comentarioRepositorio = comentarioRepositorio;
+        this.perfilRepositorio = perfilRepositorio;
         this.tokenJWT = tokenJWT;
     }
 
@@ -195,6 +227,56 @@ public class ResenaServicio {
      */
     public List<Resena> obtenerResenasPorLibro(Integer idLibro) {
         return resenaRepositorio.encontrarPorLibroConUsuario(idLibro);
+    }
+
+    /**
+     * Obtiene las reseñas más recientes con datos del libro, usuario, citas y comentarios.
+     * @param limite cantidad máxima de reseñas a devolver
+     * @return lista de DTOs para la landing
+     */
+    @Transactional(readOnly = true)
+    public List<VistaResenaReciente> obtenerRecientes(int limite) {
+        int cantidad = Math.max(1, limite);
+        List<Resena> resenas = resenaRepositorio.encontrarRecientes(PageRequest.of(0, cantidad));
+        List<VistaResenaReciente> resultado = new ArrayList<>();
+
+        for (Resena resena : resenas) {
+            VistaResenaReciente vista = new VistaResenaReciente();
+            vista.setIdResena(resena.getIdResena());
+            vista.setCalificacionLibro(resena.getCalificacionLibro());
+            vista.setCalificacionResena(resena.getCalificacionResena());
+            vista.setTextoResena(resena.getTextoResena());
+            vista.setLikes(resena.getLikes());
+            vista.setFechaPublicacion(resena.getFechaPublicacion());
+            vista.setTotalComentarios(comentarioRepositorio.encontrarPorResena(resena.getIdResena()).size());
+
+            Usuario usuario = resena.getUsuario();
+            if (usuario != null) {
+                vista.setNombreUsuario(usuario.getNombreUsuario());
+                perfilRepositorio.encontrarPorUsuario(usuario.getIdUsuario())
+                    .map(Perfil::getAvatar)
+                    .ifPresent(vista::setAvatarUsuario);
+            }
+
+            Libro libro = resena.getLibro();
+            if (libro != null) {
+                vista.setIdLibro(libro.getIdLibro());
+                vista.setTituloLibro(libro.getTitulo());
+                vista.setImagenLibro(libro.getImagen());
+                if (libro.getAutor() != null) {
+                    vista.setNombreAutor(libro.getAutor().getNombreAutor());
+                }
+            }
+
+            List<VistaCitaReciente> citas = citaRepositorio.encontrarPorResena(resena.getIdResena())
+                .stream()
+                .map(cita -> new VistaCitaReciente(cita.getTexto()))
+                .toList();
+            vista.setCitas(citas);
+            resultado.add(vista);
+        }
+
+        return resultado;
     }
 
     /**
