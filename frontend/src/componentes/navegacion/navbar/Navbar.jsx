@@ -61,7 +61,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                     ) : (
                         /* VISTA: Usuario Logueado */
                         <>
-                            <NavLink href="/dashboard">Feed</NavLink>
+                            <NavLink href="/dashboard">Inicio</NavLink>
                             <NavLink href="/dashboard">Explorar</NavLink>
                             <NavLink href="/biblioteca">Biblioteca</NavLink>
                             <NavLink href="/registrarLibro">Nuevo Libro</NavLink>
@@ -89,7 +89,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                         </>
                     ) : (
                         <>
-                            <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Feed</NavLink>
+                            <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Inicio</NavLink>
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Explorar</NavLink>
                             <NavLink href="/biblioteca" esMovil onClick={cerrarMenu}>Biblioteca</NavLink>
                             <NavLink href="/registrarLibro" esMovil onClick={cerrarMenu}>Nuevo Libro</NavLink>

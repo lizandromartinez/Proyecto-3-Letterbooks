@@ -141,8 +141,9 @@ const DetalleLibro = () => {
                 
                 <div className="lg:col-span-2 bg-white dark:bg-dark-borde border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-8 shadow-xs text-left">
                     
-                    <div className="w-full sm:w-56 shrink-0 aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-gray-100 dark:bg-white/5">
-                        <img src={obtenerUrlImagen(libro.imagen)} alt={libro.titulo} className="w-full h-full object-cover" />
+                    {/* Contenedor adaptativo de la Portada */}
+                    <div className="w-full sm:w-64 md:w-72 shrink-0 rounded-xl overflow-hidden shadow-md bg-gray-100 dark:bg-white/5 self-start">
+                        <img src={obtenerUrlImagen(libro.imagen)} alt={libro.titulo} className="w-full h-full object-contain block" />
                     </div>
 
                     <div className="flex flex-col flex-grow">
