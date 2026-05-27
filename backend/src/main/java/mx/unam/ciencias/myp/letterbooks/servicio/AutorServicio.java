@@ -1,12 +1,14 @@
 package mx.unam.ciencias.myp.letterbooks.servicio;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mx.unam.ciencias.myp.letterbooks.dto.RegistroAutor;
 import mx.unam.ciencias.myp.letterbooks.modelo.Autor;
 import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
+import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
+import mx.unam.ciencias.myp.letterbooks.seguridad.TokenJWT;
 
 /**
  * Servicio para la gestión y consulta de autores.
@@ -14,16 +16,27 @@ import mx.unam.ciencias.myp.letterbooks.repositorio.AutorRepositorio;
 @Service
 public class AutorServicio {
 
+    private final AutorRepositorio autorRepositorio;
+    private final UsuarioRepositorio usuarioRepositorio;
+    private final TokenJWT tokenJWT;
+
     /**
-     * Repositorio del autor
-     **/
-    @Autowired
-    private AutorRepositorio autorRepositorio;
+     * Constructor único para la inyección de dependencias.
+     * Spring Boot inyectará automáticamente los tres componentes necesarios al arrancar.
+     */
+    public AutorServicio(AutorRepositorio autorRepositorio, 
+                         UsuarioRepositorio usuarioRepositorio, 
+                         TokenJWT tokenJWT) {
+        this.autorRepositorio = autorRepositorio;
+        this.usuarioRepositorio = usuarioRepositorio;
+        this.tokenJWT = tokenJWT;
+    }
 
     /**
      * Obtiene todos los autores disponibles.
      * @return lista de todos los autores
      */
+    @Transactional(readOnly = true)
     public List<Autor> obtenerTodos() {
         return autorRepositorio.findAll();
     }
@@ -33,6 +46,7 @@ public class AutorServicio {
      * @param nombre cadena a buscar
      * @return lista de autores que coinciden
      */
+    @Transactional(readOnly = true)
     public List<Autor> buscarPorNombre(String nombre) {
         return autorRepositorio.encontrarPorNombreContiene(nombre);
     }
@@ -42,22 +56,17 @@ public class AutorServicio {
      * @param idAutor identificador del autor
      * @return el autor encontrado
      */
+    @Transactional(readOnly = true)
     public Autor obtenerPorId(Integer idAutor) {
         return autorRepositorio.encontrarPorId(idAutor)
-            .orElseThrow(() -> new RuntimeException("Autor no encontrado: " + idAutor));
+            .orElseThrow(() -> new IllegalArgumentException("Autor no encontrado: " + idAutor));
     }
 
     /**
      * Registra un nuevo autor en la base de datos aplicando reglas de negocio.
-     * Valida que no exista un autor con el mismo nombre, limpia espacios en blanco,
-     * transforma el DTO {@link RegistroAutor} en la entidad {@link Autor} y la persiste.
-     * @param registro DTO con los datos del formulario enviados desde el Frontend
-     * @return el autor guardado con su ID asignado por la base de datos
-     * @throws IllegalArgumentException si el nombre del autor ya se encuentra registrado
      */
     @Transactional
     public Autor registrar(RegistroAutor registro) {
-
         String nombreLimpio = registro.getNombreAutor().trim();
 
         if (autorRepositorio.existePorNombre(nombreLimpio)) {
@@ -75,18 +84,9 @@ public class AutorServicio {
 
     /**
      * Modifica un autor existente en el sistema verificando los permisos del usuario.
-     * Este método extrae la identidad del operador mediante su token JWT y restringe
-     * la acción de edición en caso de que no cuente con el rol de administrador.
-     *
-     * @param idAutor ID del autor que se desea modificar.
-     * @param registro DTO con los nuevos datos optimizados del formulario.
-     * @param token Token JWT del usuario que intenta realizar la operación.
-     * @return La entidad {@link Autor} con sus campos actualizados en la base de datos.
-     * @throws IllegalArgumentException Si el autor no existe, el usuario no es válido o no tiene permisos.
      */
     @Transactional
     public Autor editar(Integer idAutor, RegistroAutor registro, String token) {
-
         Autor autor = autorRepositorio.encontrarPorId(idAutor)
                 .orElseThrow(() -> new IllegalArgumentException("El autor buscado no existe en la base de datos."));
 
