@@ -6,6 +6,7 @@ import subir from '../estilos/img/iconos/subir.png';
 
 import Navbar from '../componentes/navegacion/navbar/Navbar';
 import Footer from '../componentes/navegacion/footer/Footer';
+import ModalAutor from '../componentes/modals/ModalAgregaAutor';
 import { 
     obtenerAutores, 
     obtenerGeneros, 
@@ -14,10 +15,11 @@ import {
     registrarLibro,
     editarLibro,
     obtenerLibroPorId,
-    crearAutor,
+    registrarAutor,
     crearGenero,
     crearEditorial
 } from '../api/Libros';
+
 
 /**
  * COMPONENTE: RegistrarLibro
@@ -33,13 +35,13 @@ const RegistrarLibro = () => {
 
     // ESTADOS PARA EL FORMULARIO
     const [listaGeneros, setListaGeneros] = useState([]);
-    const [listaAutores, setListaAutores] = useState([]);
     const [listaEditoriales, setListaEditoriales] = useState([]);
+    const [listaAutores, setListaAutores] = useState([]);
 
     const [titulo, setTitulo] = useState('');
     const [idAutor, setIdAutor] = useState('');
-    const [ano, setAno] = useState('2007');
-    const [paginas, setPaginas] = useState('662');
+    const [ano, setAno] = useState('');
+    const [paginas, setPaginas] = useState('');
     const [idGenero, setIdGenero] = useState('');
     const [idEditorial, setIdEditorial] = useState('');
     const [isbn, setIsbn] = useState('');
@@ -49,9 +51,7 @@ const RegistrarLibro = () => {
     const [portada, setPortada] = useState(null);
     const [vistaPrevia, setVistaPrevia] = useState(null);
 
-    // ESTADOS PARA CREACIÓN RÁPIDA DE METADATOS
-    const [creandoAutor, setCreandoAutor] = useState(false);
-    const [nuevoAutorNombre, setNuevoAutorNombre] = useState('');
+    // ESTADOS PARA CREACIÓN RÁPIDA DE METADATOS    
     const [creandoGenero, setCreandoGenero] = useState(false);
     const [nuevoGeneroNombre, setNuevoGeneroNombre] = useState('');
     const [creandoEditorial, setCreandoEditorial] = useState(false);
@@ -60,21 +60,38 @@ const RegistrarLibro = () => {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const cargarAutores = async () => {
+        if (!token) return;
+        try {
+            setCargando(true); 
+            const autores = await obtenerAutores(token);
+            setListaAutores(autores);       
+        } catch (error) {
+            console.error('Error al conectar con el backend:', error);
+            setError('No se pudieron cargar los autores.');
+        } finally {
+            setCargando(false);
+        }
+    };
+
+   useEffect(() => {
         if (!token) return;
 
         const cargarTodo = async () => {
             setCargando(true);
             setError('');
             try {
-                // Cargar catálogos
-                const autores = await obtenerAutores(token);
-                setListaAutores(autores);
-                
-                const generos = await obtenerGeneros(token);
-                setListaGeneros(generos);
+                // Cargar catálogos en paralelo para mejorar rendimiento
+                const [autores, generos, editoriales] = await Promise.all([
+                    obtenerAutores(token),
+                    obtenerGeneros(token),
+                    obtenerEditoriales(token)
+                ]);
 
-                const editoriales = await obtenerEditoriales(token);
+                setListaAutores(autores);
+                setListaGeneros(generos);
                 setListaEditoriales(editoriales);
 
                 // Si estamos editando, cargar los detalles del libro
@@ -94,7 +111,7 @@ const RegistrarLibro = () => {
                         }
                     }
 
-                    // Emparejar autor, género y editorial seleccionados por nombre
+                    // Emparejar selectores
                     const autorNom = libro.nombreAutor || libro.autor?.nombreAutor;
                     const autorEncontrado = autores.find(a => a.nombreAutor === autorNom);
                     if (autorEncontrado) setIdAutor(autorEncontrado.idAutor);
@@ -109,7 +126,7 @@ const RegistrarLibro = () => {
                 }
             } catch (err) {
                 console.error("Error al cargar datos:", err);
-                setError("Error al obtener los detalles del libro o catálogos del servidor.");
+                setError("Error al obtener los detalles del servidor.");
             } finally {
                 setCargando(false);
             }
@@ -123,21 +140,15 @@ const RegistrarLibro = () => {
     }
 
     // MANEJADORES DE CREACIÓN DINÁMICA
-    const handleCrearAutor = async () => {
-        if (!nuevoAutorNombre.trim()) return;
-        try {
-            const nuevo = await crearAutor(nuevoAutorNombre, token);
-            setListaAutores(prev => [...prev, nuevo]);
-            setIdAutor(nuevo.idAutor);
-            setNuevoAutorNombre('');
-            setCreandoAutor(false);
-        } catch (err) {
-            setError(err.message || 'Error al crear el autor');
-        }
-    };
+    const handleAutorGuardado = (nuevoAutorCreado) => {
+	setListaAutores(prev => [...prev, nuevoAutorCreado]);
+        setIdAutor(nuevoAutorCreado.idAutor || nuevoAutorCreado.id); 
+        setIsModalOpen(false);
+  };
 
     const handleCrearGenero = async () => {
-        if (!nuevoGeneroNombre.trim()) return;
+        if (!nuevoGeneroNombre.trim())
+	    return;
         try {
             const nuevo = await crearGenero(nuevoGeneroNombre, token);
             setListaGeneros(prev => [...prev, nuevo]);
@@ -177,7 +188,7 @@ const RegistrarLibro = () => {
         setCargando(true);
         setError('');
 
-        if (!idAutor && !nuevoAutorNombre) {
+        if (!idAutor) {
             setError('Por favor selecciona o crea un autor');
             setCargando(false);
             return;
@@ -218,16 +229,11 @@ const RegistrarLibro = () => {
 
             if (esEdicion) {
                 await editarLibro(id, datosLibro, token);
-                alert("¡Libro actualizado exitosamente!");
                 navigate(`/libro/${id}`);
             } else {
                 await registrarLibro(datosLibro, token);
-                alert("¡Libro registrado exitosamente!");
                 navigate("/biblioteca");
             }
-	    
-            await registrarLibro(datosLibro, token);
-            navigate("/biblioteca");
 
         } catch (err) {
             console.error("Error al procesar libro:", err);
@@ -239,7 +245,7 @@ const RegistrarLibro = () => {
 
     const formularioInvalido =  !titulo.trim() || !idAutor || !ano || !paginas || 
                                 !idGenero || !idEditorial || !isbn || !sinopsis || 
-                                !portada || cargando;
+                                (!portada && !esEdicion) || cargando;
 
     return (
         <div className="bg-crema-fondo min-h-screen dark:bg-dark-fondo transition-colors duration-500 flex flex-col">
@@ -312,47 +318,22 @@ const RegistrarLibro = () => {
                             </div>
 
                             {/* DROPDOWN: Autor */}
-                            <div className="flex flex-col gap-1">
+			    <div className="flex flex-col gap-1">
                                 <div className="flex justify-between items-center h-4">
                                     <label className="font-medium text-xs">Autor *</label>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setCreandoAutor(!creandoAutor)}
-                                        className="text-xs text-[#d4a373] hover:underline font-semibold focus:outline-none"
-                                    >
-                                        {creandoAutor ? 'Seleccionar existente' : '+ Nuevo'}
+                                    <button type="button" onClick={() => setIsModalOpen(true)} className="text-xs text-[#d4a373] hover:underline font-semibold focus:outline-none">
+                                        + Nuevo
                                     </button>
                                 </div>
-                                {creandoAutor ? (
-                                    <div className="flex gap-2">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Nombre del nuevo autor"
-                                            value={nuevoAutorNombre} 
-                                            onChange={(e) => setNuevoAutorNombre(e.target.value)}
-                                            className="flex-grow p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-gold-button"
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={handleCrearAutor}
-                                            className="bg-gold-button text-white px-4 py-2.5 rounded-lg hover:opacity-90 transition-opacity font-medium text-xs"
-                                        >
-                                            Guardar
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <select 
-                                        required value={idAutor} onChange={(e) => setIdAutor(e.target.value)}
-                                        className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-white dark:bg-dark-borde text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gold-button"
-                                    >
-                                        <option value="" disabled>Selecciona un autor</option>
-                                        {listaAutores.map(aut => (
-                                            <option key={aut.idAutor} value={aut.idAutor}>{aut.nombreAutor}</option>
-                                        ))}
-                                    </select>
-                                )}
+                                
+                                <select required value={idAutor} onChange={(e) => setIdAutor(e.target.value)} className="w-full p-2.5 border border-gray-300 dark:border-white/10 rounded-lg bg-white dark:bg-dark-borde text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gold-button">
+                                    <option value="" disabled>Selecciona un autor</option>
+                                    {listaAutores.map(aut => (
+                                        <option key={aut.idAutor} value={aut.idAutor}>{aut.nombreAutor}</option>
+                                    ))}
+                                </select>
                             </div>
-
+			    
                             {/* Año y Páginas */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1">
@@ -570,6 +551,15 @@ const RegistrarLibro = () => {
             </main>
 
             <Footer estaAutenticado={true} />
+
+	    {isModalOpen && (
+               <ModalAutor 
+		   isOpen={isModalOpen} 
+		   onClose={() => setIsModalOpen(false)} 
+		   onSave={handleAutorGuardado} 
+		   token={token}
+	       />
+            )}
         </div>
     );
 };

@@ -223,3 +223,43 @@ export async function editarLibro(idLibro, datosLibro, token) {
     }
     return datos;
 }
+
+/**
+ * Sube una imagen de foto de autor al servidor de almacenamiento.
+ */
+export async function subirFotoAutor(archivo, token) {
+    const formData = new FormData();
+    formData.append('archivo', archivo); // Asegúrate de que tu backend use el nombre 'archivo'
+
+    const respuesta = await fetch(`${URL_BASE}/almacenamiento/imagen/autores`, { // 👈 O la ruta que maneje tu backend para fotos
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    const datos = await respuesta.json().catch(() => ({}));
+    if (!respuesta.ok) {
+        throw new Error(datos.error || 'Error al subir la foto del autor');
+    }
+    return datos.url; // Nos devuelve el string de la URL (ej: "http://.../foto.jpg")
+}
+
+/**
+ * Crea un nuevo autor con todos sus detalles
+ */
+export async function registrarAutor(datosAutor, token) {
+    const respuesta = await fetch(`${URL_BASE}/catalogo/autores`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(datosAutor)
+    });
+    if (!respuesta.ok) {
+        throw new Error('Error al crear el autor');
+    }
+    return await respuesta.json();
+}
