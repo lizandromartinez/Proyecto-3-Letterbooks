@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.dto.Registro;
+import mx.unam.ciencias.myp.letterbooks.dto.RegistroRespuesta;
 import mx.unam.ciencias.myp.letterbooks.modelo.Perfil;
 import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 
@@ -68,10 +69,10 @@ public class UsuarioServicio {
      * </p>
      *
      * @param registro DTO con los datos del usuario a registrar
-     * @return usuario recién creado y persistido en la base de datos
+     * @return DTO con los datos públicos del usuario registrado, sin información sensible
      * @throws IllegalArgumentException si el nombre de usuario o correo ya existen
      */
-    public Usuario registrar(Registro registro) {
+    public RegistroRespuesta registrar(Registro registro) {
 
 	registro.setNombreUsuario(registro.getNombreUsuario().trim());
 	registro.setCorreo(registro.getCorreo().trim().toLowerCase());
@@ -101,7 +102,11 @@ public class UsuarioServicio {
 	Usuario guardado = usuarioRepositorio.save(usuario);	
 	perfilRepositorio.save(crearPerfilPorDefecto(guardado));
 	
-        return guardado;	
+	return new RegistroRespuesta(
+            guardado.getIdUsuario(),
+            guardado.getNombreUsuario(),
+            guardado.getCorreo()
+	);
     }
 
     /**
@@ -130,8 +135,6 @@ public class UsuarioServicio {
 	perfil.setAutor(null);
 	perfil.setGenero(null);
 	perfil.setLibro(null);
-	// perfil.setAvatar("/estilos/img/defecto/avatar.jpg");
-	// perfil.setBanner("/estilos/img/defecto/banner.png");
 	perfil.setFechaRegistro(java.time.LocalDate.now().toString());
 	perfil.setReportes(0);
 	return perfil;

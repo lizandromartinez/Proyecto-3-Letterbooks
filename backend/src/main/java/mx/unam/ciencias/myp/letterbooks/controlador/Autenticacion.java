@@ -2,9 +2,10 @@ package mx.unam.ciencias.myp.letterbooks.controlador;
 
 import mx.unam.ciencias.myp.letterbooks.dto.InicioDeSesion;
 import mx.unam.ciencias.myp.letterbooks.servicio.AutenticacionServicio;
-import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
+// import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.servicio.UsuarioServicio;
 import mx.unam.ciencias.myp.letterbooks.dto.Registro;
+import mx.unam.ciencias.myp.letterbooks.dto.RegistroRespuesta;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,8 +53,8 @@ public class Autenticacion {
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@Valid @RequestBody Registro registro) {	
 	try {	    
-            Usuario usuario = usuarioServicio.registrar(registro);
-            return ResponseEntity.ok(usuario);
+            RegistroRespuesta respuesta = usuarioServicio.registrar(registro);
+            return ResponseEntity.ok(respuesta);
 	} catch (IllegalArgumentException e) {
             return ResponseEntity
 		.badRequest()
