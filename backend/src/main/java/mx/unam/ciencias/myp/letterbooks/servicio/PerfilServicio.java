@@ -252,9 +252,9 @@ public class PerfilServicio {
 
 	if (datos.getBiografia() != null)
             perfil.setBiografia(datos.getBiografia());
-	if (datos.getAvatar() != null)
+	if (datos.getAvatar() != null && !datos.getAvatar().isEmpty())
             perfil.setAvatar(datos.getAvatar());
-	if (datos.getBanner() != null)
+	if (datos.getBanner() != null && !datos.getBanner().isEmpty())
             perfil.setBanner(datos.getBanner());
 	if (datos.getIdAutorFavorito() != null)
             perfil.setAutor(autorRepositorio.encontrarPorId(datos.getIdAutorFavorito())

@@ -83,8 +83,8 @@ function Perfil() {
                 const datosPerfil = await obtenerPerfil(id, tokenGuardado);
                 setPerfil(datosPerfil);
                 setBiografia(datosPerfil.biografia || "");
-                setAvatar(datosPerfil.avatar || "");
-                setBanner(datosPerfil.banner || "");
+                setAvatar(datosPerfil.avatar || null);
+                setBanner(datosPerfil.banner || null);
                 setIdAutorFavorito(datosPerfil.idAutor ? String(datosPerfil.idAutor) : "");
                 setIdGeneroFavorito(datosPerfil.idGenero ? String(datosPerfil.idGenero) : "");
                 setIdLibroFavorito(datosPerfil.idLibro ? String(datosPerfil.idLibro) : "");
@@ -167,7 +167,7 @@ function Perfil() {
             if (archivoAvatar) urlAvatar = await subirImagen(archivoAvatar, token, "avatares");
             if (archivoBanner) urlBanner = await subirImagen(archivoBanner, token, "banners");
             const datos = {
-                biografia, avatar: urlAvatar, banner: urlBanner,
+                biografia, avatar: urlAvatar || null, banner: urlBanner || null,
                 idAutorFavorito: idAutorFavorito ? parseInt(idAutorFavorito) : null,
                 idGeneroFavorito: idGeneroFavorito ? parseInt(idGeneroFavorito) : null,
                 idLibroFavorito: idLibroFavorito ? parseInt(idLibroFavorito) : null,
