@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import EnlaceRuta from '../navegacion/EnlaceRuta';
+import { ContextoSesion } from '../../contexto/Sesion';
+import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import Cita from './Cita';
 import like from '../../estilos/img/iconos/like.png'; 
 import comentarioIcon from '../../estilos/img/iconos/comentario.png';
+import avatarDefecto from '../../estilos/img/defecto/avatar.jpg';
 import { obtenerResenasRecientes } from '../../api/Resenas';
 
 const obtenerUrlImagen = (ruta) => {
@@ -23,24 +27,40 @@ const formatearFecha = (fechaIso) => {
  * Representación visual de una reseña individual.
  */
 const ResenaCard = ({ resena }) => {
+
+    const { token } = useContext(ContextoSesion);
+    const usuarioActual = obtenerUsuarioDelToken(token);
+
+    // Determina la ruta según si es el perfil propio o ajeno
+    const rutaPerfil = usuarioActual === resena.usuario
+        ? "/perfil"
+        : `/usuario/${resena.usuario}`;
+    
     return (
         <div className="bg-white dark:bg-dark-borde p-8 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow duration-300 max-w-3xl mx-auto mb-10">
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                    <img 
-                        src={obtenerUrlImagen(resena.userImg)} 
-                        alt={resena.usuario} 
-                        className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover" 
-                    />
-                    <div className="text-left">
-                        <h4 className="font-bold text-navy-letter dark:text-white leading-tight">
-                            {resena.usuario}
-                        </h4>
-                        <p className="text-gray-400 text-sm">@{resena.arroba}</p>
-                    </div>
-                </div>
-                <span className="text-gray-400 text-xs font-inter">{resena.fecha}</span>
-            </div>
+	    <div className="flex justify-between items-start mb-6">
+		<div className="flex items-center gap-4">
+		    <Link to={rutaPerfil}>
+			<img
+			    src={resena.userImg
+				? `http://localhost:8080${resena.userImg}`
+				: avatarDefecto}
+			    alt={resena.usuario}
+			    className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover hover:border-gold-button hover:scale-105 transition-all duration-200 cursor-pointer"
+			/>
+		    </Link>
+		    <div className="text-left">
+			<Link
+			    to={rutaPerfil}
+			    className="font-bold text-navy-letter dark:text-white leading-tight hover:text-gold-button dark:hover:text-gold-button transition-colors duration-200 cursor-pointer"
+			>
+			    {resena.usuario}
+			</Link>
+			<p className="text-gray-400 text-sm">@{resena.usuario}</p>
+		    </div>
+		</div>
+		<span className="text-gray-400 text-xs font-inter">{resena.fecha}</span>
+	    </div>
 
             <EnlaceRuta 
                 to={`/libro/${resena.idLibro}`}

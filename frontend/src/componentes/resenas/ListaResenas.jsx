@@ -3,6 +3,7 @@ import { obtenerResenas, eliminarResena } from '../../api/Resenas';
 import { ContextoSesion } from '../../contexto/Sesion';
 import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import { obtenerPerfilPublico } from '../../api/Perfil';
+import { Link } from 'react-router-dom';
 import FormularioResena from './FormularioResena';
 import Cita from '../citas/Cita'; 
 import avatarDefecto from '../../estilos/img/defecto/avatar.jpg';
@@ -35,26 +36,37 @@ function TarjetaResena({ resena, usuarioActual, onEditar, onEliminar }) {
         return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
     };
 
+    // Determina la ruta según si es el perfil propio o ajeno
+    const rutaPerfil = usuarioActual === resena.usuario?.nombreUsuario
+        ? "/perfil"
+        : `/usuario/${resena.usuario?.nombreUsuario}`;
+
+    
     return (
         <div className="bg-white dark:bg-dark-borde p-6 sm:p-8 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md transition-all duration-300 max-w-3xl mx-auto mb-6 w-full text-left">
             {/* Cabecera del usuario y fecha */}
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                    <img 
-                        src={avatarUrl} 
-                        alt={resena.usuario?.nombreUsuario} 
-                        className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover" 
-                    />
-                    <div className="text-left">
-                        <h4 className="font-bold text-navy-letter dark:text-white leading-tight">
-                            {resena.usuario?.nombreUsuario}
-                        </h4>
-                        <p className="text-gray-400 text-sm">@{resena.usuario?.nombreUsuario}</p>
-                    </div>
-                </div>
-                <span className="text-gray-400 text-xs font-inter">{formatearFecha(resena.fechaPublicacion)}</span>
-            </div>
-
+	    <div className="flex justify-between items-start mb-6">
+		<div className="flex items-center gap-4">
+		    <Link to={rutaPerfil}>
+			<img
+			    src={avatarUrl}
+			    alt={resena.usuario?.nombreUsuario}
+			    className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover hover:border-gold-button hover:scale-105 transition-all duration-200 cursor-pointer"
+			/>
+		    </Link>
+		    <div className="text-left">
+			<Link
+			    to={rutaPerfil}
+			    className="font-bold text-navy-letter dark:text-white leading-tight hover:text-gold-button dark:hover:text-gold-button transition-colors duration-200 cursor-pointer"
+			>
+			    {resena.usuario?.nombreUsuario}
+			</Link>
+			<p className="text-gray-400 text-sm">@{resena.usuario?.nombreUsuario}</p>
+		    </div>
+		</div>
+		<span className="text-gray-400 text-xs font-inter">{formatearFecha(resena.fechaPublicacion)}</span>
+	    </div>
+	    
             {/* Texto de opinión */}
             <p className="text-black dark:text-white text-left mb-6 font-inter leading-relaxed whitespace-pre-line">
                 {resena.textoResena}
