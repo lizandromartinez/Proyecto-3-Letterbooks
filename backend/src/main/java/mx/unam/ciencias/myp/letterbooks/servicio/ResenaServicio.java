@@ -6,12 +6,14 @@ import mx.unam.ciencias.myp.letterbooks.dto.VistaCitaReciente;
 import mx.unam.ciencias.myp.letterbooks.dto.VistaResenaReciente;
 import mx.unam.ciencias.myp.letterbooks.modelo.Cita;
 import mx.unam.ciencias.myp.letterbooks.modelo.Libro;
+import mx.unam.ciencias.myp.letterbooks.modelo.LikesResena;
 import mx.unam.ciencias.myp.letterbooks.modelo.Perfil;
 import mx.unam.ciencias.myp.letterbooks.modelo.Resena;
 import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
 import mx.unam.ciencias.myp.letterbooks.repositorio.CitaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ComentarioRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.LibroRepositorio;
+import mx.unam.ciencias.myp.letterbooks.repositorio.LikesResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.PerfilRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.ResenaRepositorio;
 import mx.unam.ciencias.myp.letterbooks.repositorio.UsuarioRepositorio;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Servicio encargado de la lógica de negocio para las reseñas.
@@ -53,6 +56,11 @@ public class ResenaServicio {
      */
     private final PerfilRepositorio perfilRepositorio;
 
+    /**
+     * Repositorio de likes en reseñas.
+     */
+    private final LikesResenaRepositorio likesResenaRepositorio;
+
     private final TokenJWT tokenJWT;
 
     /**
@@ -63,6 +71,7 @@ public class ResenaServicio {
      * @param citaRepositorio repositorio para acceder a las citas
      * @param comentarioRepositorio repositorio para acceder a los comentarios
      * @param perfilRepositorio repositorio para acceder a los perfiles
+     * @param likesResenaRepositorio repositorio para acceder a los likes de reseñas
      * @param tokenJWT utilidad para el procesamiento y lectura de firmas JWT
      */
     public ResenaServicio(ResenaRepositorio resenaRepositorio,
@@ -71,6 +80,7 @@ public class ResenaServicio {
                           CitaRepositorio citaRepositorio,
                           ComentarioRepositorio comentarioRepositorio,
                           PerfilRepositorio perfilRepositorio,
+                          LikesResenaRepositorio likesResenaRepositorio,
                           TokenJWT tokenJWT) {
         this.resenaRepositorio = resenaRepositorio;
         this.libroRepositorio = libroRepositorio;
@@ -78,6 +88,7 @@ public class ResenaServicio {
         this.citaRepositorio = citaRepositorio;
         this.comentarioRepositorio = comentarioRepositorio;
         this.perfilRepositorio = perfilRepositorio;
+        this.likesResenaRepositorio = likesResenaRepositorio;
         this.tokenJWT = tokenJWT;
     }
 
@@ -198,17 +209,20 @@ public class ResenaServicio {
      * @return una lista de entidades reseña pertenecientes al libro con sus citas cargadas
      */
     @Transactional(readOnly = true)
-    public List<Resena> obtenerResenasPorLibro(Integer idLibro) {
-        return resenaRepositorio.encontrarPorLibroConCitas(idLibro);
+    public List<Resena> obtenerResenasPorLibro(Integer idLibro, String token) {
+        List<Resena> resenas = resenaRepositorio.encontrarPorLibroConCitas(idLibro);
+        marcarLikesActivos(resenas, token);
+        return resenas;
     }
 
     /**
      * Obtiene las reseñas más recientes con datos del libro, usuario, citas y comentarios.
      * @param limite cantidad máxima de reseñas a devolver
+     * @param token JWT opcional del usuario autenticado
      * @return lista de DTOs para la landing
      */
     @Transactional(readOnly = true)
-    public List<VistaResenaReciente> obtenerRecientes(int limite) {
+    public List<VistaResenaReciente> obtenerRecientes(int limite, String token) {
         int cantidad = Math.max(1, limite);
         List<Resena> resenas = resenaRepositorio.encontrarRecientes(PageRequest.of(0, cantidad));
         List<VistaResenaReciente> resultado = new ArrayList<>();
@@ -246,10 +260,46 @@ public class ResenaServicio {
                 .map(cita -> new VistaCitaReciente(cita.getTexto()))
                 .toList();
             vista.setCitas(citas);
+            vista.setLikeActivo(usuarioDioLike(resena.getIdResena(), token));
             resultado.add(vista);
         }
 
         return resultado;
+    }
+
+    private void marcarLikesActivos(List<Resena> resenas, String token) {
+        Integer idUsuario = obtenerIdUsuarioDesdeToken(token);
+        for (Resena resena : resenas) {
+            if (idUsuario == null) {
+                resena.setLikeActivo(false);
+            } else {
+                resena.setLikeActivo(
+                    likesResenaRepositorio.existePorUsuarioYResena(idUsuario, resena.getIdResena())
+                );
+            }
+        }
+    }
+
+    private boolean usuarioDioLike(Integer idResena, String token) {
+        Integer idUsuario = obtenerIdUsuarioDesdeToken(token);
+        if (idUsuario == null) {
+            return false;
+        }
+        return likesResenaRepositorio.existePorUsuarioYResena(idUsuario, idResena);
+    }
+
+    private Integer obtenerIdUsuarioDesdeToken(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
+        try {
+            String nombreUsuario = tokenJWT.obtenerNombreUsuario(token);
+            return usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
+                .map(Usuario::getIdUsuario)
+                .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -284,5 +334,43 @@ public class ResenaServicio {
         Double nuevoPromedio = calcularPromedioLibro(libro.getIdLibro());
         libro.setPromedioCalificacion(nuevoPromedio);
         libroRepositorio.save(libro);
+    }
+
+    /**
+     * Alterna (agrega o quita) un like de un usuario sobre una reseña.
+     * @param idResena identificador de la reseña a interactuar
+     * @param token JWT del usuario que da clic al botón de me gusta
+     * @return true si el like se agregó, false si se retiró
+     * @throws IllegalArgumentException si el usuario o la reseña no existen
+     */
+    @Transactional
+    public boolean alternarLikeResena(Integer idResena, String token) {
+        String nombreUsuario = tokenJWT.obtenerNombreUsuario(token);
+
+        Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario(nombreUsuario)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+
+        Resena resena = resenaRepositorio.findById(idResena)
+            .orElseThrow(() -> new IllegalArgumentException("Reseña no encontrada."));
+
+        Optional<LikesResena> likeExistente = likesResenaRepositorio
+            .findByUsuario_IdUsuarioAndResena_IdResena(usuario.getIdUsuario(), resena.getIdResena());
+
+        if (likeExistente.isPresent()) {
+            likesResenaRepositorio.delete(likeExistente.get());
+            resena.setLikes(resena.getLikes() - 1);
+            resenaRepositorio.save(resena);
+            return false;
+        }
+
+        LikesResena nuevoLike = new LikesResena();
+        nuevoLike.setUsuario(usuario);
+        nuevoLike.setResena(resena);
+        nuevoLike.setFecha(LocalDate.now().toString());
+        likesResenaRepositorio.save(nuevoLike);
+
+        resena.setLikes(resena.getLikes() + 1);
+        resenaRepositorio.save(resena);
+        return true;
     }
 }

@@ -4,10 +4,9 @@ import EnlaceRuta from '../navegacion/EnlaceRuta';
 import { ContextoSesion } from '../../contexto/Sesion';
 import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import Cita from './Cita';
-import like from '../../estilos/img/iconos/like.png'; 
 import comentarioIcon from '../../estilos/img/iconos/comentario.png';
 import avatarDefecto from '../../estilos/img/defecto/avatar.jpg';
-import { obtenerResenasRecientes } from '../../api/Resenas';
+import { obtenerResenasRecientes, alternarLikeResena } from '../../api/Resenas';
 
 const obtenerUrlImagen = (ruta) => {
     if (!ruta) return 'https://via.placeholder.com/80x120?text=Sin+Portada';
@@ -30,6 +29,34 @@ const ResenaCard = ({ resena }) => {
 
     const { token } = useContext(ContextoSesion);
     const usuarioActual = obtenerUsuarioDelToken(token);
+    const [likesTotales, setLikesTotales] = useState(resena.likes || 0);
+    const [dioLike, setDioLike] = useState(Boolean(resena.likeActivo));
+
+    useEffect(() => {
+        setLikesTotales(resena.likes || 0);
+        setDioLike(Boolean(resena.likeActivo));
+    }, [resena.id, resena.likes, resena.likeActivo]);
+
+    const manejarLike = async () => {
+        if (!token) {
+            alert("Debes iniciar sesión para dar me gusta a una reseña.");
+            return;
+        }
+
+        try {
+            const respuesta = await alternarLikeResena(resena.id, token);
+
+            if (respuesta.likeActivo) {
+                setLikesTotales(likesTotales + 1);
+                setDioLike(true);
+            } else {
+                setLikesTotales(likesTotales - 1);
+                setDioLike(false);
+            }
+        } catch (error) {
+            console.error("Error al registrar el like:", error);
+        }
+    };
 
     // Determina la ruta según si es el perfil propio o ajeno
     const rutaPerfil = usuarioActual === resena.usuario
@@ -103,13 +130,18 @@ const ResenaCard = ({ resena }) => {
             </div>
 
             <div className="flex items-center w-full gap-4 border-t border-gray-50 dark:border-white/5">
-                <button type="button" className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group cursor-pointer">
-                    <img
-                        src={like} 
-                        alt="Icono de Like" 
-                        className="h-5 w-auto dark:invert dark:brightness-200 transition-all group-hover:scale-110"
-                    />
-                    <span className="text-xs font-bold">{resena.likes}</span>
+                <button
+                    type="button"
+                    className={`flex items-center gap-1.5 transition-colors group cursor-pointer ${
+                        dioLike ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                    }`}
+                    onClick={manejarLike}
+                    title="Me gusta"
+                >
+                    <span className="text-base group-hover:scale-110 transition-transform">
+                        {dioLike ? '♥' : '♡'}
+                    </span>
+                    <span className="text-xs font-bold">{likesTotales}</span>
                 </button>
                 
                 <button type="button" className="flex items-center gap-1.5 text-gray-400 hover:text-navy-letter dark:hover:text-white transition-colors group cursor-pointer">
@@ -139,6 +171,7 @@ const ResenaCard = ({ resena }) => {
  * Gestiona el conjunto de datos y el layout de la sección.
  */
 const ResenasRecientes = () => {
+    const { token } = useContext(ContextoSesion);
     const [resenas, setResenas] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
@@ -148,7 +181,7 @@ const ResenasRecientes = () => {
             try {
                 setCargando(true);
                 setError(null);
-                const data = await obtenerResenasRecientes(5);
+                const data = await obtenerResenasRecientes(5, token);
                 const mapeadas = data.map((resena) => ({
                     id: resena.idResena,
                     idLibro: resena.idLibro,
@@ -164,6 +197,7 @@ const ResenasRecientes = () => {
                     comentario: resena.textoResena,
                     citas: resena.citas ?? [],
                     likes: resena.likes ?? 0,
+                    likeActivo: resena.likeActivo ?? false,
                     comments: resena.totalComentarios ?? 0,
                 }));
                 setResenas(mapeadas);
@@ -176,7 +210,7 @@ const ResenasRecientes = () => {
         };
 
         cargarResenas();
-    }, []);
+    }, [token]);
 
     return (
         <section className="py-20 px-10 bg-[#FDF8F3] dark:bg-dark-fondo transition-colors duration-300">

@@ -61,6 +61,10 @@ public class Resena {
     /* Citas asociadas a la reseña. */
     @OneToMany(mappedBy = "resena", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cita> citas = new ArrayList<>();
+
+    /* Indica si el usuario autenticado ya dio like (no persistido en BD). */
+    @Transient
+    private Boolean likeActivo = false;
     
     /* Lista de comentarios asociados. */
     @JsonIgnore
@@ -225,6 +229,22 @@ public class Resena {
      */
     public void setCitas(List<Cita> citas) {
         this.citas = citas;
+    }
+
+    /**
+     * Indica si el usuario autenticado ya dio like a esta reseña.
+     * @return likeActivo true si el usuario ya dio like
+     */
+    public Boolean getLikeActivo() {
+        return likeActivo;
+    }
+
+    /**
+     * Define si el usuario autenticado ya dio like a esta reseña.
+     * @param likeActivo estado del like para el usuario actual
+     */
+    public void setLikeActivo(Boolean likeActivo) {
+        this.likeActivo = likeActivo;
     }
     
     /**

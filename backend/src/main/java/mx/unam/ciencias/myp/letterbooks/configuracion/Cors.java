@@ -30,7 +30,11 @@ public class Cors {
         CorsConfiguration configuracion = new CorsConfiguration();
 
 	//Permitir solicitudes desde el frontend
-        configuracion.setAllowedOrigins(Arrays.asList("http://localhost","http://localhost:3000"));
+        configuracion.setAllowedOrigins(Arrays.asList(
+            "http://localhost",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000"
+        ));
         configuracion.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
         configuracion.setAllowedHeaders(Arrays.asList("*"));
         configuracion.setAllowCredentials(true);

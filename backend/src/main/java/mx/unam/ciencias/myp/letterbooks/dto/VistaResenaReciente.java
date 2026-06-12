@@ -21,6 +21,7 @@ public class VistaResenaReciente {
     private String textoResena;
     private Integer likes;
     private Integer totalComentarios;
+    private Boolean likeActivo = false;
     private List<VistaCitaReciente> citas = new ArrayList<>();
 
     public Integer getIdResena() {
@@ -125,6 +126,14 @@ public class VistaResenaReciente {
 
     public void setTotalComentarios(Integer totalComentarios) {
         this.totalComentarios = totalComentarios;
+    }
+
+    public Boolean getLikeActivo() {
+        return likeActivo;
+    }
+
+    public void setLikeActivo(Boolean likeActivo) {
+        this.likeActivo = likeActivo;
     }
 
     public List<VistaCitaReciente> getCitas() {

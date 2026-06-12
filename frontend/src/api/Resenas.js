@@ -1,15 +1,22 @@
 import axios from 'axios';
+import { obtenerTokenSesion } from '../utilidades/DecodificadorToken';
 
 const URL_BASE = 'http://localhost:8080/api/resenas';
+
+const encabezadoAuth = (token) => {
+    const tokenActivo = obtenerTokenSesion(token);
+    return tokenActivo ? { Authorization: `Bearer ${tokenActivo}` } : {};
+};
 
 /**
  * Consulta las reseñas más recientes para la landing page (público).
  * @param {number} limite cantidad máxima de reseñas.
  * @return {Promise<Array>} lista de reseñas recientes.
  */
-export const obtenerResenasRecientes = async (limite = 5) => {
+export const obtenerResenasRecientes = async (limite = 5, token = null) => {
     const respuesta = await axios.get(`${URL_BASE}/recientes`, {
-        params: { limite }
+        params: { limite },
+        headers: encabezadoAuth(token)
     });
     return respuesta.data;
 };
@@ -21,7 +28,7 @@ export const obtenerResenasRecientes = async (limite = 5) => {
  */
 export const obtenerResenas = async (idLibro, token) => {
     const respuesta = await axios.get(`${URL_BASE}/libro/${idLibro}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
+        headers: encabezadoAuth(token)
     });
     return respuesta.data;
 };
@@ -61,6 +68,19 @@ export const editarResena = async (idResena, datosResena, token) => {
  */
 export const eliminarResena = async (idResena, token) => {
     const respuesta = await axios.delete(`${URL_BASE}/${idResena}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return respuesta.data;
+};
+
+/**
+ * Alterna el estado de un "Me gusta" de una reseña.
+ * @param {number} idResena id de la reseña.
+ * @param {string} token token JWT del usuario activo.
+ * @return {Promise<Object>} objeto con el estado actualizado { likeActivo: boolean }.
+ */
+export const alternarLikeResena = async (idResena, token) => {
+    const respuesta = await axios.post(`${URL_BASE}/${idResena}/like`, {}, {
         headers: { Authorization: `Bearer ${token}` }
     });
     return respuesta.data;

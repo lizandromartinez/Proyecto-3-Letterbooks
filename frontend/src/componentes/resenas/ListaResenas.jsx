@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { obtenerResenas, eliminarResena } from '../../api/Resenas';
+import { obtenerResenas, eliminarResena, alternarLikeResena } from '../../api/Resenas';
 import { ContextoSesion } from '../../contexto/Sesion';
 import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import { obtenerPerfilPublico } from '../../api/Perfil';
@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import FormularioResena from './FormularioResena';
 import Cita from '../citas/Cita'; 
 import avatarDefecto from '../../estilos/img/defecto/avatar.jpg';
-import likeIcon from '../../estilos/img/iconos/like.png';
 import './ListaResenas.css';
 
 /**
@@ -15,7 +14,15 @@ import './ListaResenas.css';
  * Gestiona de forma local la consulta del avatar para no sobrecargar el endpoint principal.
  */
 function TarjetaResena({ resena, usuarioActual, onEditar, onEliminar }) {
+    const { token } = useContext(ContextoSesion);
     const [avatarUrl, setAvatarUrl] = useState(avatarDefecto);
+    const [likesTotales, setLikesTotales] = useState(resena.likes || 0);
+    const [dioLike, setDioLike] = useState(Boolean(resena.likeActivo));
+
+    useEffect(() => {
+        setLikesTotales(resena.likes || 0);
+        setDioLike(Boolean(resena.likeActivo));
+    }, [resena.idResena, resena.likes, resena.likeActivo]);
 
     useEffect(() => {
         if (resena.usuario?.nombreUsuario) {
@@ -40,6 +47,27 @@ function TarjetaResena({ resena, usuarioActual, onEditar, onEliminar }) {
     const rutaPerfil = usuarioActual === resena.usuario?.nombreUsuario
         ? "/perfil"
         : `/usuario/${resena.usuario?.nombreUsuario}`;
+
+    const manejarLike = async () => {
+        if (!token) {
+            alert("Debes iniciar sesión para dar me gusta a una reseña.");
+            return;
+        }
+
+        try {
+            const respuesta = await alternarLikeResena(resena.idResena, token);
+
+            if (respuesta.likeActivo) {
+                setLikesTotales(likesTotales + 1);
+                setDioLike(true);
+            } else {
+                setLikesTotales(likesTotales - 1);
+                setDioLike(false);
+            }
+        } catch (error) {
+            console.error("Error al registrar el like:", error);
+        }
+    };
 
     
     return (
@@ -84,14 +112,17 @@ function TarjetaResena({ resena, usuarioActual, onEditar, onEliminar }) {
             {/* Pie con likes, calificación y acciones de autoría */}
             <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-50 dark:border-white/5">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-1.5 text-gray-400">
-                        <img
-                            src={likeIcon} 
-                            alt="Me gusta" 
-                            className="h-5 w-auto dark:invert dark:brightness-200"
-                        />
-                        <span className="text-xs font-bold">{resena.likes || 0}</span>
-                    </div>
+                    <button
+                        type="button"
+                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                            dioLike ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                        }`}
+                        onClick={manejarLike}
+                        title="Me gusta"
+                    >
+                        <span className="text-base">{dioLike ? '♥' : '♡'}</span>
+                        <span className="text-xs font-bold">{likesTotales}</span>
+                    </button>
 
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-400 font-inter font-medium">

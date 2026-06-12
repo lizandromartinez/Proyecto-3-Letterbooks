@@ -171,14 +171,15 @@ public class DatosIniciales implements CommandLineRunner {
     }
 
     private Usuario guardarUsuarioDemo() {
-        return usuarioRepositorio.encontrarPorNombreUsuario("ana_lee")
+        Usuario usuario = usuarioRepositorio.encontrarPorNombreUsuario("ana_lee")
             .orElseGet(() -> {
-                Usuario usuario = new Usuario();
-                usuario.setNombreUsuario("ana_lee");
-                usuario.setCorreo("ana.lee@letterbooks.demo");
-                usuario.setContrasena(codificadorContrasena.encode("demo1234"));
-                return usuarioRepositorio.save(usuario);
+                Usuario nuevo = new Usuario();
+                nuevo.setNombreUsuario("ana_lee");
+                nuevo.setCorreo("ana.lee@letterbooks.demo");
+                return nuevo;
             });
+        usuario.setContrasena(codificadorContrasena.encode("demo1234"));
+        return usuarioRepositorio.save(usuario);
     }
 
     private void guardarPerfilDemo(Usuario usuario, Autor autorFavorito, Genero generoFavorito, Libro libroFavorito) {

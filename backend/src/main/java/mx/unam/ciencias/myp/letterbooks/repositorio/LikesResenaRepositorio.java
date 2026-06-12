@@ -1,6 +1,7 @@
 package mx.unam.ciencias.myp.letterbooks.repositorio;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +42,12 @@ public interface LikesResenaRepositorio extends JpaRepository<LikesResena, Integ
      */
     @Query("SELECT COUNT(l) > 0 FROM LikesResena l WHERE l.usuario.idUsuario = :idUsuario AND l.resena.idResena = :idResena")
     boolean existePorUsuarioYResena(@Param("idUsuario") Integer idUsuario, @Param("idResena") Integer idResena);
+
+    /**
+     * Busca si un usuario ya le dio like a una reseña específica.
+     * @param idUsuario id del usuario
+     * @param idResena id de la reseña
+     * @return un Optional con el Like si existe
+     */
+    Optional<LikesResena> findByUsuario_IdUsuarioAndResena_IdResena(Integer idUsuario, Integer idResena);
 }

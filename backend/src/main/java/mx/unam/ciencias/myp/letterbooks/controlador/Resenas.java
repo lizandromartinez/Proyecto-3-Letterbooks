@@ -5,12 +5,14 @@ import mx.unam.ciencias.myp.letterbooks.dto.VistaResenaReciente;
 import mx.unam.ciencias.myp.letterbooks.modelo.Resena;
 import mx.unam.ciencias.myp.letterbooks.servicio.ResenaServicio;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador REST para exponer los endpoints de gestión de reseñas.
@@ -39,8 +41,11 @@ public class Resenas {
      * @return respuesta HTTP 200 con la lista de reseñas asociadas al libro
      */
     @GetMapping("/libro/{idLibro}")
-    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(@PathVariable("idLibro") Integer idLibro) {
-        List<Resena> resenas = resenaServicio.obtenerResenasPorLibro(idLibro);
+    public ResponseEntity<List<Resena>> obtenerResenasPorLibro(
+            @PathVariable("idLibro") Integer idLibro,
+            @RequestHeader(value = "Authorization", required = false) String encabezadoAutorizacion) {
+        String token = extraerTokenOpcional(encabezadoAutorizacion);
+        List<Resena> resenas = resenaServicio.obtenerResenasPorLibro(idLibro, token);
         return ResponseEntity.ok(resenas);
     }
 
@@ -51,8 +56,10 @@ public class Resenas {
      */
     @GetMapping("/recientes")
     public ResponseEntity<List<VistaResenaReciente>> obtenerResenasRecientes(
-            @RequestParam(value = "limite", defaultValue = "5") int limite) {
-        return ResponseEntity.ok(resenaServicio.obtenerRecientes(limite));
+            @RequestParam(value = "limite", defaultValue = "5") int limite,
+            @RequestHeader(value = "Authorization", required = false) String encabezadoAutorizacion) {
+        String token = extraerTokenOpcional(encabezadoAutorizacion);
+        return ResponseEntity.ok(resenaServicio.obtenerRecientes(limite, token));
     }
 
     /**
@@ -124,6 +131,30 @@ public class Resenas {
     }
 
     /**
+     * Endpoint protegido para alternar el "Me gusta" de una reseña.
+     * @param idResena el identificador de la reseña
+     * @param encabezadoAutorizacion el encabezado HTTP con el token JWT
+     * @return objeto JSON con el nuevo estado del like (likeActivo: true/false)
+     */
+    @PostMapping("/{idResena}/like")
+    public ResponseEntity<?> alternarLikeResena(
+            @PathVariable("idResena") Integer idResena,
+            @RequestHeader("Authorization") String encabezadoAutorizacion) {
+        try {
+            String token = extraerToken(encabezadoAutorizacion);
+            boolean estadoLike = resenaServicio.alternarLikeResena(idResena, token);
+            return ResponseEntity.ok(Map.of("likeActivo", estadoLike));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body("Solicitud de like duplicada.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor al procesar el like.");
+        }
+    }
+
+    /**
      * Extrae de forma segura el token JWT del encabezado HTTP Authorization.
      * @param encabezado el valor crudo del encabezado de la petición
      * @return la cadena de texto con el token limpio
@@ -134,5 +165,12 @@ public class Resenas {
             throw new IllegalArgumentException("Token de autorización inválido o ausente.");
         }
         return encabezado.substring(7);
+    }
+
+    private String extraerTokenOpcional(String encabezado) {
+        if (encabezado != null && encabezado.startsWith("Bearer ")) {
+            return encabezado.substring(7);
+        }
+        return null;
     }
 }
