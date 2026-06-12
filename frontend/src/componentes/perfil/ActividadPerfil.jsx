@@ -1,5 +1,6 @@
 import { resolverUrlImagen } from "../../utilidades/resolverUrlImagen";
 import MensajeVacio from "../comunes/MensajeVacio";
+import { Link } from 'react-router-dom';
 
 /**
  * Componente que muestra la actividad del usuario organizada en tabs.
@@ -100,27 +101,37 @@ function ActividadPerfil({ perfil, tabActiva, setTabActiva, tituloSeccion = "Act
             {/* Libros calificados */}
             {tabActiva === "libros" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
-                        <div key={l.idLibro} className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200">
-                            {l.imagen ? (
-                                <img src={resolverUrlImagen(l.imagen, null)} alt={l.titulo} className="w-14 h-20 object-cover rounded-lg flex-shrink-0" />
-                            ) : (
-                                <div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-2xl">📖</span>
-                                </div>
-                            )}
-                            <div className="flex flex-col justify-between flex-1">
-                                <div>
-                                    <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight">{l.titulo}</p>
-                                    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">{l.autor}</p>
-                                </div>
-                                <div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
-                                    <span className="text-gold-button text-xs">★</span>
-                                    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/5</span>
-                                </div>
-                            </div>
-                        </div>
-                    )) : <div className="col-span-2"><MensajeVacio texto="Aún no ha calificado ningún libro" /></div>}
+		    {perfil.librosCalificados?.length > 0 ? perfil.librosCalificados.map(l => (
+			<Link
+			    key={l.idLibro}
+			    to={`/libro/${l.idLibro}`}
+			    className="bg-white dark:bg-dark-borde rounded-xl border border-gray-100 dark:border-white/5 p-4 flex gap-4 hover:shadow-md transition-shadow duration-200 group cursor-pointer"
+			>
+			    {l.imagen ? (
+				<img
+				    src={resolverUrlImagen(l.imagen, null)}
+				    alt={l.titulo}
+				    className="w-14 h-20 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
+				/>
+			    ) : (
+				<div className="w-14 h-20 bg-gray-100 dark:bg-dark-fondo rounded-lg flex-shrink-0 flex items-center justify-center">
+				    <span className="text-2xl">📖</span>
+				</div>
+			    )}
+			    <div className="flex flex-col justify-between flex-1">
+				<div>
+				    <p className="font-cormorant text-base font-bold text-navy-letter dark:text-gray-100 leading-tight group-hover:text-gold-button transition-colors duration-200">
+					{l.titulo}
+				    </p>
+				    <p className="font-inter text-xs text-gray-400 dark:text-gray-500 mt-0.5">{l.autor}</p>
+				</div>
+				<div className="flex items-center gap-1 bg-gold-button/10 px-2 py-0.5 rounded-full w-fit">
+				    <span className="text-gold-button text-xs">★</span>
+				    <span className="font-inter font-bold text-gold-button text-xs">{l.calificacion}/5</span>
+				</div>
+			    </div>
+			</Link>
+		    )) : <div className="col-span-2"><MensajeVacio texto="Aún no ha calificado ningún libro" /></div>}
                 </div>
             )}
 

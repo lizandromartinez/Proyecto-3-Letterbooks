@@ -1,4 +1,5 @@
 import { resolverUrlImagen } from "../../utilidades/resolverUrlImagen";
+import { Link } from 'react-router-dom';
 
 /**
  * Componente que muestra los favoritos literarios del usuario.
@@ -41,35 +42,38 @@ function FavoritosPerfil({ perfil }) {
                     <span className="text-gold-button">♥</span>
                     <p className="font-inter text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">Libro favorito</p>
                 </div>
-                {perfil.libroFavorito && perfil.libroFavorito !== "Ninguno" ? (
-                    <div className="flex items-start gap-4">
-                        <div className="w-16 h-24 bg-gray-200 dark:bg-dark-fondo rounded-lg overflow-hidden flex-shrink-0">
-                            {perfil.imagenLibroFavorito ? (
-                                <img
-                                    src={resolverUrlImagen(perfil.imagenLibroFavorito, null)}
-                                    alt={perfil.libroFavorito}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <span className="text-2xl">📖</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex flex-col justify-start gap-1">
-                            <p className="font-cormorant text-xl font-bold text-navy-letter dark:text-gray-100 leading-tight">
-                                {perfil.libroFavorito}
-                            </p>
-                            {perfil.autorLibroFavorito && (
-                                <p className="font-inter text-sm text-gray-500 dark:text-gray-400">
-                                    {perfil.autorLibroFavorito}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <p className="text-gray-400 font-inter text-sm">No definido</p>
-                )}
+		{perfil.libroFavorito && perfil.libroFavorito !== "Ninguno" ? (
+		    <Link
+			to={`/libro/${perfil.idLibro}`}
+			className="flex items-start gap-4 group cursor-pointer"
+		    >
+			<div className="w-16 h-24 bg-gray-200 dark:bg-dark-fondo rounded-lg overflow-hidden flex-shrink-0 group-hover:shadow-md transition-shadow duration-200">
+			    {perfil.imagenLibroFavorito ? (
+				<img
+				    src={resolverUrlImagen(perfil.imagenLibroFavorito, null)}
+				    alt={perfil.libroFavorito}
+				    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+				/>
+			    ) : (
+				<div className="w-full h-full flex items-center justify-center">
+				    <span className="text-2xl">📖</span>
+				</div>
+			    )}
+			</div>
+			<div className="flex flex-col justify-start gap-1">
+			    <p className="font-cormorant text-xl font-bold text-navy-letter dark:text-gray-100 leading-tight group-hover:text-gold-button transition-colors duration-200">
+				{perfil.libroFavorito}
+			    </p>
+			    {perfil.autorLibroFavorito && (
+				<p className="font-inter text-sm text-gray-500 dark:text-gray-400">
+				    {perfil.autorLibroFavorito}
+				</p>
+			    )}
+			</div>
+		    </Link>
+		) : (
+		    <p className="text-gray-400 font-inter text-sm">No definido</p>
+		)}
             </div>
         </div>
     );
