@@ -220,7 +220,7 @@ function Perfil() {
 
     return (
         <div className="min-h-screen bg-crema-fondo dark:bg-dark-fondo transition-colors duration-500">
-            <Navbar estaAutenticado={true} />
+            <Navbar estaAutenticado={true} avatarUrl={perfil?.avatar} />
             <div className="py-8 px-4">
                 <div className="max-w-4xl mx-auto bg-white dark:bg-dark-borde rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-white/5">
                     <BannerPerfil perfil={perfil} botones={!editando ? botones : null} />

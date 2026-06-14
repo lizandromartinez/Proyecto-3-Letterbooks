@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Logo from '../../comunes/Logo';
 import NavLink from './NavLink';
 import AccionRecomendada from '../../comunes/AccionRecomendada';
+import EnlaceAvatarPerfil from './EnlaceAvatarPerfil';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -9,8 +10,9 @@ import { useNavigate } from 'react-router-dom';
  * Gestiona el estado del menú colapsable para móviles y adapta las opciones
  * de navegación dependiendo de si el usuario está autenticado o no.
  * @param {boolean} estaAutenticado - Prop que define qué conjunto de enlaces mostrar.
+ * @param {string|null} avatarUrl - Ruta del avatar para actualización inmediata en la página de perfil.
  */
-const Navbar = ({ estaAutenticado = false }) => {
+const Navbar = ({ estaAutenticado = false, avatarUrl }) => {
     // Estado local para controlar la apertura/cierre del menú en dispositivos móviles.
     const [isOpen, setIsOpen] = useState(false);
 
@@ -65,9 +67,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <NavLink href="/dashboard">Explorar</NavLink>
                             <NavLink href="/biblioteca">Biblioteca</NavLink>
                             <NavLink href="/registrarLibro">Nuevo Libro</NavLink>
-                            <AccionRecomendada href="/perfil" variante="primario">
-                                Mi Perfil
-                            </AccionRecomendada>
+                            <EnlaceAvatarPerfil avatarUrl={avatarUrl} />
                         </>
                     )}
                 </div>
@@ -93,9 +93,7 @@ const Navbar = ({ estaAutenticado = false }) => {
                             <NavLink href="/dashboard" esMovil onClick={cerrarMenu}>Explorar</NavLink>
                             <NavLink href="/biblioteca" esMovil onClick={cerrarMenu}>Biblioteca</NavLink>
                             <NavLink href="/registrarLibro" esMovil onClick={cerrarMenu}>Nuevo Libro</NavLink>
-                            <AccionRecomendada href="/perfil" variante="outline" esMovil onClick={cerrarMenu}>
-                                Mi Perfil
-                            </AccionRecomendada>
+                            <EnlaceAvatarPerfil avatarUrl={avatarUrl} onClick={cerrarMenu} />
                         </>
                     )}
                 </div>
