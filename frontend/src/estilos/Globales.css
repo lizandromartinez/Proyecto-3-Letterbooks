@@ -1,6 +1,5 @@
-/* frontend/src/estilos/Globales.css */
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&family=Lato:wght@300;400;700&display=swap');
+@import "tailwindcss";
 
 @theme {
   --color-crema-fondo: #FDF8F3;
@@ -35,6 +34,20 @@
   /* Variables originales */
   --color-crema: #f5f5f1;
   --color-azul:  #1a2b3c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:          #121212;
+    --card-bg:     #1E1E1E;
+    --navy:        #e5e7eb;
+    --gold:        #d4a049;
+    --text:        #e5e7eb;
+    --muted:       #9ca3af;
+    --border:      rgba(255, 255, 255, 0.12);
+    --input-bg:    #121212;
+    --shadow:      0 4px 24px rgba(0, 0, 0, 0.35);
+  }
 }
 
 /* ── Estilos Base ── */

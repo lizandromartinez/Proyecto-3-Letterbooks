@@ -37,7 +37,8 @@ public class TokenJWT {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", usuario.getRol().name());
         claims.put("nombre_usuario", usuario.getNombreUsuario());
-
+	claims.put("id_usuario", usuario.getIdUsuario());
+	
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(usuario.getNombreUsuario()) 

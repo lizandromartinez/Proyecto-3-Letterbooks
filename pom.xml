@@ -68,6 +68,7 @@
         <configuration>
           <compilerArgument>-Xlint:deprecation</compilerArgument>
           <compilerArgument>-Xlint:unchecked</compilerArgument>
+          <parameters>true</parameters>
           <debug>true</debug>
           <debuglevel>lines,vars,source</debuglevel>
           <showDeprecation>true</showDeprecation>
@@ -215,6 +216,11 @@
       <artifactId>jjwt-jackson</artifactId>
       <version>0.11.5</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

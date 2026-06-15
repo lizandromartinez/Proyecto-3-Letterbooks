@@ -1,44 +1,106 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import EnlaceRuta from '../navegacion/EnlaceRuta';
+import { ContextoSesion } from '../../contexto/Sesion';
+import { obtenerUsuarioDelToken } from '../../utilidades/DecodificadorToken';
 import Cita from './Cita';
-import like from '../../estilos/img/iconos/like.png'; 
-import comentarioIcon from '../../estilos/img/iconos/comentario.png'; 
-import mujerImg from '../../estilos/img/imagenes-ejemplo/mujer_random.png';
-import libroCienAnos from '../../estilos/img/imagenes-ejemplo/cienAñosDeSoledad.png';
+import comentarioIcon from '../../estilos/img/iconos/comentario.png';
+import avatarDefecto from '../../estilos/img/defecto/avatar.jpg';
+import { obtenerResenasRecientes, alternarLikeResena } from '../../api/Resenas';
+
+const obtenerUrlImagen = (ruta) => {
+    if (!ruta) return 'https://via.placeholder.com/80x120?text=Sin+Portada';
+    if (ruta.startsWith('http')) return ruta;
+    return `http://localhost:8080${ruta}`;
+};
+
+const formatearFecha = (fechaIso) => {
+    if (!fechaIso) return '';
+    const fecha = new Date(fechaIso);
+    if (Number.isNaN(fecha.getTime())) return fechaIso;
+    return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+};
 
 /**
  * COMPONENTE: ResenaCard
  * Representación visual de una reseña individual.
- * @param {Object} resena - Objeto con toda la información de la reseña.
  */
 const ResenaCard = ({ resena }) => {
+
+    const { token } = useContext(ContextoSesion);
+    const usuarioActual = obtenerUsuarioDelToken(token);
+    const [likesTotales, setLikesTotales] = useState(resena.likes || 0);
+    const [dioLike, setDioLike] = useState(Boolean(resena.likeActivo));
+
+    useEffect(() => {
+        setLikesTotales(resena.likes || 0);
+        setDioLike(Boolean(resena.likeActivo));
+    }, [resena.id, resena.likes, resena.likeActivo]);
+
+    const manejarLike = async () => {
+        if (!token) {
+            alert("Debes iniciar sesión para dar me gusta a una reseña.");
+            return;
+        }
+
+        try {
+            const respuesta = await alternarLikeResena(resena.id, token);
+
+            if (respuesta.likeActivo) {
+                setLikesTotales(likesTotales + 1);
+                setDioLike(true);
+            } else {
+                setLikesTotales(likesTotales - 1);
+                setDioLike(false);
+            }
+        } catch (error) {
+            console.error("Error al registrar el like:", error);
+        }
+    };
+
+    // Determina la ruta según si es el perfil propio o ajeno
+    const rutaPerfil = usuarioActual === resena.usuario
+        ? "/perfil"
+        : `/usuario/${resena.usuario}`;
+    
     return (
         <div className="bg-white dark:bg-dark-borde p-8 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow duration-300 max-w-3xl mx-auto mb-10">
-            
-            {/* CABECERA: Información del usuario y fecha */}
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                    <img 
-                        src={resena.userImg} 
-                        alt={resena.usuario} 
-                        className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover" 
-                    />
-                    <div className="text-left">
-                        <h4 className="font-bold text-navy-letter dark:text-white leading-tight">
-                            {resena.usuario}
-                        </h4>
-                        <p className="text-gray-400 text-sm">@{resena.arroba}</p>
-                    </div>
-                </div>
-                <span className="text-gray-400 text-xs font-inter">{resena.fecha}</span>
-            </div>
+	    <div className="flex justify-between items-start mb-6">
+		<div className="flex items-center gap-4">
+		    <Link to={rutaPerfil}>
+			<img
+			    src={resena.userImg
+				? `http://localhost:8080${resena.userImg}`
+				: avatarDefecto}
+			    alt={resena.usuario}
+			    className="w-12 h-12 rounded-full border-2 border-gold-button/20 object-cover hover:border-gold-button hover:scale-105 transition-all duration-200 cursor-pointer"
+			/>
+		    </Link>
+		    <div className="text-left">
+			<Link
+			    to={rutaPerfil}
+			    className="font-bold text-navy-letter dark:text-white leading-tight hover:text-gold-button dark:hover:text-gold-button transition-colors duration-200 cursor-pointer"
+			>
+			    {resena.usuario}
+			</Link>
+			<p className="text-gray-400 text-sm">@{resena.usuario}</p>
+		    </div>
+		</div>
+		<span className="text-gray-400 text-xs font-inter">{resena.fecha}</span>
+	    </div>
 
-            {/* INFO LIBRO: Enlace visual al detalle del libro reseñado */}
-            <a 
-                href={`/libro/${resena.id}`} 
+            <EnlaceRuta 
+                to={`/libro/${resena.idLibro}`}
+                state={{ libroData: {
+                    idLibro: resena.idLibro,
+                    titulo: resena.libro,
+                    imagen: resena.libroImg,
+                    nombreAutor: resena.autor,
+                } }}
                 className="flex gap-4 mb-6 p-4 bg-[#dedfe0] dark:bg-white/5 rounded-2xl border border-gold-button/5 hover:bg-[#c7c7c7] transition-all duration-300"
             >
                 <img 
-                    src={resena.libroImg} 
+                    src={obtenerUrlImagen(resena.libroImg)} 
                     alt={resena.libro} 
                     className="w-14 h-20 object-cover rounded-lg shadow-sm" 
                 />
@@ -47,19 +109,16 @@ const ResenaCard = ({ resena }) => {
                         {resena.libro}
                     </h5>
                     <p className="text-gray-500 text-xs mb-2">{resena.autor}</p>
-                    {/* Renderizado dinámico de estrellas (Rating) */}
                     <div className="flex text-gold-button text-xs">
                         {"★".repeat(resena.estrellas)}{"☆".repeat(5 - resena.estrellas)}
                     </div>
                 </div>
-            </a>
+            </EnlaceRuta>
 
-            {/* CUERPO: Comentario principal del usuario */}
             <p className="text-black dark:text-white text-left mb-6 font-inter leading-relaxed">
                 {resena.comentario}
             </p>
 
-            {/* SECCIÓN DE CITAS: Mapeo del componente modular 'Cita' */}
             <div className="space-y-2 mb-6">
                 {resena.citas && resena.citas.map((item, index) => (
                     <Cita 
@@ -70,20 +129,22 @@ const ResenaCard = ({ resena }) => {
                 ))}
             </div>
 
-            {/* FOOTER: Botones de interacción (Like y Comentarios) */}
             <div className="flex items-center w-full gap-4 border-t border-gray-50 dark:border-white/5">
-                {/* Botón Me Gusta (Like) */}
-                <button className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group cursor-pointer">
-                    <img
-                        src={like} 
-                        alt="Icono de Like" 
-                        className="h-5 w-auto dark:invert dark:brightness-200 transition-all group-hover:scale-110"
-                    />
-                    <span className="text-xs font-bold">{resena.likes}</span>
+                <button
+                    type="button"
+                    className={`flex items-center gap-1.5 transition-colors group cursor-pointer ${
+                        dioLike ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                    }`}
+                    onClick={manejarLike}
+                    title="Me gusta"
+                >
+                    <span className="text-base group-hover:scale-110 transition-transform">
+                        {dioLike ? '♥' : '♡'}
+                    </span>
+                    <span className="text-xs font-bold">{likesTotales}</span>
                 </button>
                 
-                {/* Botón Comentar */}
-                <button className="flex items-center gap-1.5 text-gray-400 hover:text-navy-letter dark:hover:text-white transition-colors group cursor-pointer">
+                <button type="button" className="flex items-center gap-1.5 text-gray-400 hover:text-navy-letter dark:hover:text-white transition-colors group cursor-pointer">
                     <img
                         src={comentarioIcon} 
                         alt="Icono de Comentario" 
@@ -92,12 +153,10 @@ const ResenaCard = ({ resena }) => {
                     <span className="text-xs font-bold">{resena.comments}</span>
                 </button>
 
-                {/* Contenedor de Calificación - Empujado al extremo derecho con ml-auto */}
                 <div className="ml-auto flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-inter font-medium hidden sm:inline">
                         Calificación de la reseña:
                     </span>
-                    {/* Renderizado dinámico de estrellas (Rating) */}
                     <div className="flex text-gold-button text-xs tracking-wider">
                         {"★".repeat(resena.calificacionResena)}{"☆".repeat(5 - resena.calificacionResena)}
                     </div>
@@ -112,28 +171,46 @@ const ResenaCard = ({ resena }) => {
  * Gestiona el conjunto de datos y el layout de la sección.
  */
 const ResenasRecientes = () => {
-    // MOCK DATA: Simulación de datos provenientes de una Base de Datos
-    const resenas = [
-        {
-            id: 1,
-            usuario: "Ana Lee",
-            arroba: "ana_lee",
-            fecha: "12 mayo",
-            userImg: mujerImg,    
-            libro: "Cien años de soledad",
-            autor: "Gabriel García Márquez",
-            libroImg: libroCienAnos,
-            estrellas: 5,
-            calificacionResena: 4,
-            comentario: "Una obra maestra absoluta. García Márquez teje una narrativa tan rica y compleja que te sumerge completamente en Macondo. Cada relectura revela nuevas capas de significado.",
-            citas: [
-                { texto: "Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota...", pagina: "1" },
-                { texto: "La vida no es sino una continua sucesión de oportunidades para sobrevivir.", pagina: "156" }
-            ],
-            likes: 3,
-            comments: 1
-        }
-    ];
+    const { token } = useContext(ContextoSesion);
+    const [resenas, setResenas] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const cargarResenas = async () => {
+            try {
+                setCargando(true);
+                setError(null);
+                const data = await obtenerResenasRecientes(5, token);
+                const mapeadas = data.map((resena) => ({
+                    id: resena.idResena,
+                    idLibro: resena.idLibro,
+                    usuario: resena.nombreUsuario,
+                    arroba: resena.nombreUsuario,
+                    fecha: formatearFecha(resena.fechaPublicacion),
+                    userImg: resena.avatarUsuario,
+                    libro: resena.tituloLibro,
+                    autor: resena.nombreAutor,
+                    libroImg: resena.imagenLibro,
+                    estrellas: resena.calificacionLibro ?? 0,
+                    calificacionResena: resena.calificacionResena ?? 0,
+                    comentario: resena.textoResena,
+                    citas: resena.citas ?? [],
+                    likes: resena.likes ?? 0,
+                    likeActivo: resena.likeActivo ?? false,
+                    comments: resena.totalComentarios ?? 0,
+                }));
+                setResenas(mapeadas);
+            } catch (err) {
+                console.error('Error al cargar reseñas recientes:', err);
+                setError('No se pudieron cargar las reseñas recientes.');
+            } finally {
+                setCargando(false);
+            }
+        };
+
+        cargarResenas();
+    }, [token]);
 
     return (
         <section className="py-20 px-10 bg-[#FDF8F3] dark:bg-dark-fondo transition-colors duration-300">
@@ -142,8 +219,19 @@ const ResenasRecientes = () => {
                     Reseñas recientes
                 </h2>                
             </div>
+
+            {cargando && (
+                <p className="text-center text-gray-500 dark:text-gray-400 font-inter">Cargando reseñas...</p>
+            )}
+
+            {error && (
+                <p className="text-center text-red-500 font-inter">{error}</p>
+            )}
+
+            {!cargando && !error && resenas.length === 0 && (
+                <p className="text-center text-gray-500 dark:text-gray-400 font-inter">Aún no hay reseñas publicadas.</p>
+            )}
             
-            {/* Iteración sobre el arreglo de reseñas */}
             {resenas.map(resena => (
                 <ResenaCard key={resena.id} resena={resena} />
             ))}

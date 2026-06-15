@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import EnlaceRuta from '../EnlaceRuta';
 
 /**
  * NavLink - Componente de enlace de navegación optimizado.
@@ -35,7 +35,7 @@ const NavLink = ({ href, children, esMovil = false, onClick }) => {
   const estilosMovil = "text-navy-letter dark:text-white text-xl font-semibold w-full text-center py-4 hover:text-gold-books-2";
 
   return (
-    <Link 
+    <EnlaceRuta 
       to={href} 
       onClick={onClick} 
       className={`
@@ -44,7 +44,7 @@ const NavLink = ({ href, children, esMovil = false, onClick }) => {
       `}
     >
       {children}
-    </Link>
+    </EnlaceRuta>
   );
 };
 

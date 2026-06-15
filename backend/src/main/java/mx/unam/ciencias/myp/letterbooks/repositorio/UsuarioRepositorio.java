@@ -18,35 +18,36 @@ import mx.unam.ciencias.myp.letterbooks.modelo.Usuario;
  */
 @Repository
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Integer> {
-    
-    @Query("SELECT u FROM Usuario u WHERE u.nombreUsuario = :nombreUsuario")
-    Optional<Usuario> encontrarPorNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 
     /**
      * Busca un usuario por su nombre de usuario.
      * @param nombreUsuario nombre único del usuario
      * @return un Optional con el usuario si existe, o vacío si no se encuentra
      */
-    Optional<Usuario> findByNombreUsuario(String nombreUsuario);
+    @Query("SELECT u FROM Usuario u WHERE u.nombreUsuario = :nombreUsuario")
+    Optional<Usuario> encontrarPorNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 
     /**
      * Busca un usuario por su correo electrónico.
      * @param correo correo electrónico del usuario
      * @return un Optional con el usuario si existe, o vacío si no se encuentra
      */
-    Optional<Usuario> findByCorreo(String correo);
+    @Query("SELECT u FROM Usuario u WHERE u.correo = :correo")
+    Optional<Usuario> encontrarPorCorreo(@Param("correo") String correo);
 
     /**
      * Verifica si existe un usuario con el nombre de usuario dado.
      * @param nombreUsuario nombre de usuario a verificar
      * @return true si existe al menos un usuario con ese nombre, false en caso contrario
      */
-    boolean existsByNombreUsuario(String nombreUsuario);
+    @Query("SELECT COUNT(u) > 0 FROM Usuario u WHERE u.nombreUsuario = :nombreUsuario")
+    boolean existePorNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 
     /**
      * Verifica si existe un usuario con el correo electrónico dado.
      * @param correo correo a verificar
      * @return true si existe al menos un usuario con ese correo, false en caso contrario
      */
-    boolean existsByCorreo(String correo);    
+    @Query("SELECT COUNT(u) > 0 FROM Usuario u WHERE u.correo = :correo")
+    boolean existePorCorreo(@Param("correo") String correo);    
 }

@@ -1,0 +1,128 @@
+.tarjeta-formulario-resena {
+    background-color: var(--color-dark-borde, #1E1E1E);
+    border: 1px solid var(--color-navy-button-hover, #323D4D);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.subtitulo-formulario {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-crema-fondo, #FDF8F3);
+    margin-bottom: 20px;
+}
+
+.etiqueta-formulario {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.contenedor-estrellas-interactivas {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.icono-estrella {
+    font-size: 1.75rem;
+    color: #475569;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out, transform 0.1s;
+}
+
+.icono-estrella.activa {
+    color: var(--color-gold-button, #d4a049);
+}
+
+.icono-estrella:hover {
+    transform: scale(1.15);
+}
+
+.area-texto-opinion {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 16px;
+    background-color: var(--color-dark-fondo, #121212);
+    color: var(--color-crema-fondo, #FDF8F3);
+    border: 1px solid var(--color-navy-button-hover, #323D4D);
+    border-radius: 8px;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.contenedor-previsualizacion-citas {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pildora-cita-previa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-dark-fondo, #121212);
+    border-left: 3px solid var(--color-gold-button, #d4a049);
+    padding: 10px 14px;
+    border-radius: 6px;
+}
+
+.resumen-texto-pildora {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: #cbd5e1;
+    margin: 0;
+}
+
+.boton-remover-pildora {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.boton-remover-pildora:hover {
+    color: #ef4444;
+}
+
+.mensaje-limite-citas {
+    font-size: 0.8rem;
+    color: var(--color-gold-button, #d4a049);
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+
+.acciones-formulario-pie {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.boton-pildora {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.boton-pildora.primario {
+    background-color: var(--color-navy-button, #1B2A47);
+    color: var(--color-crema-fondo, #FDF8F3);
+}
+
+.boton-pildora.cancelar {
+    background-color: var(--color-navy-button-hover, #323D4D);
+    color: #cbd5e1;
+}

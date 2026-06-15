@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-#BACKEND (Java/Maven) 
+#BACKEND (Java/Maven)
 target/
 *.class
 *.jar
@@ -10,20 +9,11 @@ target/
 .project
 .settings/
 .classpath
+almacenamiento/usuarios/avatares/
+almacenamiento/usuarios/banners/
+almacenamiento/usuarios/portadas/
 
 #FRONTEND (React/Vite)
-frontend/node_modules/
-frontend/dist/
-
-# Logs de errores de Node
-npm-debug.log*
-
-# Variables de entorno
-.env
-.env.local
-=======
-target/
-
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
@@ -33,10 +23,12 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/pnpm-debug.log*
+npm-debug.log*
 
 frontend/.env
 frontend/.env.*
+.env
+.env.local
 
 frontend/.DS_Store
 frontend/Thumbs.db
->>>>>>> 3d790db

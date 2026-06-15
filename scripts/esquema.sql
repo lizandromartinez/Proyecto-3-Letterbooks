@@ -6,17 +6,34 @@ USE letterbooks;
 -- 2. Creamos tablas independientes.
 CREATE TABLE genero (
     id_genero INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_genero VARCHAR(100) NOT NULL
+    nombre_genero VARCHAR(100) NOT NULL,
+    origen VARCHAR(255),               
+    descripcion TEXT,        
+    libro_iconico VARCHAR(255)             
 );
 
 CREATE TABLE autor (
     id_autor INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_autor VARCHAR(150) NOT NULL
+    nombre_autor VARCHAR(150) NOT NULL,
+    biografia TEXT,
+    fecha_nacimiento VARCHAR(10),
+    foto VARCHAR(255)
 );
 
 CREATE TABLE editorial (
     id_editorial INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_editorial VARCHAR(150) NOT NULL
+    nombre_editorial VARCHAR(150) NOT NULL,
+    pais_origen VARCHAR(100),
+    ano_fundacion INT,
+    descripcion TEXT
+);
+
+CREATE TABLE premio (                
+    id_premio INT AUTO_INCREMENT PRIMARY KEY,
+    id_autor INT NOT NULL,
+    nombre_premio VARCHAR(255) NOT NULL,
+    ano_ganado INT,
+    FOREIGN KEY (id_autor) REFERENCES autor(id_autor) 
 );
 
 CREATE TABLE tipo_accion (
@@ -39,6 +56,7 @@ CREATE TABLE libro (
     id_genero INT,
     id_autor INT,
     id_editorial INT,
+    id_usuario INT,
     titulo VARCHAR(255) NOT NULL,
     sinopsis TEXT,
     imagen VARCHAR(255),	
@@ -49,7 +67,8 @@ CREATE TABLE libro (
     promedio_calificacion DECIMAL(3,2) DEFAULT 0.00,
     FOREIGN KEY (id_genero) REFERENCES genero(id_genero),
     FOREIGN KEY (id_autor) REFERENCES autor(id_autor),
-    FOREIGN KEY (id_editorial) REFERENCES editorial(id_editorial)
+    FOREIGN KEY (id_editorial) REFERENCES editorial(id_editorial),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 -- 5. Tabla Perfil
@@ -90,6 +109,8 @@ CREATE TABLE cita (
     id_cita INT AUTO_INCREMENT PRIMARY KEY,
     id_resena INT NOT NULL,
     texto TEXT NOT NULL,
+    pagina INT,
+    likes INT DEFAULT 0,
     FOREIGN KEY (id_resena) REFERENCES resena(id_resena) 
 );
 
@@ -159,3 +180,4 @@ CREATE TABLE logs (
 );
 
 
+	

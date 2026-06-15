@@ -9,6 +9,7 @@ Este documento guía nuestra forma de trabajar para que el código sea legible y
 * **docs/[nombre]**: Para agregar documentación nueva (ej: `docs/convenciones`).
 * **db/[nombre]**: Para agregar cambios a la base de datos (ej: `db/agregar-registros`).
 * **fix/[error]**: Para corregir errores específicos (ej: `feature/error-registro`).
+* **merge**: Para combinar lo que se mostrara en las presentaciones.
 
 ### Mensajes de Commit
 Usaremos un formato descriptivo sencillo:
